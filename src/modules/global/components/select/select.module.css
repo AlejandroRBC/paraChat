@@ -1,0 +1,155 @@
+/* src/modules/global/components/Select/Select.module.css */
+
+  
+  .root {
+    position: relative;
+  }
+  
+  .input {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .label {
+    display: block;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #034C8C;
+    letter-spacing: 0.3px;
+    position: relative;
+  }
+  
+  .label[data-required="true"] {
+    color: #034C8C;
+  }
+  
+  .requiredStar {
+    color: #dc3545;
+    font-weight: 800;
+  }
+  
+  .description {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  
+  .chevron {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .optionContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 2px 0;
+  }
+  
+  .optionText {
+    flex: 1;
+    font-weight: 500;
+  }
+  
+  .checkIcon {
+    color: currentColor;
+    opacity: 0.9;
+  }
+  
+  .error {
+    margin-top: 6px;
+  }
+  
+  .errorText {
+    font-size: 12px;
+    font-weight: 600;
+    color: #dc3545;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    animation: slideIn 0.3s ease;
+  }
+  
+  .errorText::before {
+    content: '⚠';
+    font-size: 10px;
+  }
+  
+  .dropdown {
+    animation: dropdownAppear 0.2s ease;
+  }
+  
+  .option {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .option:hover::before {
+    left: 100%;
+  }
+  
+  .section {
+    transition: all 0.2s ease;
+  }
+  
+  /* Animaciones */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes dropdownAppear {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  /* Estados especiales */
+  .input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+  
+  /* Efecto de onda al hacer clic */
+  .input:active:not(:disabled) {
+    transform: scale(0.99);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container {
+      margin-bottom: 20px;
+    }
+    
+    .input {
+      font-size: 16px; /* Previene zoom en iOS */
+    }
+  }
