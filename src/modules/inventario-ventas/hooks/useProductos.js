@@ -62,7 +62,7 @@ const productosMock = [
     presentacion: 'Tabletas 850mg',
     precio_base: 18.00,
     precio_venta: 27.50,
-    stock: 85,
+    stock: 0,
     fecha_expiracion: '2026-01-25',
     laboratorio: 'Diabetech',
     porcentaje_g: 45
@@ -88,7 +88,7 @@ const productosMock = [
     presentacion: 'Gotas 2.5mg/ml',
     precio_base: 35.00,
     precio_venta: 52.50,
-    stock: 40,
+    stock:0,
     fecha_expiracion: '2025-10-05',
     laboratorio: 'NeuroCorp',
     porcentaje_g: 30
@@ -101,7 +101,7 @@ const productosMock = [
     presentacion: 'Efervescente',
     precio_base: 15.00,
     precio_venta: 24.00,
-    stock: 180,
+    stock: 0,
     fecha_expiracion: '2026-12-30',
     laboratorio: 'VitaMax',
     porcentaje_g: 60

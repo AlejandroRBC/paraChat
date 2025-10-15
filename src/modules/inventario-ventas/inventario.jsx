@@ -61,6 +61,7 @@ function Inventario() {
   } = useModales();
   
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
+  const [mostrarSinStock, setMostrarSinStock] = useState(false); // Nuevo estado para el switch
 
   const handleRealizarVenta = (datosCliente) => {
     console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
@@ -91,11 +92,20 @@ function Inventario() {
 
   const [busqueda, setBusqueda] = useState('');
   
-  // Filtrar productos basado en búsqueda
-  const productosFiltrados = productos.filter(p =>
-    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
-    p.codigo.includes(busqueda.toUpperCase())
-  );
+  // Filtrar productos basado en búsqueda y estado del switch
+  const productosFiltrados = productos.filter(p => {
+    const coincideBusqueda = 
+      p.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
+      p.codigo.includes(busqueda.toUpperCase());
+    
+    // Si el switch está activado, mostrar solo productos con stock <= 0
+    if (mostrarSinStock) {
+      return coincideBusqueda && p.stock <= 0;
+    }
+    
+    // Si no, mostrar todos los productos que coincidan con la búsqueda
+    return coincideBusqueda;
+  });
   
   const resultadosParaBuscador = productosFiltrados.map(p => ({
     id: p.id,
@@ -182,11 +192,25 @@ function Inventario() {
         </Flex>
 
         
-        <Switch
-          defaultNotChecked
-          color="red"
-          size="md"
-        />
+        {/* Switch para mostrar productos sin stock */}
+        <Flex align="center" gap="md" mb="xl">
+          <Switch
+            checked={mostrarSinStock}
+            onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
+            color="red"
+            size="md"
+            label={
+              <Text size="sm" fw={500}>
+                {mostrarSinStock ? "Mostrando productos sin stock" : "Mostrar productos sin stock"}
+              </Text>
+            }
+          />
+          {mostrarSinStock && (
+            <Badge color="red" variant="light">
+              {productosFiltrados.length} productos sin stock
+            </Badge>
+          )}
+        </Flex>
         
         {/* Tabla de productos */}
         <ProductoList 
@@ -194,6 +218,7 @@ function Inventario() {
           onAgregarCarrito={agregarAlCarrito}
           onEditar={abrirModalProducto} 
           onEliminar={eliminarProducto}
+          mostrarSinStock={mostrarSinStock} // Pasar el estado al componente
         />
         
         {/* Botones de acción */}

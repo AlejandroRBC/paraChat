@@ -1,5 +1,5 @@
-import { useState } from 'react';
 
+import { useState } from 'react';
 import { 
   ScrollArea, 
   Box, 
@@ -11,18 +11,25 @@ import {
   ThemeIcon,
   Badge,
   Stack,
-  Divider,
   Modal,
-  TextInput, Select
+  TextInput, 
+  Select,
+  Alert
 } from '@mantine/core';
-import { IconPlus, 
+import { 
+  IconPlus, 
   IconMinus, 
   IconTrash, 
   IconUser,
   IconShoppingCartExclamation,
   IconReceiptDollar,
   IconInvoice,
-  IconCancel } from '@tabler/icons-react';
+  IconDownload,
+  IconPrinter,
+  IconCheck
+} from '@tabler/icons-react';
+import { generarPDFVenta,
+  imprimirComprobante } from '../utils/generarPDF';
 
 function VentaForm({ 
   carrito, 
@@ -34,6 +41,9 @@ function VentaForm({
   onCancel 
 }) {
   const [modalClienteAbierto, setModalClienteAbierto] = useState(false);
+  const [modalExitoAbierto, setModalExitoAbierto] = useState(false);
+  const [datosVentaConfirmada, setDatosVentaConfirmada] = useState(null);
+  const [numeroVentaGenerado, setNumeroVentaGenerado] = useState('');
   const [datosCliente, setDatosCliente] = useState({
     nombre: '',
     ci_nit: '',
@@ -53,9 +63,14 @@ function VentaForm({
       alert('El carrito está vacío');
       return;
     }
+    
+    const numeroVenta = `V${String(Math.floor(Math.random() * 100000)).padStart(6, '0')}`;
+    setNumeroVentaGenerado(numeroVenta);
+    setDatosVentaConfirmada(datosCliente);
     onRealizarVenta(datosCliente);
+    setModalExitoAbierto(true);
     setModalClienteAbierto(false);
-    // Resetear datos del cliente después de la venta
+    
     setDatosCliente({
       nombre: '',
       ci_nit: '',
@@ -76,26 +91,36 @@ function VentaForm({
       alert('El carrito está vacío');
       return;
     }
-    // Lógica para venta rápida (sin datos de cliente)
+    
+    const numeroVenta = `V${String(Math.floor(Math.random() * 100000)).padStart(6, '0')}`;
     const datosVentaRapida = {
       nombre: 'S/N',
       ci_nit: '00000',
       metodo_pago: 'efectivo'
     };
+    
+    setNumeroVentaGenerado(numeroVenta);
+    setDatosVentaConfirmada(datosVentaRapida);
     onRealizarVenta(datosVentaRapida);
+    setModalExitoAbierto(true);
   };
 
-  if (carrito.length === 0) {
+  const cerrarModalExito = () => {
+    setModalExitoAbierto(false);
+    onCancel();
+  };
+
+  if (carrito.length === 0 && !datosVentaConfirmada) {
     return (
       <Box ta="center" py="xl">
-          <ActionIcon 
-            variant="subtle" 
-            color="blue" 
-            size="xl" 
-            onClick={onCancel}
-          >
-            <IconShoppingCartExclamation size ={80}/>
-          </ActionIcon>
+        <ActionIcon 
+          variant="subtle" 
+          color="blue" 
+          size="xl" 
+          onClick={onCancel}
+        >
+          <IconShoppingCartExclamation size={80} />
+        </ActionIcon>
         <Text c="dimmed" mb="lg">El carrito está vacío</Text>
         <Button onClick={onCancel} variant="light">
           Continuar Comprando
@@ -107,7 +132,6 @@ function VentaForm({
   return (
     <>
       <Box>
-        {/* Lista de productos en el carrito */}
         <ScrollArea flex={1} mb="md">
           <Stack gap="sm">
             {carrito.map(item => (
@@ -177,7 +201,6 @@ function VentaForm({
           </Stack>
         </ScrollArea>
 
-        {/* Total */}
         <Box py="md" style={{ borderTop: '2px solid #e9ecef' }}>
           <Group justify="space-between" mb="md">
             <Text fw={700} size="lg">Total:</Text>
@@ -187,51 +210,41 @@ function VentaForm({
           </Group>
         </Box>
 
-        {/* Botones de acción */}
         <Stack gap>
           <Group grow>
-          <Button 
-            onClick={abrirModalVenta}
-            size="md"
-            fullWidth
-          >
-            <IconReceiptDollar/>
-            Venta
-          </Button>
+            <Button 
+              onClick={abrirModalVenta}
+              size="md"
+              fullWidth
+            >
+              <IconReceiptDollar size={16} />
+              Venta
+            </Button>
 
-          <Button 
-            onClick={handleVentaRapida}
-            size="md"
-            fullWidth
-            variant="light"
-          >
-            <IconInvoice/>
-            Venta Rápida
-          </Button>
-
+            <Button 
+              onClick={handleVentaRapida}
+              size="md"
+              fullWidth
+              variant="light"
+            >
+              <IconInvoice size={16} />
+              Venta Rápida
+            </Button>
           </Group>
-           <Flex
-            gap="md"
-            justify="center"
-            align="flex-start"
-            direction="row"
-            wrap="wrap"
-          >
+          <Flex gap="md" justify="center" align="flex-start" direction="row" wrap="wrap">
             <Button 
               variant="light" 
               onClick={onVaciarCarrito}
               size="md"
             >
-              <IconTrash/> Vaciar
+              <IconTrash size={16} />
+              Vaciar
             </Button>
           </Flex>
-          <Group grow>
-            
-          </Group>
         </Stack>
       </Box>
 
-      {/* Modal para datos del cliente */}
+      {/* Modal Datos del Cliente */}
       <Modal
         opened={modalClienteAbierto}
         onClose={() => setModalClienteAbierto(false)}
@@ -243,11 +256,7 @@ function VentaForm({
         }
         size="md"
         overlayProps={{ opacity: 0.5, blur: 4 }}
-        styles={{
-          content: {
-            borderRadius: '12px',
-          }
-        }}
+        styles={{ content: { borderRadius: '12px' } }}
       >
         <Box component="form" onSubmit={handleSubmit}>
           <Stack gap="md">
@@ -307,11 +316,79 @@ function VentaForm({
           </Stack>
         </Box>
       </Modal>
+
+      {/* Modal Éxito y Opciones */}
+      {datosVentaConfirmada && (
+        <Modal
+          opened={modalExitoAbierto}
+          onClose={cerrarModalExito}
+          title={
+            <Group gap="sm">
+              <IconCheck size={20} color="green" />
+              <Text fw={600}>¡Venta Realizada!</Text>
+            </Group>
+          }
+          size="md"
+          centered
+        >
+          <Stack gap="md">
+                
+
+            <Box
+              p="md"
+              style={{
+                border: '2px solid #1871c1',
+                borderRadius: '8px',
+                backgroundColor: '#f0f7ff'
+              }}
+            >
+              <Text fw={600} mb="xs">Comprobante: #{numeroVentaGenerado}</Text>
+              <Text size="sm" c="dimmed">Cliente: {datosVentaConfirmada.nombre}</Text>
+              <Text size="sm" c="dimmed">Total: Bs {totalVenta.toFixed(2)}</Text>
+            </Box>
+
+            <Group grow>
+              <Button
+                leftSection={<IconDownload size={16} />}
+                onClick={() => generarPDFVenta(datosVentaConfirmada, carrito, totalVenta, numeroVentaGenerado)}
+              >
+                Descargar PDF
+              </Button>
+              
+              <Button
+                leftSection={<IconPrinter size={16} />}
+                variant="light"
+                onClick={() => imprimirComprobante(datosVentaConfirmada, carrito, totalVenta, numeroVentaGenerado)}
+              >
+                Imprimir
+              </Button>
+            </Group>
+
+          </Stack>
+          <br/>
+          <Flex
+            
+            gap="md"
+            justify="center"
+            align="center"
+            direction="row"
+            wrap="wrap"
+          >
+            <Button
+              onClick={cerrarModalExito}
+              variant="light"
+            >
+              Continuar
+            </Button>
+          </Flex>
+
+
+          
+            
+        </Modal>
+      )}
     </>
   );
 }
-
-
-
 
 export default VentaForm;
