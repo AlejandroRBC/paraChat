@@ -1,18 +1,23 @@
 import { 
   IconBell,
-  IconShoppingCart
+  IconShoppingCart,
+  IconShoppingCartFilled,
+  IconX
 } from '@tabler/icons-react';
 import { 
+  ThemeIcon,
   Stack,
+  Switch,
   Badge,
   Text,
   Container,
   Flex,
-  ThemeIcon,
   ActionIcon,
   Button,
   Space,
-  Group
+  Group,
+  Drawer,
+  AppShell
 } from '@mantine/core';
 import { useState } from 'react';
 import { useProductos } from './hooks/useProductos';
@@ -48,20 +53,31 @@ function Inventario() {
   const {
     modalProducto,
     modalLaboratorio,
-    modalVenta,
     abrirModalProducto,
     cerrarModalProducto,
     abrirModalLaboratorio,
     cerrarModalLaboratorio,
-    abrirModalVenta,
-    cerrarModalVenta
+    
   } = useModales();
   
+  const [sidebarAbierto, setSidebarAbierto] = useState(false);
+
   const handleRealizarVenta = (datosCliente) => {
     console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
-    alert(`Venta realizada exitosamente!\nTotal: ${totalVenta} Bs\nCliente: ${datosCliente.nombre}`);
+    
+    // Mostrar resumen de la venta
+    const productosVendidos = carrito.map(item => 
+      `${item.nombre} x${item.cantidad} = Bs ${(item.precio_venta * item.cantidad).toFixed(2)}`
+    ).join('\n');
+    
+    alert(`✅ Venta realizada exitosamente!\n\n` +
+          `Cliente: ${datosCliente.nombre}\n` +
+          `Método de pago: ${datosCliente.metodo_pago}\n` +
+          `Total: Bs ${totalVenta.toFixed(2)}\n\n` +
+          `Productos:\n${productosVendidos}`);
+    
     vaciarCarrito();
-    cerrarModalVenta();
+    // No cerramos el sidebar aquí para permitir múltiples ventas
   };
 
   const handleSubmitProducto = (datos) => {
@@ -96,159 +112,176 @@ function Inventario() {
   const cantidadCarrito = carrito.reduce((total, item) => total + item.cantidad, 0);
 
   return (
-    <Container size="100%" py="xl" px="md">
-      
-      {/* Header con título centrado y carrito a la derecha */}
-<Flex
-  justify="space-between"
-  align="center"
-  mb="xl"
-  gap="md"
-  style={{ position: 'relative' }}
->
-  {/* Espacio vacío para balancear el flex */}
-  <div style={{ width: '40px' }}></div>
+    <>
+      <Container size="100%" py="xl" px="md">
+        
+        {/* Header con título centrado y carrito a la derecha */}
+        <Flex
+          justify="space-between"
+          align="center"
+          mb="xl"
+          gap="md"
+          style={{ position: 'relative' }}
+        >
+          {/* Espacio vacío para balancear el flex */}
+          <div style={{ width: '40px' }}></div>
 
-  {/* Título centrado */}
-  <Text 
-    className="dashboard-title" 
-    size="xl"
-    style={{ 
-      position: 'absolute', 
-      left: '50%', 
-      transform: 'translateX(-50%)' 
-    }}
-  >
-    INVENTARIO
-  </Text>
+          {/* Título centrado */}
+          <Text 
+            className="dashboard-title" 
+            size="xl"
+            style={{ 
+              position: 'absolute', 
+              left: '50%', 
+              transform: 'translateX(-50%)' 
+            }}
+          >
+            INVENTARIO
+          </Text>
 
-  {/* Carrito alineado a la derecha */}
-  <ActionIcon 
-    variant="subtle" 
-    color="blue" 
-    size="xl" 
-    onClick={abrirModalVenta}
-    style={{ position: 'relative', cursor: 'pointer' }}
-  >
-    <IconShoppingCart size={32} />
-    {cantidadCarrito > 0 && (
-      <Badge 
-        size="sm" 
-        circle 
-        color="red"
-        style={{ 
-          position: 'absolute', 
-          top: 2, 
-          right: 2,
-          
-        }}
-      >
-        {cantidadCarrito}
-      </Badge>
-    )}
-  </ActionIcon>
-</Flex>
+          {/* Carrito alineado a la derecha */}
+          <ActionIcon 
+            variant="subtle" 
+            color="blue" 
+            size="xl" 
+            onClick={() => setSidebarAbierto(true)}
+            style={{ position: 'relative', cursor: 'pointer' }}
+          >
+            <IconShoppingCart size={32} />
+            {cantidadCarrito > 0 && (
+              <Badge 
+                size="sm" 
+                circle 
+                color="red"
+                style={{ 
+                  position: 'absolute', 
+                  top: 2, 
+                  right: 2,
+                }}
+              >
+                {cantidadCarrito}
+              </Badge>
+            )}
+          </ActionIcon>
+        </Flex>
 
-      {/* Barra de búsqueda centrada */}
-      <Flex
-        justify="center"
-        mb="xl"
-      >
-        <div style={{ width: '100%', maxWidth: '500px' }}>
-          <Buscador
-            placeholder="Buscar por nombre o código..."
-            value={busqueda}
-            onChange={setBusqueda} 
-            results={resultadosParaBuscador}
-            onResultSelect={handleResultSelect} 
-          />
-        </div>
-      </Flex>
-      
-      {/* Tabla de productos */}
-      
+        {/* Barra de búsqueda centrada */}
+        <Flex
+          justify="center"
+          mb="xl"
+        >
+          <div style={{ width: '100%', maxWidth: '500px' }}>
+            <Buscador
+              placeholder="Buscar por nombre o código..."
+              value={busqueda}
+              onChange={setBusqueda} 
+              results={resultadosParaBuscador}
+              onResultSelect={handleResultSelect} 
+            />
+          </div>
+        </Flex>
+
+        
+        <Switch
+          defaultNotChecked
+          color="red"
+          size="md"
+        />
+        
+        {/* Tabla de productos */}
         <ProductoList 
           productos={productosFiltrados}
           onAgregarCarrito={agregarAlCarrito}
           onEditar={abrirModalProducto} 
           onEliminar={eliminarProducto}
         />
-      {/* Botones de acción */}
-      <Flex
-        gap="lg"
-        justify="center"
-        align="center"
-        direction="row"
-        wrap="wrap"
-        p="md"
-      >
-        <Button 
-          size="md"
-          variant="light"
-          onClick={() => abrirModalProducto()}
-        >
-          Registrar Nuevo Producto
-        </Button>
         
-        <Button 
-          size="md" 
-          variant="light"
-          onClick={abrirModalLaboratorio}
+        {/* Botones de acción */}
+        <Flex
+          gap="lg"
+          justify="center"
+          align="center"
+          direction="row"
+          wrap="wrap"
+          p="md"
         >
-          Registrar Nuevo Laboratorio
-        </Button>
-      </Flex>
+          <Button 
+            size="md"
+            variant="light"
+            onClick={() => abrirModalProducto()}
+          >
+            Registrar Nuevo Producto
+          </Button>
+          
+          <Button 
+            size="md" 
+            variant="light"
+            onClick={abrirModalLaboratorio}
+          >
+            Registrar Nuevo Laboratorio
+          </Button>
+        </Flex>
 
-      {/* Modal Agregar/Editar Producto */}
-      {modalProducto.abierto && (
-        <Modal 
-          titulo={modalProducto.producto ? "Editar Producto" : "Agregar Nuevo Producto"}
-          onClose={cerrarModalProducto}
-        >
-          <ProductoForm
-            laboratorios={laboratorios}
-            producto={modalProducto.producto}
-            onSubmit={handleSubmitProducto}
-            onCancel={cerrarModalProducto}
-          />
-        </Modal>
-      )}
+        {/* Modal Agregar/Editar Producto */}
+        {modalProducto.abierto && (
+          <Modal 
+            titulo={modalProducto.producto ? "Editar Producto" : "Agregar Nuevo Producto"}
+            onClose={cerrarModalProducto}
+          >
+            <ProductoForm
+              laboratorios={laboratorios}
+              producto={modalProducto.producto}
+              onSubmit={handleSubmitProducto}
+              onCancel={cerrarModalProducto}
+            />
+          </Modal>
+        )}
 
-      {/* Modal Agregar Laboratorio */}
-      {modalLaboratorio && (
-        <Modal 
-          titulo="Agregar Nuevo Laboratorio"
-          onClose={cerrarModalLaboratorio}
-        >
-          <LaboratorioForm
-            onSubmit={(datosLaboratorio) => {
-              agregarLaboratorio(datosLaboratorio);
-              cerrarModalLaboratorio();
-            }}
-            onCancel={cerrarModalLaboratorio}
-          />
-        </Modal>
-      )}
+        {/* Modal Agregar Laboratorio */}
+        {modalLaboratorio && (
+          <Modal 
+            titulo="Agregar Nuevo Laboratorio"
+            onClose={cerrarModalLaboratorio}
+          >
+            <LaboratorioForm
+              onSubmit={(datosLaboratorio) => {
+                agregarLaboratorio(datosLaboratorio);
+                cerrarModalLaboratorio();
+              }}
+              onCancel={cerrarModalLaboratorio}
+            />
+          </Modal>
+        )}
+      </Container>
 
-      {/* Modal Venta */}
-      {modalVenta && (
-        <Modal 
-          titulo="Realizar Venta"
-          tamaño="grande"
-          onClose={cerrarModalVenta}
-        >
-          <VentaForm
-            carrito={carrito}
-            totalVenta={totalVenta}
-            onModificarCantidad={modificarCantidad}
-            onEliminarItem={eliminarDelCarrito}
-            onVaciarCarrito={vaciarCarrito}
-            onRealizarVenta={handleRealizarVenta}
-            onCancel={cerrarModalVenta}
-          />
-        </Modal>
-      )}
-    </Container>
+      {/* Sidebar del Carrito */}
+      <Drawer
+        opened={sidebarAbierto}
+        onClose={() => setSidebarAbierto(false)}
+        position="right"
+        size="md"
+        padding="md"
+      >
+        <Flex justify="space-between" align="center" mb="lg">
+          <ThemeIcon size="xl" variant="light">
+            <IconShoppingCartFilled/>  
+          </ThemeIcon>
+            <Text>
+              Carrito de Compras
+            </Text>
+        </Flex>
+        
+        <VentaForm
+          carrito={carrito}
+          totalVenta={totalVenta}
+          onModificarCantidad={modificarCantidad}
+          onEliminarItem={eliminarDelCarrito}
+          onVaciarCarrito={vaciarCarrito}
+          onRealizarVenta={handleRealizarVenta}
+          onCancel={() => setSidebarAbierto(false)}
+        />
+      </Drawer>
+    </>
   );
 }
 

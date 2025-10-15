@@ -33,10 +33,7 @@
 
 /* HEADER CON GRADIENTE AZUL-CIAN */
 .mantine-Table-thead {
-  background: linear-gradient(135deg, 
-    var(--mantine-color-blue-9) 0%, 
-    var(--mantine-color-blue-8) 50%, 
-    var(--mantine-color-cyan-9) 100%);
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
   position: sticky ;
   top: 0 ;
   z-index: 10 ;

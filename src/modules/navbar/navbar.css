@@ -1,10 +1,7 @@
 
 /* Navbar Superior - MÁS GRUESO Y CON ESTILO */
 .navbar-header {
-  background: linear-gradient(135deg, 
-    var(--mantine-color-blue-9) 0%, 
-    var(--mantine-color-blue-8) 50%, 
-    var(--mantine-color-cyan-9) 100%);
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
   border-bottom: 3px solid var(--mantine-color-blue-6);
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.15),
