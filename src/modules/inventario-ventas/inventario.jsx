@@ -29,7 +29,10 @@ import ProductoList from './components/ProductoList';
 import ProductoForm from './components/ProductoForm';
 import LaboratorioForm from './components/LaboratorioForm';
 import VentaForm from './components/VentaForm';
-import Modal from './components/Modal.jsx';
+import Modal from '../global/components/modal/Modal.jsx';
+
+
+
 
 function Inventario() {
   const {
@@ -65,20 +68,6 @@ function Inventario() {
 
   const handleRealizarVenta = (datosCliente) => {
     console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
-    
-    // Mostrar resumen de la venta
-    const productosVendidos = carrito.map(item => 
-      `${item.nombre} x${item.cantidad} = Bs ${(item.precio_venta * item.cantidad).toFixed(2)}`
-    ).join('\n');
-    
-    alert(`✅ Venta realizada exitosamente!\n\n` +
-          `Cliente: ${datosCliente.nombre}\n` +
-          `Método de pago: ${datosCliente.metodo_pago}\n` +
-          `Total: Bs ${totalVenta.toFixed(2)}\n\n` +
-          `Productos:\n${productosVendidos}`);
-    
-    vaciarCarrito();
-    // No cerramos el sidebar aquí para permitir múltiples ventas
   };
 
   const handleSubmitProducto = (datos) => {
@@ -124,7 +113,6 @@ function Inventario() {
   return (
     <>
       <Container size="100%" py="xl" px="md">
-        
         {/* Header con título centrado y carrito a la derecha */}
         <Flex
           justify="space-between"
@@ -149,6 +137,45 @@ function Inventario() {
             INVENTARIO
           </Text>
 
+          
+        </Flex>
+
+        {/* Barra de búsqueda centrada */}
+        <Flex
+          justify="center"
+          mb="xl"
+        >
+          <div style={{ width: '100%', maxWidth: '500px' }}>
+            <Buscador
+              placeholder="Buscar por nombre o código..."
+              value={busqueda}
+              onChange={setBusqueda} 
+              results={resultadosParaBuscador}
+              onResultSelect={handleResultSelect} 
+            />
+          </div>
+        </Flex>
+
+        
+        {/* Switch para mostrar productos sin stock */}
+        {mostrarSinStock && (
+            <Badge color="red" variant="light">
+              {productosFiltrados.length} productos sin stock
+            </Badge>
+        )}
+        <Flex gap="md"  justify="space-between">
+          <Switch
+            checked={mostrarSinStock}
+            onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
+            color="red"
+            size="md"
+            label={
+              <Text size="sm" fw={500}>
+                {mostrarSinStock ? "" : ""}
+              </Text>
+            }
+          />
+          
           {/* Carrito alineado a la derecha */}
           <ActionIcon 
             variant="subtle" 
@@ -173,43 +200,6 @@ function Inventario() {
               </Badge>
             )}
           </ActionIcon>
-        </Flex>
-
-        {/* Barra de búsqueda centrada */}
-        <Flex
-          justify="center"
-          mb="xl"
-        >
-          <div style={{ width: '100%', maxWidth: '500px' }}>
-            <Buscador
-              placeholder="Buscar por nombre o código..."
-              value={busqueda}
-              onChange={setBusqueda} 
-              results={resultadosParaBuscador}
-              onResultSelect={handleResultSelect} 
-            />
-          </div>
-        </Flex>
-
-        
-        {/* Switch para mostrar productos sin stock */}
-        <Flex align="center" gap="md" mb="xl">
-          <Switch
-            checked={mostrarSinStock}
-            onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
-            color="red"
-            size="md"
-            label={
-              <Text size="sm" fw={500}>
-                {mostrarSinStock ? "Mostrando productos sin stock" : "Mostrar productos sin stock"}
-              </Text>
-            }
-          />
-          {mostrarSinStock && (
-            <Badge color="red" variant="light">
-              {productosFiltrados.length} productos sin stock
-            </Badge>
-          )}
         </Flex>
         
         {/* Tabla de productos */}
@@ -304,6 +294,7 @@ function Inventario() {
           onVaciarCarrito={vaciarCarrito}
           onRealizarVenta={handleRealizarVenta}
           onCancel={() => setSidebarAbierto(false)}
+          
         />
       </Drawer>
     </>

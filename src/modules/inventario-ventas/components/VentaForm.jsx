@@ -38,7 +38,7 @@ function VentaForm({
   onEliminarItem, 
   onVaciarCarrito, 
   onRealizarVenta, 
-  onCancel 
+  onCancel
 }) {
   const [modalClienteAbierto, setModalClienteAbierto] = useState(false);
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false);
@@ -107,6 +107,7 @@ function VentaForm({
 
   const cerrarModalExito = () => {
     setModalExitoAbierto(false);
+    onVaciarCarrito();
     onCancel();
   };
 
@@ -332,7 +333,7 @@ function VentaForm({
           centered
         >
           <Stack gap="md">
-                
+            
 
             <Box
               p="md"
@@ -382,9 +383,6 @@ function VentaForm({
             </Button>
           </Flex>
 
-
-          
-            
         </Modal>
       )}
     </>

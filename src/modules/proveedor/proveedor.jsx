@@ -11,63 +11,63 @@ import {
   Divider,
   Box
 } from '@mantine/core';
-import { IconPlus, IconX, IconUsers, IconTrash } from '@tabler/icons-react';
-import { useClientes } from './hooks/useClientes';
-import { ClienteList } from './components/ClienteList';
-import { ClienteForm } from './components/ClienteForm';
+import { IconPlus, IconX, IconTruck, IconTrash } from '@tabler/icons-react';
+import { useProveedores } from './hooks/useProveedores';
+import { ProveedorList } from './components/ProveedorList';
+import { ProveedorForm } from './components/ProveedorForm';
 import { Buscador } from '../global/components/buscador/buscador';
 import { useMediaQuery } from 'react-responsive';
-import Modal from '../global/components/Modal/Modal'; // ← Importa tu Modal
-import './cliente.css';
+import Modal from '../global/components/Modal/Modal';
+import './proveedor.css';
 
-export function ClientePage() {
+export function ProveedorPage() {
   const {
-    clientes,
-    clientesOriginales,
-    clienteEditando,
+    proveedores,
+    proveedoresOriginales,
+    proveedorEditando,
     mostrarForm,
     busqueda,
     setBusqueda,
     resultadosBusqueda,
-    clienteAEliminar,
+    proveedorAEliminar,
     mostrarConfirmacion,
-    setClienteEditando,
+    setProveedorEditando,
     setMostrarForm,
-    crearCliente,
-    actualizarCliente,
-    eliminarCliente,
+    crearProveedor,
+    actualizarProveedor,
+    eliminarProveedor,
     solicitarEliminacion,
     cancelarEliminacion,
     manejarSeleccionResultado,
-  } = useClientes();
+  } = useProveedores();
 
   // Breakpoints responsive
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
   const isDesktop = useMediaQuery({ minWidth: 1025 });
 
-  const handleGuardarCliente = (datosCliente) => {
-    if (clienteEditando) {
-      actualizarCliente({ ...datosCliente, id: clienteEditando.id });
+  const handleGuardarProveedor = (datosProveedor) => {
+    if (proveedorEditando) {
+      actualizarProveedor({ ...datosProveedor, id: proveedorEditando.id });
     } else {
-      crearCliente(datosCliente);
+      crearProveedor(datosProveedor);
     }
     cerrarFormulario();
   };
 
-  const abrirNuevoCliente = () => {
-    setClienteEditando(null);
+  const abrirNuevoProveedor = () => {
+    setProveedorEditando(null);
     setMostrarForm(true);
   };
 
-  const abrirEditarCliente = (cliente) => {
-    setClienteEditando(cliente);
+  const abrirEditarProveedor = (proveedor) => {
+    setProveedorEditando(proveedor);
     setMostrarForm(true);
   };
 
   const cerrarFormulario = () => {
     setMostrarForm(false);
-    setClienteEditando(null);
+    setProveedorEditando(null);
   };
 
   // Calcular spans responsive
@@ -89,6 +89,7 @@ export function ClientePage() {
         <Text size="sm" fw={500}>
           {resultado.label}
         </Text>
+        
       </div>
       <Text size="xs" c="blue" className="result-category">
         {resultado.category}
@@ -97,13 +98,13 @@ export function ClientePage() {
   );
 
   return (
-    <div className="cliente-page">
+    <div className="proveedor-page">
       <Container size="xl" py="xl" px={isMobile ? "xs" : "md"}>
         {/* Header Responsive */}
         <Group justify="space-between" mb="xl" wrap={isMobile ? "wrap" : "nowrap"} gap={isMobile ? "md" : "lg"}>
           <Group gap="md" wrap="nowrap">
             <div className="header-icon">
-              <IconUsers size={isMobile ? 24 : 32} />
+              <IconTruck size={isMobile ? 24 : 32} />
             </div>
             <div>
               <Title 
@@ -111,10 +112,10 @@ export function ClientePage() {
                 className="gradient-title"
                 style={{ fontSize: isMobile ? '28px' : '32px' }}
               >
-                Gestión de Clientes
+                Gestión de Proveedores
               </Title>
               <Text c="dimmed" size={isMobile ? "xs" : "sm"}>
-                Administra tu lista de clientes
+                Administra tu lista de proveedores
               </Text>
             </div>
           </Group>
@@ -122,17 +123,17 @@ export function ClientePage() {
           {!mostrarForm && (
             <Button 
               leftSection={<IconPlus size={isMobile ? 14 : 18} />}
-              onClick={abrirNuevoCliente}
+              onClick={abrirNuevoProveedor}
               size={isMobile ? "sm" : "md"}
               fullWidth={isMobile}
             >
-              Nuevo Cliente
+              Nuevo Proveedor
             </Button>
           )}
         </Group>
 
         <Grid gutter={isMobile ? "md" : "xl"} align="start">
-          {/* Lista de clientes */}
+          {/* Lista de proveedores */}
           <Grid.Col span={gridSpans.lista}>
             <Paper withBorder p={isMobile ? "sm" : "md"} radius="md" className="list-container">
               <div className="card-header">
@@ -145,18 +146,19 @@ export function ClientePage() {
                 >
                   <div>
                     <Title order={isMobile ? 3 : 2} className="gradient-title">
-                      Lista de Clientes
+                      Lista de Proveedores
                     </Title>
                     <Text c="dimmed" size={isMobile ? "xs" : "sm"}>
-                      {clientes.length} de {clientesOriginales.length} clientes activos
+                      {proveedores.length} de {proveedoresOriginales.length} proveedores activos
                       {busqueda && ` - Buscando: "${busqueda}"`}
                     </Text>
                   </div>
                 </Group>
                 
+                {/* BUSCADOR RESPONSIVE */}
                 <Box className="buscador-container">
                   <Buscador
-                    placeholder="Buscar clientes..."
+                    placeholder="Buscar proveedores..."
                     value={busqueda}
                     onChange={setBusqueda}
                     onSearch={(valor) => console.log('Buscando:', valor)}
@@ -174,9 +176,9 @@ export function ClientePage() {
                 </Box>
               </div>
               <Divider my="md" />
-              <ClienteList
-                clientes={clientes}
-                onEditar={abrirEditarCliente}
+              <ProveedorList
+                proveedores={proveedores}
+                onEditar={abrirEditarProveedor}
                 onEliminar={solicitarEliminacion}
                 isMobile={isMobile}
               />
@@ -208,10 +210,10 @@ export function ClientePage() {
                   <Group justify="space-between" align="center" wrap="nowrap">
                     <div>
                       <Title order={isMobile ? 4 : 3} className="gradient-title">
-                        {clienteEditando ? 'Editar Cliente' : 'Nuevo Cliente'}
+                        {proveedorEditando ? 'Editar Proveedor' : 'Nuevo Proveedor'}
                       </Title>
                       <Text c="dimmed" size={isMobile ? "xs" : "sm"}>
-                        {clienteEditando ? 'Modifica la información' : 'Completa los datos'}
+                        {proveedorEditando ? 'Modifica la información' : 'Completa los datos'}
                       </Text>
                     </div>
                     <ActionIcon
@@ -224,9 +226,9 @@ export function ClientePage() {
                   </Group>
                 </div>
                 <Divider my="md" />
-                <ClienteForm
-                  cliente={clienteEditando}
-                  onGuardar={handleGuardarCliente}
+                <ProveedorForm
+                  proveedor={proveedorEditando}
+                  onGuardar={handleGuardarProveedor}
                   isMobile={isMobile}
                 />
               </Card>
@@ -236,7 +238,7 @@ export function ClientePage() {
 
         {/* Modal de Confirmación de Eliminación */}
         {mostrarConfirmacion && (
-          <Modal
+           <Modal
               titulo={<span className="titulo-gradiente">Confirmar Eliminación</span>}
               onClose={cancelarEliminacion}
               tamaño="normal"
@@ -247,10 +249,13 @@ export function ClientePage() {
               </div>
               
               <Text ta="center" size="lg" fw={600} mb="md">
-                ¿Estás seguro de que quieres eliminar este cliente?
+                ¿Estás seguro de que quieres eliminar este proveedor?
               </Text>
+              
+             
+
               <Text ta="center" c="dimmed" size="sm" mb="xl">
-                ⚠️ El cliente cambiará a estado "desactivado" y no aparecerá en la lista principal.
+                ⚠️ El proveedor cambiará a estado "desactivado" y no aparecerá en la lista principal.
               </Text>
 
               <Group justify="center" gap="md">
@@ -264,7 +269,7 @@ export function ClientePage() {
                 </Button>
                 <Button 
                   color="red" 
-                  onClick={() => eliminarCliente(clienteAEliminar?.id)}
+                  onClick={() => eliminarProveedor(proveedorAEliminar?.id)}
                   size="md"
                   leftSection={<IconTrash size={16} />}
                   className="btn-confirmar"

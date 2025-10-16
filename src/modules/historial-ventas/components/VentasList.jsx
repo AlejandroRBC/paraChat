@@ -102,7 +102,6 @@ function VentasList({ ventas }) {
                 <Table.Th className="mantine-Table-th">
                   idVenta
                 </Table.Th>
-
                 <Table.Th className="mantine-Table-th">
                   Fecha
                 </Table.Th>
@@ -116,7 +115,6 @@ function VentasList({ ventas }) {
                   Ci/Nit
                 </Table.Th>
                 <Table.Th className="mantine-Table-th">
-                  
                   metodo Pago
                 </Table.Th>
                 <Table.Th className="mantine-Table-th">

@@ -214,16 +214,15 @@ body {
     font-weight: 400;
 }
 
-/* ===== ESTILOS MODERNOS PARA MODALES ===== */
-/* ===== ESTILOS MODERNOS AZUL-CELESTE ===== */
-.modal-overlay {
+/* MODALES*/
+.mantine-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -231,7 +230,7 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
-.modal-content {
+.mantine-modal-content {
   background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
   border-radius: 16px;
   box-shadow: 
@@ -246,23 +245,13 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.9);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.mantine-modal-content.grande {
+  max-width: 800px;
 }
 
-@keyframes slideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-.modal-header {
+
+.mantine-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -270,10 +259,9 @@ body {
   border-bottom: 1px solid #e1f5fe;
   background: white;
   border-radius: 16px 16px 0 0;
-  color: white;
 }
 
-.modal-title {
+.mantine-modal-title {
   font-size: 1.4rem;
   font-weight: 700;
   margin: 0;
@@ -302,30 +290,59 @@ body {
   transform: rotate(90deg);
 }
 
-/* FORMULARIO PRODUCTO  */
-.producto-form {
+.mantine-modal-body {
+  padding: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* FORMULARIOS */
+.mantine-form {
   width: 100%;
   background: white;
 }
 
-.form-grid {
+.mantine-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
   padding: 2rem;
 }
 
-.form-group {
+.mantine-form-simple {
+  padding: 2rem;
+}
+
+.mantine-form-group {
   display: flex;
   flex-direction: column;
   position: relative;
+  margin-bottom: 1.25rem;
 }
 
-.form-group.full-width {
+.mantine-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.mantine-form-group.full-width {
   grid-column: 1 / -1;
 }
 
-.form-group label {
+.mantine-form-group label {
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: black;
@@ -335,35 +352,37 @@ body {
   gap: 0.25rem;
 }
 
-.form-group label::before {
+.mantine-form-group label::before {
   content: "•";
   color: #0288d1;
   font-weight: bold;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
+.mantine-form-group input,
+.mantine-form-group select,
+.mantine-form-group textarea {
   padding: 0.75rem 1rem;
   border: 2px solid #e1f5fe;
   border-radius: 8px;
   font-size: 0.95rem;
   transition: all 0.3s ease;
   background: #f8fdff;
+  color: #000000;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.mantine-form-group input:focus,
+.mantine-form-group select:focus,
+.mantine-form-group textarea:focus {
   outline: none;
   border-color: #0288d1;
   background: white;
   box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.1);
   transform: translateY(-1px);
+  animation: glowBlue 0.5s ease;
 }
 
-.form-group input:hover,
-.form-group select:hover {
+.mantine-form-group input:hover,
+.mantine-form-group select:hover {
   border-color: #b3e5fc;
 }
 .form-group input::placeholder,
@@ -371,8 +390,7 @@ body {
   color: #000000 ; 
   opacity: 1; 
 }
-/* BOTONES*/
-.form-actions {
+.mantine-form-actions {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
@@ -382,40 +400,9 @@ body {
   border-radius: 0 0 16px 16px;
 }
 
-.btn-agregar {
-  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(2, 136, 209, 0.2);
-}
-
-.btn-agregar:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(24, 113, 193, 0.3);
-  background: linear-gradient(135deg, #00BCD4 0%, #1871c1 100%);
-}
-
-.btn-agregar:active {
-  transform: translateY(0);
-}
-
-.btn-cancelar {
-  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(120, 144, 156, 0.2);
+.mantine-modal-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .btn-cancelar:hover {
@@ -448,21 +435,11 @@ body {
   border-radius: 3px;
 }
 
-.modal-content::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #0288d1 0%, #4fc3f7 100%);
-  border-radius: 3px;
+.mantine-modal-content::-webkit-scrollbar {
+  display: none; 
 }
 
-.modal-content::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #0277bd 0%, #29b6f6 100%);
-}
-
-/* ===== EFECTO GLOW AZUL ===== */
-.form-group input:focus,
-.form-group select:focus {
-  animation: glowBlue 0.5s ease;
-}
-
+/* EFECTO GLOW AZUL*/
 @keyframes glowBlue {
   0% {
     box-shadow: 0 0 0 0 rgba(2, 136, 209, 0.4);
@@ -475,46 +452,3 @@ body {
   }
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .modal-content {
-    max-width: 95%;
-    margin: 1rem;
-  }
-  
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 1.5rem;
-  }
-  
-  .modal-header {
-    padding: 1.25rem 1.5rem;
-  }
-  
-  .form-actions {
-    padding: 1.25rem 1.5rem;
-    flex-direction: column;
-  }
-  
-  .btn-agregar,
-  .btn-cancelar {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-/* ===== DETALLES ADICIONALES ===== */
-.form-group select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%230288d1' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-  padding-right: 2.5rem;
-}
-
-.form-group input::placeholder {
-  color: #81d4fa;
-  opacity: 0.7;
-}

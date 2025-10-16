@@ -42,10 +42,10 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="producto-form">
-      <div className="form-grid">
+    <form onSubmit={handleSubmit} className="mantine-form">
+      <div className="mantine-form-grid">
         {/* Fila 1: Código | Lote */}
-        <div className="form-group">
+        <div className="mantine-form-group">
           <label htmlFor="codigo">Código</label>
           <input
             id="codigo"
@@ -57,7 +57,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
           />
         </div>
         
-        <div className="form-group">
+        <div className="mantine-form-group">
           <label htmlFor="lote">Lote</label>
           <input
             id="lote"
@@ -70,7 +70,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
         </div>
 
         {/* Fila 2: Nombre | Presentación */}
-        <div className="form-group">
+        <div className="mantine-form-group">
           <label htmlFor="nombre">Nombre</label>
           <input
             id="nombre"
@@ -82,7 +82,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
           />
         </div>
         
-        <div className="form-group">
+        <div className="mantine-form-group">
           <label htmlFor="presentacion">Presentación</label>
           <input
             id="presentacion"
@@ -94,7 +94,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
         </div>
 
         {/* Fila 3: Precio Base | % Ganancia */}
-        <div className="form-group">
+        <div className="mantine-form-group">
           <label htmlFor="precio_base">Precio Base</label>
           <input
             type="number"
@@ -108,7 +108,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
           />
         </div>
         
-        <div className="form-group">
+        <div className="mantine-form-group">
           <label htmlFor="porcentaje_g">Porcentaje Ganancia</label>
           <input
             type="number"
@@ -122,7 +122,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
         </div>
 
         {/* Fila 4: Stock | Fecha Expiración */}
-        <div className="form-group">
+        <div className="mantine-form-group">
           <label htmlFor="stock">Stock</label>
           <input
             type="number"
@@ -135,7 +135,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
           />
         </div>
         
-        <div className="form-group">
+        <div className="mantine-form-group">
           <label htmlFor="fecha_expiracion">Fecha Expiración</label>
           <input
             type="date"
@@ -148,7 +148,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
         </div>
 
         {/* Fila 5: Laboratorio (ocupa 2 columnas) */}
-        <div className="form-group full-width">
+        <div className="mantine-form-group full-width">
           <label htmlFor="laboratorio">Seleccionar laboratorio</label>
           <select
             id="laboratorio"
@@ -168,7 +168,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
       </div>
 
       {/* Botones */}
-      <div className="form-actions">
+      <div className="mantine-form-actions">
         <button type="submit" className="btn-agregar">
           {producto ? 'Guardar Cambios' : 'Agregar Producto'}
         </button>

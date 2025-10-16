@@ -30,21 +30,34 @@
   pointer-events: none;
 }
 
-.dashboard-title {
-  font-weight: 900;
+/* AUMENTA ESPECIFICIDAD - Pon esto al final de tu CSS */
+.mantine-Text-root.dashboard-title {
+  font-family: inherit !important;
+  font-weight: 900 !important;
   font-size: 45px !important;
-  background: linear-gradient(135deg, 
-    var(--mantine-color-blue-9) 0%, 
-    var(--mantine-color-blue-8) 50%, 
-    var(--mantine-color-cyan-9) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #034C8C 0%, #0277BD 50%, #04BFBF 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
   margin: 0 !important;
   position: relative;
-  letter-spacing: -0.8px;
-  line-height: 1;
+  letter-spacing: -0.8px !important;
+  line-height: 1 !important;
+  color: transparent !important;
+}
+
+.mantine-Text-root.dashboard-subtitle {
+  font-family: inherit !important;
+  letter-spacing: 2px !important;
+  margin: 20px 0 0 0 !important;
+  font-weight: 600 !important;
+  color: #666 !important;
+  font-size: 1rem !important;
+  text-transform: uppercase !important;
+  position: relative;
+  background: none !important;
+  -webkit-text-fill-color: #666 !important;
 }
 
 .dashboard-title::after {
@@ -58,15 +71,7 @@
   border-radius: 2px;
 }
 
-.dashboard-subtitle {
-  letter-spacing: 2px;
-  margin: 20px 0 0 0 !important;
-  font-weight: 600;
-  color: #666 !important;
-  font-size: 1rem;
-  text-transform: uppercase;
-  position: relative;
-}
+
 
 /* Campana de notificaciones */
 .notification-bell {

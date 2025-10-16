@@ -7,15 +7,19 @@ import {
   IconListDetails,
   IconLogout,
   IconUser,
+  IconUsers,
+  IconTruck
 } from '@tabler/icons-react';
 import { Group, CloseButton, Avatar, Text } from '@mantine/core';
 import classes from './MantineSidebar.module.css';
 
 const data = [
-  { link: '/', label: 'Inicio', icon: IconHome },
+  { link: '/', label: 'Dashboard', icon: IconHome },
   { link: '/inventario', label: 'Inventario', icon: IconPackage },
   { link: '/historial-ventas', label: 'Historial Ventas', icon: IconReceipt2 },
   { link: '/ingresos-egresos', label: 'Ingresos y Egresos', icon: IconListDetails },
+  { link: '/clientes', label: 'Clientes', icon: IconUsers },
+  { link: '/proveedores', label: 'Proveedores', icon: IconTruck },
 ];
 
 export function MantineSidebar({ onClose }) {
@@ -35,7 +39,7 @@ export function MantineSidebar({ onClose }) {
       onClick={() => {
         setActive(item.link);
         navigate(item.link);
-        onClose();
+        if (onClose) onClose();
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
@@ -52,7 +56,13 @@ export function MantineSidebar({ onClose }) {
             <img src="/img/logo.png" alt="Farmacia Oasis" className={classes.logo} />
             <Text size="sm" c="white" fw={600}>Farmacia Oasis</Text>
           </div>
-          
+          {onClose && (
+            <CloseButton 
+              size="md" 
+              color="white" 
+              onClick={onClose} 
+            />
+          )}
         </Group>
       </div>
 
@@ -62,8 +72,7 @@ export function MantineSidebar({ onClose }) {
       </div>
 
       {/* 
-      
-      si en algun momento queremos meter un usuario o un login asi chalitaFooter
+      Si en algun momento queremos meter un usuario o un login asi chalitaFooter
       <div className={classes.footer}>
         <div className={classes.userInfo}>
           <Avatar 

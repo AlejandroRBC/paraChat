@@ -6,7 +6,7 @@ const movimientosMock = [
     id: 1,
     id_producto: 1,
     nombre: 'Paracetamol',
-    complemento: 'Jarabe',
+    presentacion: 'Jarabe',
     lote: '123',
     precio_venta: 3.50,
     stock_antiguo: 6,
@@ -20,7 +20,7 @@ const movimientosMock = [
     id: 2,
     id_producto: 1,
     nombre: 'Paracetamol',
-    complemento: 'Jarabe',
+    presentacion: 'Jarabe',
     lote: '123',
     precio_venta: 3.50,
     stock_antiguo: 5,
@@ -34,7 +34,7 @@ const movimientosMock = [
     id: 3,
     id_producto: 2,
     nombre: 'Ibuprofeno',
-    complemento: 'Tabletas',
+    presentacion: 'Tabletas',
     lote: '456',
     precio_venta: 15.00,
     stock_antiguo: 20,
@@ -48,7 +48,7 @@ const movimientosMock = [
     id: 4,
     id_producto: 3,
     nombre: 'Amoxicilina',
-    complemento: 'Cápsulas',
+    presentacion: 'Cápsulas',
     lote: '789',
     precio_venta: 25.00,
     stock_antiguo: 10,
@@ -62,7 +62,7 @@ const movimientosMock = [
     id: 5,
     id_producto: 4,
     nombre: 'Vitamina C',
-    complemento: 'Tabletas Masticables',
+    presentacion: 'Tabletas Masticables',
     lote: '101',
     precio_venta: 21.25,
     stock_antiguo: 25,
@@ -76,7 +76,7 @@ const movimientosMock = [
     id: 6,
     id_producto: 2,
     nombre: 'Ibuprofeno',
-    complemento: 'Tabletas',
+    presentacion: 'Tabletas',
     lote: '456',
     precio_venta: 15.00,
     stock_antiguo: 18,
@@ -90,7 +90,7 @@ const movimientosMock = [
     id: 7,
     id_producto: 5,
     nombre: 'Jarabe para la Tos',
-    complemento: 'Botella 120ml',
+    presentacion: 'Botella 120ml',
     lote: '202',
     precio_venta: 25.00,
     stock_antiguo: 8,
@@ -99,43 +99,78 @@ const movimientosMock = [
     hora: '20:10:00',
     laboratorio: 'Laboratorio ABC',
     tipo: 'egreso'
+  },
+  {
+    id: 8,
+    id_producto: 99,
+    nombre: 'Jarabe para la Tos',
+    presentacion: 'Botella 120ml',
+    lote: '202',
+    precio_venta: 25.00,
+    stock_antiguo: 8,
+    stock_nuevo: 5,
+    fecha: '2025-10-15',
+    hora: '20:10:00',
+    laboratorio: 'Laboratorio ABC',
+    tipo: 'egreso'
   }
 ];
-
 export const useMovimientos = () => {
   const [movimientos, setMovimientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const cargarMovimientos = async () => {
-      try {
-        setLoading(true);
-        // Simular llamada a API
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Ordenar por fecha y hora más reciente primero
-        const movimientosOrdenados = [...movimientosMock].sort((a, b) => {
-          const fechaA = new Date(`${a.fecha} ${a.hora}`);
-          const fechaB = new Date(`${b.fecha} ${b.hora}`);
-          return fechaB - fechaA;
-        });
-        
-        setMovimientos(movimientosOrdenados);
-      } catch (err) {
-        setError('Error al cargar los movimientos de productos');
-        console.error('Error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const cargarMovimientos = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Simular llamada a API con timeout
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Ordenar por fecha y hora más reciente primero
+      const movimientosOrdenados = [...movimientosMock].sort((a, b) => {
+        const fechaA = new Date(`${a.fecha}T${a.hora}`);
+        const fechaB = new Date(`${b.fecha}T${b.hora}`);
+        return fechaB - fechaA; // Más reciente primero
+      });
+      
+      setMovimientos(movimientosOrdenados);
+    } catch (err) {
+      setError('Error al cargar los movimientos de productos');
+      console.error('Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     cargarMovimientos();
   }, []);
+
+  // Función para buscar movimientos por ID, nombre y lote
+  const buscarMovimientos = (terminoBusqueda) => {
+    if (!terminoBusqueda) return movimientos; // Si no hay búsqueda, devolver todos
+    
+    const termino = terminoBusqueda.toLowerCase().trim();
+    
+    return movimientos.filter(movimiento => 
+      movimiento.id_producto.toString().includes(termino) ||
+      movimiento.nombre.toLowerCase().includes(termino) ||
+      movimiento.lote.toLowerCase().includes(termino)
+    );
+  };
+
+  // Función para recargar los datos
+  const refetch = () => {
+    cargarMovimientos();
+  };
 
   return {
     movimientos,
     loading,
-    error
+    error,
+    refetch,
+    buscarMovimientos // Nueva función con búsqueda múltiple
   };
 };

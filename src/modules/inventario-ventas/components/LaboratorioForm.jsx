@@ -20,8 +20,8 @@ function LaboratorioForm({ onSubmit, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="laboratorio-form">
-      <div className="form-group">
+    <form onSubmit={handleSubmit} className="mantine-form">
+      <div className="mantine-form-group">
         <label htmlFor="nombre">Nombre del laboratorio</label>
         <input
           id="nombre"
@@ -33,7 +33,7 @@ function LaboratorioForm({ onSubmit, onCancel }) {
         />
       </div>
 
-      <div className="form-group">
+      <div className="mantine-form-group">
         <label htmlFor="direccion">Dirección</label>
         <input
           id="direccion"
@@ -45,7 +45,7 @@ function LaboratorioForm({ onSubmit, onCancel }) {
         />
       </div>
 
-      <div className="form-actions">
+      <div className="mantine-form-actions">
         <button type="submit" className="btn-agregar">
           Agregar Laboratorio
         </button>

@@ -24,7 +24,6 @@ mostrarSinStock = false // Nuevo prop para controlar qué botones mostrar
 }) {
 
 const getBadgeColor = (metodo) => {
-    
     if (metodo <= 10 ) {
         return '#FF0000';
     }
@@ -48,28 +47,28 @@ const filas = productos.map((producto) => {
 
         <Table.Tr 
             key={producto.id} 
-            className="mantine-Table-tr" 
+            
             withTableBorder
         >
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {producto.codigo}
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {producto.lote}
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {producto.nombre}
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {producto.presentacion}
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {producto.precio_base}
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {producto.precio_venta}
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             <Badge 
                 color={getBadgeColor(producto.stock)}
                 size="sm"
@@ -77,16 +76,16 @@ const filas = productos.map((producto) => {
             {producto.stock}
             </Badge>
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {producto.fecha_expiracion}
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {producto.laboratorio}
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {producto.porcentaje_g} %
             </Table.Td>
-            <Table.Td className="mantine-Table-td">
+            <Table.Td >
             {/* Mostrar botón de agregar al carrito solo si NO estamos en modo "sin stock" */}
             {!mostrarSinStock && (
                 <ActionIcon 
@@ -133,50 +132,50 @@ return (
     <Paper 
         
     >
-    <Box className="top-productos-content">
+    <Box >
     <ScrollArea h={250}  scrollbarSize={20} scrollHideDelay={500} >
         <Table 
-            className="mantine-Table-table"
+            
             verticalSpacing="sm"
         >
-            <Table.Thead className="mantine-Table-thead">
-            <Table.Tr className="mantine-Table-tr">
-                <Table.Th className="mantine-Table-th">
+            <Table.Thead >
+            <Table.Tr >
+                <Table.Th >
                         idProducto
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Lote
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Nombre
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Presentacion
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Precio Base
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Precio Venta
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Stock
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Fecha Expiracion
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Laboratorio
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Ganancia %
                 </Table.Th>
-                <Table.Th className="mantine-Table-th">
+                <Table.Th >
                 Acciones
                 </Table.Th>
             </Table.Tr>
             </Table.Thead>
-            <Table.Tbody className="mantine-Table-tbody">
+            <Table.Tbody >
             {filas}
             </Table.Tbody>
         </Table>

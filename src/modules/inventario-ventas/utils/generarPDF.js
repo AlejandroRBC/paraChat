@@ -198,7 +198,7 @@
                     <th style="width: 10%;">Cant.</th>
                     <th style="width: 40%;">Producto</th>
                     <th style="width: 20%; text-align: right;">P. Unit.</th>
-                    <th style="width: 15%; text-align: center;">Stock</th>
+                    
                     <th style="width: 15%; text-align: right;">Subtotal</th>
                 </tr>
                 </thead>
@@ -211,7 +211,7 @@
                         ${item.presentacion ? `<br><span style="color: #999; font-size: 9px;">(${item.presentacion})</span>` : ''}
                     </td>
                     <td class="text-right">Bs ${item.precio_venta.toFixed(2)}</td>
-                    <td class="text-center">${item.stock}</td>
+                    
                     <td class="text-right">Bs ${(item.precio_venta * item.cantidad).toFixed(2)}</td>
                     </tr>
                 `).join('')}
@@ -229,12 +229,9 @@
                 <span class="label">Subtotal:</span>
                 <span>Bs ${totalVenta.toFixed(2)}</span>
             </div>
-            <div class="summary-row">
-                <span class="label">Descuento:</span>
-                <span>Bs 0.00</span>
-            </div>
+            
             <div class="total-row">
-                <span>TOTAL A PAGAR:</span>
+                <span>TOTAL:</span>
                 <span>Bs ${totalVenta.toFixed(2)}</span>
             </div>
             </div>
@@ -466,7 +463,7 @@
                     <th style="width: 10%;">Cant.</th>
                     <th style="width: 40%;">Producto</th>
                     <th style="width: 20%; text-align: right;">P. Unit.</th>
-                    <th style="width: 15%; text-align: center;">Stock</th>
+
                     <th style="width: 15%; text-align: right;">Subtotal</th>
                 </tr>
                 </thead>
@@ -479,7 +476,7 @@
                         ${item.presentacion ? `<br><span style="color: #999; font-size: 9px;">(${item.presentacion})</span>` : ''}
                     </td>
                     <td class="text-right">Bs ${item.precio_venta.toFixed(2)}</td>
-                    <td class="text-center">${item.stock}</td>
+                    
                     <td class="text-right">Bs ${(item.precio_venta * item.cantidad).toFixed(2)}</td>
                     </tr>
                 `).join('')}
@@ -496,12 +493,9 @@
                 <span class="label">Subtotal:</span>
                 <span>Bs ${totalVenta.toFixed(2)}</span>
             </div>
-            <div class="summary-row">
-                <span class="label">Descuento:</span>
-                <span>Bs 0.00</span>
-            </div>
+            
             <div class="total-row">
-                <span>TOTAL A PAGAR:</span>
+                <span>TOTAL:</span>
                 <span>Bs ${totalVenta.toFixed(2)}</span>
             </div>
             </div>

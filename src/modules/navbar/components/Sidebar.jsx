@@ -4,11 +4,13 @@ function Sidebar({ onClose }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const menuItems = [
+ const menuItems = [
     { path: '/', label: 'Dashboard', icon: '🏠' },
     { path: '/inventario', label: 'Inventario', icon: '📦' },
     { path: '/historial-ventas', label: 'Historial Ventas', icon: '📊' },
-    { path: '/ingresos-egresos', label: 'Ingresos y egresos', icon: '📋' }
+    { path: '/ingresos-egresos', label: 'Ingresos y egresos', icon: '📋' },
+    { path: '/clientes', label: 'Clientes', icon: '👥' },
+    { path: '/proveedores', label: 'Proveedores', icon: '🚚' }
   ];
 
   const handleNavigation = (path) => {

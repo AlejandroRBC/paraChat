@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react'; // ✅ Añadir useMemo
 
 // Datos mock del historial de ventas
-
 const ventasMock = [
   {
     id: 1,
@@ -57,49 +56,153 @@ const ventasMock = [
     metodo_pago: 'Efectivo',
     total: 68.75,
     productos: 'Antigripal x2 = 35.00 Bs, Analgésico x1 = 33.75 Bs'
+  },
+  {
+    id: 6,
+    id_venta: 'V006',
+    fecha: '2025-10-14',
+    hora: '16:45:20',
+    nombre_cliente: 'Jose Jose',
+    ci_nit: '23841234',
+    metodo_pago: 'QR',
+    total: 3000.00,
+    productos: 'Mentisan plus = 18.00 Bs, Sanatusin x1 = 4.75 Bs'
   }
 ];
-
 
 export const useVentas = () => {
   const [ventas, setearVentas] = useState([]);
   const [error, setError] = useState(null);
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState('general');
+  const [dateRange, setDateRange] = useState({ start: null, end: null });
+  const [loading, setLoading] = useState(true);
+
+  const buscarSoloMedicamentos = (productos, textoBusqueda) => {
+    if (!productos) return false;
+    
+    const textoProductos = productos.toLowerCase();
+    const medicamentos = textoProductos.split(',');
+    
+    return medicamentos.some(medicamento => {
+      const nombreMedicamento = medicamento
+        .split('x')[0] 
+        .split('=')[0]  
+        .trim();
+      
+      return nombreMedicamento.includes(textoBusqueda);
+    });
+  };
 
   useEffect(() => {
     const cargarVentas = async () => {
       try {
-        // Ordenar por fecha y hora más reciente primero
+        setLoading(true);
+        setError(null);
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         const ventasOrdenadas = [...ventasMock].sort((a, b) => {
           const fechaA = new Date(`${a.fecha} ${a.hora}`);
           const fechaB = new Date(`${b.fecha} ${b.hora}`);
           return fechaB - fechaA;
         });
-        setearVentas(ventasOrdenadas);
-
+        
         setearVentas(ventasOrdenadas);
       } catch (err) {
         setError('Error al cargar el historial de ventas');
         console.error('Error:', err);
+      } finally {
+        setLoading(false);
       }
     };
+    
     cargarVentas();
-
   }, []);
 
-  const buscarVentas = (termino) => {
-    // Lógica de búsqueda (se puede implementar después)
-    console.log('Buscando:', termino);
-  };
+  // ✅ FILTROS CON DEBUG DETALLADO
+  const ventasFiltradas = useMemo(() => {
+    console.log('=== APLICANDO FILTROS ===');
+    console.log('Filtro tipo:', filtroTipo);
+    console.log('Búsqueda:', busqueda);
+    console.log('Date range:', dateRange);
+    console.log('Total ventas originales:', ventas.length);
 
-  const filtrarPorFecha = (fechaInicio, fechaFin) => {
-    // Lógica de filtrado por fecha (se puede implementar después)
-    console.log('Filtrando por fecha:', fechaInicio, fechaFin);
-  };
+    const resultado = ventas.filter(venta => {
+      // 1. Filtro de búsqueda
+      const textoBusqueda = busqueda.toLowerCase().trim();
+      const coincideBusqueda = 
+        busqueda === '' ||
+        venta.id.toString() === busqueda ||
+        buscarSoloMedicamentos(venta.productos, textoBusqueda);
+
+      // 2. Filtro por tipo de período
+      const ahora = new Date();
+      const fechaVenta = new Date(venta.fecha);
+      let coincideTipo = true;
+      
+      console.log(`Venta ${venta.id} - Fecha: ${venta.fecha}, FechaVenta: ${fechaVenta}, Ahora: ${ahora}`);
+      
+      switch (filtroTipo) {
+        case 'hoy':
+          coincideTipo = fechaVenta.toDateString() === ahora.toDateString();
+          console.log(`  - Hoy: ${coincideTipo} (${fechaVenta.toDateString()} vs ${ahora.toDateString()})`);
+          break;
+        case 'semana':
+          const inicioSemana = new Date(ahora);
+          inicioSemana.setDate(ahora.getDate() - ahora.getDay());
+          inicioSemana.setHours(0, 0, 0, 0);
+          coincideTipo = fechaVenta >= inicioSemana;
+          console.log(`  - Semana: ${coincideTipo} (${fechaVenta} >= ${inicioSemana})`);
+          break;
+        case 'mes':
+          const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+          coincideTipo = fechaVenta >= inicioMes;
+          console.log(`  - Mes: ${coincideTipo} (${fechaVenta} >= ${inicioMes})`);
+          break;
+        case 'año':
+          const inicioAño = new Date(ahora.getFullYear(), 0, 1);
+          coincideTipo = fechaVenta >= inicioAño;
+          console.log(`  - Año: ${coincideTipo} (${fechaVenta} >= ${inicioAño})`);
+          break;
+        default:
+          coincideTipo = true;
+          console.log(`  - General: ${coincideTipo}`);
+      }
+      
+      // 3. Filtro por intervalo personalizado
+      let coincideIntervalo = true;
+      if (dateRange.start && dateRange.end) {
+        const inicio = new Date(dateRange.start);
+        const fin = new Date(dateRange.end);
+        fin.setHours(23, 59, 59, 999);
+        coincideIntervalo = fechaVenta >= inicio && fechaVenta <= fin;
+        console.log(`  - Intervalo: ${coincideIntervalo} (${fechaVenta} entre ${inicio} y ${fin})`);
+      }
+      
+      const resultadoFinal = coincideBusqueda && coincideTipo && coincideIntervalo;
+      console.log(`  - RESULTADO FINAL para venta ${venta.id}: ${resultadoFinal}`);
+      
+      return resultadoFinal;
+    });
+
+    console.log('=== RESULTADO FILTRADO ===');
+    console.log('Ventas filtradas:', resultado.length);
+    console.log('IDs encontrados:', resultado.map(v => v.id));
+    
+    return resultado;
+  }, [ventas, busqueda, filtroTipo, dateRange]);
 
   return {
-    ventas,
+    ventas: ventasFiltradas,
+    ventasOriginales: ventas,
     error,
-    buscarVentas,
-    filtrarPorFecha
+    loading,
+    busqueda,
+    filtroTipo,
+    dateRange,
+    setBusqueda,
+    setFiltroTipo,
+    setDateRange
   };
 };

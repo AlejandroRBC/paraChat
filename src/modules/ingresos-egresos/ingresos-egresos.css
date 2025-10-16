@@ -1,0 +1,183 @@
+/* ingresos-egresos.css */
+.ingresos-egresos-container {
+  padding: 20px;
+  max-width: 100%;
+}
+
+/* Título con gradiente */
+.gradient-title {
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Icono del título */
+.title-icon {
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title-icon svg {
+  color: white;
+}
+
+/* Estadísticas mejoradas */
+.stat-card {
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Iconos de estadísticas */
+.stat-icon-total {
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon-ingreso {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon-egreso {
+  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon-saldo {
+  background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon-total svg,
+.stat-icon-ingreso svg,
+.stat-icon-egreso svg,
+.stat-icon-saldo svg {
+  color: white;
+}
+
+/* Números con gradiente */
+.number-total {
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.number-ingreso {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.number-egreso {
+  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+.number-saldo {
+  background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+}
+
+/* Botón de Excel */
+.excel-button {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  font-weight: 600;
+}
+
+.excel-button:hover {
+  background: linear-gradient(135deg, #218838 0%, #1e9e8a 100%);
+}
+
+/* Buscador más largo */
+.buscador-largo {
+  min-width: 400px !important;
+  flex: 1;
+}
+
+/* Filtro por tipo centrado */
+.filtro-tipo-centrado {
+  min-width: 250px;
+  margin: 0 auto;
+}
+
+/* Contenedor de filtros derecho */
+.filtros-derecho {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ingresos-egresos-container {
+    padding: 10px;
+  }
+  
+  .gradient-title {
+    font-size: 1.5rem;
+  }
+  
+  .title-icon {
+    padding: 6px;
+  }
+  
+  .title-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .buscador-largo {
+    min-width: 100% !important;
+  }
+  
+  .filtro-tipo-centrado {
+    min-width: 100%;
+    margin: 0;
+  }
+  
+  .filtros-derecho {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+}
