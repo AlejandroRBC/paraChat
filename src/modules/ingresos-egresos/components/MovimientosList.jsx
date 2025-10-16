@@ -1,5 +1,5 @@
 import { Table, Badge, Paper, ScrollArea, Box } from '@mantine/core';
-
+import { useState } from 'react';
 
 function MovimientosList({ movimientos }) {
   const calcularMovimiento = (stockAntiguo, stockNuevo) => {

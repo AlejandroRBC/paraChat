@@ -24,6 +24,7 @@ mostrarSinStock = false // Nuevo prop para controlar qué botones mostrar
 }) {
 
 const getBadgeColor = (metodo) => {
+    
     if (metodo <= 10 ) {
         return '#FF0000';
     }
@@ -47,7 +48,6 @@ const filas = productos.map((producto) => {
 
         <Table.Tr 
             key={producto.id} 
-            
             withTableBorder
         >
             <Table.Td >
@@ -135,7 +135,6 @@ return (
     <Box >
     <ScrollArea h={250}  scrollbarSize={20} scrollHideDelay={500} >
         <Table 
-            
             verticalSpacing="sm"
         >
             <Table.Thead >
@@ -175,7 +174,7 @@ return (
                 </Table.Th>
             </Table.Tr>
             </Table.Thead>
-            <Table.Tbody >
+            <Table.Tbody className="mantine-Table-tbody">
             {filas}
             </Table.Tbody>
         </Table>

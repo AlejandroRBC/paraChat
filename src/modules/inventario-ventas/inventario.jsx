@@ -60,6 +60,9 @@ function Inventario() {
     cerrarModalProducto,
     abrirModalLaboratorio,
     cerrarModalLaboratorio,
+    abrirModalEliminar,
+    cerrarModalEliminar,
+    modalEliminar,
     
   } = useModales();
   
@@ -113,6 +116,7 @@ function Inventario() {
   return (
     <>
       <Container size="100%" py="xl" px="md">
+        
         {/* Header con título centrado y carrito a la derecha */}
         <Flex
           justify="space-between"
@@ -137,6 +141,7 @@ function Inventario() {
             INVENTARIO
           </Text>
 
+          {/* Carrito alineado a la derecha */}
           
         </Flex>
 
@@ -158,12 +163,7 @@ function Inventario() {
 
         
         {/* Switch para mostrar productos sin stock */}
-        {mostrarSinStock && (
-            <Badge color="red" variant="light">
-              {productosFiltrados.length} productos sin stock
-            </Badge>
-        )}
-        <Flex gap="md"  justify="space-between">
+        <Flex align="center" justify="space-between" gap="md" >
           <Switch
             checked={mostrarSinStock}
             onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
@@ -171,12 +171,14 @@ function Inventario() {
             size="md"
             label={
               <Text size="sm" fw={500}>
-                {mostrarSinStock ? "" : ""}
+                {mostrarSinStock && (
+            <Badge color="red" variant="light">
+              {productosFiltrados.length} productos sin stock
+            </Badge>
+          )}
               </Text>
             }
           />
-          
-          {/* Carrito alineado a la derecha */}
           <ActionIcon 
             variant="subtle" 
             color="blue" 
