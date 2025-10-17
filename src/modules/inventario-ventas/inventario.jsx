@@ -68,7 +68,7 @@ function Inventario() {
   } = useModales();
   
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
-  const [mostrarSinStock, setMostrarSinStock] = useState(false); // Nuevo estado para el switch
+  const [mostrarDesactivados, setMostrarDesactivados] = useState(false); // Cambio: ahora es para desactivados
 
   const handleRealizarVenta = (datosCliente) => {
     console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
@@ -91,9 +91,9 @@ function Inventario() {
       p.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
       p.codigo.includes(busqueda.toUpperCase());
     
-    // Si el switch está activado, mostrar solo productos con stock <= 0
-    if (mostrarSinStock) {
-      return coincideBusqueda && p.stock <= 0;
+    // Si el switch está activado, mostrar solo productos con estado="desactivado"
+    if (mostrarDesactivados) {
+      return coincideBusqueda && p.estado === "desactivado";
     }
     
     // Si no, mostrar todos los productos que coincidan con la búsqueda
@@ -115,8 +115,8 @@ function Inventario() {
   const cantidadCarrito = carrito.reduce((total, item) => total + item.cantidad, 0);
   // Reporte excel
   const generarReporteExcel = async () => {
-    // Filtrar productos con stock > 0
-    const productosConStock = productosFiltrados.filter(p => p.stock > 0);
+    
+    const productosConStock = productosFiltrados;
 
     if (!productosConStock || productosConStock.length === 0) {
       alert("No hay productos con stock para generar el reporte.");
@@ -136,7 +136,7 @@ function Inventario() {
     // Encabezados
     worksheet.addRow([]);
     const encabezados = [
-      "N°",
+      "Nº",
       "Código",
       "Lote",
       "Nombre",
@@ -247,17 +247,17 @@ function Inventario() {
         </Flex>
 
         
-        {/* Switch para mostrar productos sin stock */}
+        {/* Switch para mostrar productos desactivados */}
           <Flex justify="space-between" align="center" gap="md" mb="xl" wrap="wrap">
             {/* Switch a la izquierda */}
             <Switch
-              checked={mostrarSinStock}
-              onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
+              checked={mostrarDesactivados}
+              onChange={(event) => setMostrarDesactivados(event.currentTarget.checked)}
               color="red"
               size="md"
               label={
                 <Text>
-                  {mostrarSinStock ? 
+                  {mostrarDesactivados ? 
                     <Badge size="lg" color="red" variant="light">
                       <IconTrashX size={20}/>
                     </Badge>
@@ -313,7 +313,7 @@ function Inventario() {
           onAgregarCarrito={agregarAlCarrito}
           onEditar={abrirModalProducto} 
           onEliminar={eliminarProducto}
-          mostrarSinStock={mostrarSinStock} // Pasar el estado al componente
+          mostrarDesactivados={mostrarDesactivados} // Cambio: paso el nuevo prop
         />
         
         {/* Botones de acción */}
