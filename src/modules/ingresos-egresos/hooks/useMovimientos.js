@@ -124,17 +124,17 @@ export const useMovimientos = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Simular llamada a API con timeout
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Ordenar por fecha y hora más reciente primero
       const movimientosOrdenados = [...movimientosMock].sort((a, b) => {
         const fechaA = new Date(`${a.fecha}T${a.hora}`);
         const fechaB = new Date(`${b.fecha}T${b.hora}`);
         return fechaB - fechaA; // Más reciente primero
       });
-      
+
       setMovimientos(movimientosOrdenados);
     } catch (err) {
       setError('Error al cargar los movimientos de productos');
@@ -148,14 +148,13 @@ export const useMovimientos = () => {
     cargarMovimientos();
   }, []);
 
-  // Función para buscar movimientos por ID, nombre y lote
+  // Función para buscar movimientos por nombre y lote
   const buscarMovimientos = (terminoBusqueda) => {
     if (!terminoBusqueda) return movimientos; // Si no hay búsqueda, devolver todos
-    
+
     const termino = terminoBusqueda.toLowerCase().trim();
-    
-    return movimientos.filter(movimiento => 
-      movimiento.id_producto.toString().includes(termino) ||
+
+    return movimientos.filter(movimiento =>
       movimiento.nombre.toLowerCase().includes(termino) ||
       movimiento.lote.toLowerCase().includes(termino)
     );
@@ -165,12 +164,13 @@ export const useMovimientos = () => {
   const refetch = () => {
     cargarMovimientos();
   };
-
+  
   return {
     movimientos,
     loading,
     error,
     refetch,
-    buscarMovimientos // Nueva función con búsqueda múltiple
+    buscarMovimientos
   };
+  
 };

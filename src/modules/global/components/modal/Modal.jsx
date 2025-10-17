@@ -1,26 +1,19 @@
-function Modal({ 
-  titulo, 
-  children, 
-  onClose, 
-  tamaño = 'normal' }) {
+import classes from './Modal.module.css';
+function Modal({ titulo, children, onClose, tamaño = 'normal', opened = true }) {
+  if (!opened) return null; // modal invisible si opened=false
+
   const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+    if (e.target === e.currentTarget) onClose();
   };
 
   return (
-    <div className="mantine-modal-overlay" onClick={handleOverlayClick}>
-      <div className={`mantine-modal-content ${tamaño === 'grande' ? 'grande' : ''}`}>
-        <div className="mantine-modal-header">
-          <h2 className="mantine-modal-title">{titulo}</h2>
-          <button className="btn-cerrar" onClick={onClose} aria-label="Cerrar">
-            &times;
-          </button>
+    <div className={classes.globModalOverlay} onClick={handleOverlayClick}>
+      <div className={`${classes.globModalContent} ${tamaño === 'grande' ? classes.grande : ''}`}>
+        <div className={classes.globModalHeader}>
+          <h2 className={classes.globModalTitle}>{titulo}</h2>
+          <button className={classes.btnCerrar} onClick={onClose} aria-label="Cerrar">&times;</button>
         </div>
-        <div className="mantine-modal-body">
-          {children}
-        </div>
+        <div className={classes.globModalBody}>{children}</div>
       </div>
     </div>
   );

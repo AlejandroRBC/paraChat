@@ -120,71 +120,74 @@ export const useVentas = () => {
     cargarVentas();
   }, []);
 
-  // ✅ FILTROS CON DEBUG DETALLADO
+  // FILTROS CON DEBUG DETALLADO
   const ventasFiltradas = useMemo(() => {
     console.log('=== APLICANDO FILTROS ===');
     console.log('Filtro tipo:', filtroTipo);
     console.log('Búsqueda:', busqueda);
     console.log('Date range:', dateRange);
     console.log('Total ventas originales:', ventas.length);
-
+    const mismaFecha = (fecha1, fecha2) => {
+      return (
+        fecha1.getFullYear() === fecha2.getFullYear() &&
+        fecha1.getMonth() === fecha2.getMonth() &&
+        fecha1.getDate() === fecha2.getDate()
+      );
+    };
     const resultado = ventas.filter(venta => {
-      // 1. Filtro de búsqueda
-      const textoBusqueda = busqueda.toLowerCase().trim();
-      const coincideBusqueda = 
-        busqueda === '' ||
-        venta.id.toString() === busqueda ||
-        buscarSoloMedicamentos(venta.productos, textoBusqueda);
+    // 1. Filtro de búsqueda
+    const textoBusqueda = busqueda.toLowerCase().trim();
+    const coincideBusqueda = 
+      busqueda === '' ||
+      venta.id.toString() === busqueda ||
+      buscarSoloMedicamentos(venta.productos, textoBusqueda);
 
-      // 2. Filtro por tipo de período
-      const ahora = new Date();
-      const fechaVenta = new Date(venta.fecha);
-      let coincideTipo = true;
+    // 2. Filtro por tipo de período
+    const ahora = new Date();
+    const fechaVenta = new Date(venta.fecha);
+    let coincideTipo = true;
+
+    switch (filtroTipo) {
+      case 'hoy':
+        coincideTipo = fechaVenta.toDateString() === ahora.toDateString();
+        break;
+      case 'semana':
+        const inicioSemana = new Date(ahora);
+        inicioSemana.setDate(ahora.getDate() - ahora.getDay());
+        inicioSemana.setHours(0,0,0,0);
+        coincideTipo = fechaVenta >= inicioSemana;
+        break;
+      case 'mes':
+        const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+        coincideTipo = fechaVenta >= inicioMes;
+        break;
+      case 'año':
+        const inicioAño = new Date(ahora.getFullYear(), 0, 1);
+        coincideTipo = fechaVenta >= inicioAño;
+        break;
+      default:
+        coincideTipo = true;
+    }
+
+    // 3. Filtro por intervalo personalizado
+    let coincideIntervalo = true;
+    if (dateRange.start && dateRange.end) {
+      const inicio = new Date(dateRange.start);
+      const fin = new Date(dateRange.end);
       
-      console.log(`Venta ${venta.id} - Fecha: ${venta.fecha}, FechaVenta: ${fechaVenta}, Ahora: ${ahora}`);
+      // Rango normal
+      coincideIntervalo = fechaVenta >= inicio && fechaVenta <= fin;
       
-      switch (filtroTipo) {
-        case 'hoy':
-          coincideTipo = fechaVenta.toDateString() === ahora.toDateString();
-          console.log(`  - Hoy: ${coincideTipo} (${fechaVenta.toDateString()} vs ${ahora.toDateString()})`);
-          break;
-        case 'semana':
-          const inicioSemana = new Date(ahora);
-          inicioSemana.setDate(ahora.getDate() - ahora.getDay());
-          inicioSemana.setHours(0, 0, 0, 0);
-          coincideTipo = fechaVenta >= inicioSemana;
-          console.log(`  - Semana: ${coincideTipo} (${fechaVenta} >= ${inicioSemana})`);
-          break;
-        case 'mes':
-          const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
-          coincideTipo = fechaVenta >= inicioMes;
-          console.log(`  - Mes: ${coincideTipo} (${fechaVenta} >= ${inicioMes})`);
-          break;
-        case 'año':
-          const inicioAño = new Date(ahora.getFullYear(), 0, 1);
-          coincideTipo = fechaVenta >= inicioAño;
-          console.log(`  - Año: ${coincideTipo} (${fechaVenta} >= ${inicioAño})`);
-          break;
-        default:
-          coincideTipo = true;
-          console.log(`  - General: ${coincideTipo}`);
+      // Ajuste si fechas son iguales
+      if (mismaFecha(inicio, fin)) {
+        coincideIntervalo = mismaFecha(fechaVenta, inicio);
       }
-      
-      // 3. Filtro por intervalo personalizado
-      let coincideIntervalo = true;
-      if (dateRange.start && dateRange.end) {
-        const inicio = new Date(dateRange.start);
-        const fin = new Date(dateRange.end);
-        fin.setHours(23, 59, 59, 999);
-        coincideIntervalo = fechaVenta >= inicio && fechaVenta <= fin;
-        console.log(`  - Intervalo: ${coincideIntervalo} (${fechaVenta} entre ${inicio} y ${fin})`);
-      }
-      
-      const resultadoFinal = coincideBusqueda && coincideTipo && coincideIntervalo;
-      console.log(`  - RESULTADO FINAL para venta ${venta.id}: ${resultadoFinal}`);
-      
-      return resultadoFinal;
-    });
+    }
+
+    // Resultado final
+    const resultadoFinal = coincideBusqueda && coincideTipo && coincideIntervalo;
+    return resultadoFinal;
+  });
 
     console.log('=== RESULTADO FILTRADO ===');
     console.log('Ventas filtradas:', resultado.length);
