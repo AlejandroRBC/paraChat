@@ -91,14 +91,15 @@ function Inventario() {
       p.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
       p.codigo.includes(busqueda.toUpperCase());
     
-    // Si el switch está activado, mostrar solo productos con estado="desactivado"
+    
     if (mostrarDesactivados) {
       return coincideBusqueda && p.estado === "desactivado";
     }
     
     // Si no, mostrar todos los productos que coincidan con la búsqueda
-    return coincideBusqueda;
+    return coincideBusqueda && p.estado === 'activado';
   });
+  
   
   const resultadosParaBuscador = productosFiltrados.map(p => ({
     id: p.id,
