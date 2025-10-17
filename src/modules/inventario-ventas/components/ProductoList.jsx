@@ -48,27 +48,28 @@ const filas = productos.map((producto) => {
 
         <Table.Tr 
             key={producto.id} 
+            className="mantine-Table-tr" 
             withTableBorder
         >
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {producto.codigo}
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {producto.lote}
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {producto.nombre}
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {producto.presentacion}
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {producto.precio_base}
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {producto.precio_venta}
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             <Badge 
                 color={getBadgeColor(producto.stock)}
                 size="sm"
@@ -76,16 +77,16 @@ const filas = productos.map((producto) => {
             {producto.stock}
             </Badge>
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {producto.fecha_expiracion}
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {producto.laboratorio}
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {producto.porcentaje_g} %
             </Table.Td>
-            <Table.Td >
+            <Table.Td className="mantine-Table-td">
             {/* Mostrar botón de agregar al carrito solo si NO estamos en modo "sin stock" */}
             {!mostrarSinStock && (
                 <ActionIcon 
@@ -132,44 +133,45 @@ return (
     <Paper 
         
     >
-    <Box >
+    <Box className="top-productos-content">
     <ScrollArea h={250}  scrollbarSize={20} scrollHideDelay={500} >
         <Table 
+            className="mantine-Table-table"
             verticalSpacing="sm"
         >
-            <Table.Thead >
-            <Table.Tr >
-                <Table.Th >
+            <Table.Thead className="mantine-Table-thead">
+            <Table.Tr className="mantine-Table-tr">
+                <Table.Th className="mantine-Table-th">
                         idProducto
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Lote
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Nombre
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Presentacion
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Precio Base
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Precio Venta
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Stock
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Fecha Expiracion
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Laboratorio
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Ganancia %
                 </Table.Th>
-                <Table.Th >
+                <Table.Th className="mantine-Table-th">
                 Acciones
                 </Table.Th>
             </Table.Tr>

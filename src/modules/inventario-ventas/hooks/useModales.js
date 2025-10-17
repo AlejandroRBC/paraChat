@@ -5,6 +5,8 @@ export const useModales = () => {
     abierto: false,
     producto: null
   });
+  
+  const [modalLaboratorio, setModalLaboratorio] = useState(false);
 
   const abrirModalProducto = (producto = null) => {
     setModalProducto({ 
@@ -12,34 +14,24 @@ export const useModales = () => {
       producto
     });
   };
-  
+
   const cerrarModalProducto = () => {
     setModalProducto({ 
       abierto: false,
       producto: null
     });
   };
-  
-  const [modalLaboratorio, setModalLaboratorio] = useState(false);
+
   const abrirModalLaboratorio = () => setModalLaboratorio(true);
   const cerrarModalLaboratorio = () => setModalLaboratorio(false);
 
-  const [modalEliminar, setModalEliminar] = useState(false);
-  const abrirModalEliminar = () => setModalEliminar(true);
-  const cerrarModalEliminar = () => setModalEliminar(false);
-  
   return {
     modalProducto,
     modalLaboratorio,
     
     abrirModalProducto,
     cerrarModalProducto,
-
     abrirModalLaboratorio,
-    cerrarModalLaboratorio,
-
-    abrirModalEliminar,
-    cerrarModalEliminar,
-    modalEliminar
+    cerrarModalLaboratorio
   };
 };

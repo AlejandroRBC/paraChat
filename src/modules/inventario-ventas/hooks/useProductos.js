@@ -13,7 +13,8 @@ const productosMock = [
     stock: 5,
     fecha_expiracion: '2026-03-15',
     laboratorio: 'PharmaGen',
-    porcentaje_g: 40
+    porcentaje_g: 40,
+    estado: 'activado'
   },
   {
     id: 2,
@@ -26,7 +27,8 @@ const productosMock = [
     stock: 12,
     fecha_expiracion: '2025-11-20',
     laboratorio: 'BioLife',
-    porcentaje_g: 35
+    porcentaje_g: 35,
+    estado: 'desactivado'
   },
   {
     id: 3,
@@ -39,7 +41,8 @@ const productosMock = [
     stock: 30,
     fecha_expiracion: '2026-06-01',
     laboratorio: 'AeroPharm',
-    porcentaje_g: 50
+    porcentaje_g: 50,
+    estado: 'activado'
   },
   {
     id: 4,
@@ -52,7 +55,8 @@ const productosMock = [
     stock: 210,
     fecha_expiracion: '2025-09-10',
     laboratorio: 'GastroLab',
-    porcentaje_g: 30
+    porcentaje_g: 30,
+    estado: 'activado'
   },
   {
     id: 5,
@@ -65,7 +69,8 @@ const productosMock = [
     stock: 0,
     fecha_expiracion: '2026-01-25',
     laboratorio: 'Diabetech',
-    porcentaje_g: 45
+    porcentaje_g: 45,
+    estado: 'activado'
   },
   {
     id: 6,
@@ -78,7 +83,8 @@ const productosMock = [
     stock: 3,
     fecha_expiracion: '2027-02-14',
     laboratorio: 'Bayer',
-    porcentaje_g: 50
+    porcentaje_g: 50,
+    estado: 'activado'
   },
   {
     id: 7,
@@ -91,7 +97,8 @@ const productosMock = [
     stock:0,
     fecha_expiracion: '2025-10-05',
     laboratorio: 'NeuroCorp',
-    porcentaje_g: 30
+    porcentaje_g: 30,
+    estado: 'desactivado'
   },
   {
     id: 8,
@@ -104,7 +111,8 @@ const productosMock = [
     stock: 0,
     fecha_expiracion: '2026-12-30',
     laboratorio: 'VitaMax',
-    porcentaje_g: 60
+    porcentaje_g: 60,
+    estado: 'desactivado'
   },
   {
     id: 9,
@@ -117,7 +125,8 @@ const productosMock = [
     stock: 65,
     fecha_expiracion: '2025-07-01',
     laboratorio: 'SteroidInc',
-    porcentaje_g: 50
+    porcentaje_g: 50,
+    estado: 'activado'
   },
   {
     id: 10,
@@ -130,7 +139,8 @@ const productosMock = [
     stock: 95,
     fecha_expiracion: '2026-04-18',
     laboratorio: 'AllergyCure',
-    porcentaje_g: 30
+    porcentaje_g: 30,
+    estado: 'activado'
   },
   {
     id: 11,
@@ -143,7 +153,8 @@ const productosMock = [
     stock: 75,
     fecha_expiracion: '2025-11-05',
     laboratorio: 'PainFree',
-    porcentaje_g: 50
+    porcentaje_g: 50,
+    estado: 'desactivado'
   },
   {
     id: 12,
@@ -156,7 +167,8 @@ const productosMock = [
     stock: 45,
     fecha_expiracion: '2026-08-01',
     laboratorio: 'KidsCare',
-    porcentaje_g: 65
+    porcentaje_g: 65,
+    estado: 'desactivado'
   },
   {
     id: 13,
@@ -169,7 +181,8 @@ const productosMock = [
     stock: 150,
     fecha_expiracion: '2027-01-10',
     laboratorio: 'CardioPlus',
-    porcentaje_g: 50
+    porcentaje_g: 50,
+    estado: 'activado'
   },
   {
     id: 14,
@@ -182,7 +195,8 @@ const productosMock = [
     stock: 60,
     fecha_expiracion: '2025-12-24',
     laboratorio: 'Diuretik',
-    porcentaje_g: 40
+    porcentaje_g: 40,
+    estado: 'activado'
   },
   {
     id: 15,
@@ -195,7 +209,8 @@ const productosMock = [
     stock: 70,
     fecha_expiracion: '2026-05-12',
     laboratorio: 'InfectOut',
-    porcentaje_g: 50
+    porcentaje_g: 50,
+    estado: 'activado'
   },
   {
     id: 16,
@@ -208,7 +223,9 @@ const productosMock = [
     stock: 110,
     fecha_expiracion: '2025-09-01',
     laboratorio: 'Diabetech',
-    porcentaje_g: 30
+    porcentaje_g: 30,
+    estado: 'activado'
+
   },
   {
     id: 17,
@@ -221,7 +238,9 @@ const productosMock = [
     stock: 50,
     fecha_expiracion: '2026-07-20',
     laboratorio: 'NeuroCorp',
-    porcentaje_g: 50
+    porcentaje_g: 50,
+    estado: 'activado'
+
   },
   {
     id: 18,
@@ -234,7 +253,8 @@ const productosMock = [
     stock: 90,
     fecha_expiracion: '2027-03-01',
     laboratorio: 'DermoCares',
-    porcentaje_g: 60
+    porcentaje_g: 60,
+    estado: 'activado'
   },
   {
     id: 19,
@@ -247,7 +267,8 @@ const productosMock = [
     stock: 130,
     fecha_expiracion: '2025-10-15',
     laboratorio: 'GastroLab',
-    porcentaje_g: 50
+    porcentaje_g: 50,
+    estado: 'activado'
   },
   {
     id: 20,
@@ -260,7 +281,9 @@ const productosMock = [
     stock: 25,
     fecha_expiracion: '2026-01-31',
     laboratorio: 'VaxCorp',
-    porcentaje_g: 50
+    porcentaje_g: 50,
+    estado: 'activado'
+
   }
 
 ];
