@@ -24,6 +24,7 @@ import {
   AppShell
 } from '@mantine/core';
 import { useState } from 'react';
+import { useMediaQuery } from 'react-responsive';
 import { useProductos } from './hooks/useProductos';
 import { useCarrito } from './hooks/useCarrito';
 import { useModales } from './hooks/useModales'; 
@@ -36,9 +37,6 @@ import VentaForm from './components/VentaForm';
 import Modal from '../global/components/modal/Modal.jsx';
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-
-
-
 
 function Inventario() {
   const {
@@ -67,24 +65,28 @@ function Inventario() {
     cerrarModalProducto,
     abrirModalLaboratorio,
     cerrarModalLaboratorio,
-    
   } = useModales();
   
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
-  const [mostrarDesactivados, setMostrarDesactivados] = useState(false); // Cambio: ahora es para desactivados
-  //Estado para el modal de confirmación de desactivación
+  const [mostrarDesactivados, setMostrarDesactivados] = useState(false);
+  
   const [modalConfirmacionDesactivar, setModalConfirmacionDesactivar] = useState({
     abierto: false,
     producto: null
   });
-  //Función para abrir modal de confirmación de desactivación
+
+  // Media queries para responsive
+  const isMobile = useMediaQuery({ maxWidth: 768 });
+  const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
+  
+
   const abrirModalConfirmacionDesactivar = (producto) => {
     setModalConfirmacionDesactivar({
       abierto: true,
       producto
     });
   };
-  //Función para confirmar desactivación
+
   const confirmarDesactivarProducto = () => {
     if (modalConfirmacionDesactivar.producto) {
       desactivarProducto(modalConfirmacionDesactivar.producto.id);
@@ -94,13 +96,14 @@ function Inventario() {
       });
     }
   };
-  //Función para cerrar modal de confirmación
+
   const cerrarModalConfirmacionDesactivar = () => {
     setModalConfirmacionDesactivar({
       abierto: false,
       producto: null
     });
   };
+
   const handleRealizarVenta = (datosCliente) => {
     console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
   };
@@ -116,21 +119,17 @@ function Inventario() {
 
   const [busqueda, setBusqueda] = useState('');
   
-  // Filtrar productos basado en búsqueda y estado del switch
   const productosFiltrados = productos.filter(p => {
     const coincideBusqueda = 
       p.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
       p.codigo.includes(busqueda.toUpperCase());
     
-    
     if (mostrarDesactivados) {
       return coincideBusqueda && p.estado === "desactivado";
     }
     
-    // Si no, mostrar todos los productos que coincidan con la búsqueda
     return coincideBusqueda && p.estado === 'activado';
   });
-  
   
   const resultadosParaBuscador = productosFiltrados.map(p => ({
     id: p.id,
@@ -141,13 +140,12 @@ function Inventario() {
   }));
   
   const handleResultSelect = (result) => {
-    console.log("hola mundo", result);
+    console.log("Producto seleccionado:", result);
   };
   
   const cantidadCarrito = carrito.reduce((total, item) => total + item.cantidad, 0);
-  // Reporte excel
+
   const generarReporteExcel = async () => {
-    
     const productosConStock = productosFiltrados;
 
     if (!productosConStock || productosConStock.length === 0) {
@@ -235,93 +233,94 @@ function Inventario() {
     saveAs(new Blob([buffer]), `reporte-inventario-${fechaActual}.xlsx`);
   };
 
-
   return (
     <>
-      <Container size="100%" py="xl" px="md">
-        
-        {/* Header con título centrado y carrito a la derecha */}
+      <Container size="100%" py={isMobile ? "md" : "xl"} px={isMobile ? "xs" : "md"}>
+        {/* Header responsive */}
         <Flex
           justify="space-between"
           align="center"
-          mb="xl"
+          mb={isMobile ? "md" : "xl"}
           gap="md"
-          style={{ position: 'relative' }}
+          direction={isMobile ? "column" : "row"}
         >
-          {/* Espacio vacío para balancear el flex */}
-          <div style={{ width: '40px' }}></div>
-
-          {/* Título centrado */}
-          <Text 
-            className="dashboard-title" 
-            size="xl"
-            style={{ 
-              position: 'absolute', 
-              left: '50%', 
-              transform: 'translateX(-50%)' 
-            }}
-          >
-            INVENTARIO
-          </Text>
-          <br />
-          <br />
-
+          {/* En móvil, el título va arriba */}
+          {isMobile && (
+            <Text className="dashboard-title" size="xl" ta="center" w="100%">
+              INVENTARIO
+            </Text>
+          )}
           
+          {/* En desktop/tablet, el título centrado */}
+          {!isMobile && (
+            <Text 
+              className="dashboard-title" 
+              size="xl"
+              style={{ 
+                position: 'absolute', 
+                left: '50%', 
+                transform: 'translateX(-50%)' 
+              }}
+            >
+              INVENTARIO
+            </Text>
+          )}
         </Flex>
-        <br />
-          <br />
 
-        {/* Barra de búsqueda centrada */}
-        <Flex
-          justify="center"
-          mb="xl"
+        {/* Barra de controles responsive */}
+        <Flex 
+          justify="space-between" 
+          align={isMobile ? "stretch" : "center"} 
+          gap="md" 
+          mb="xl" 
+          direction={isMobile ? "column" : "row"}
+          wrap="wrap"
         >
-        </Flex>
-
-        
-        {/* Switch para mostrar productos desactivados */}
-          <Flex justify="space-between" align="center" gap="md" mb="xl" wrap="wrap">
-            {/* Switch a la izquierda */}
+          {/* Switch para mostrar desactivados */}
+          <Flex justify={isMobile ? "center" : "flex-start"} align="center">
             <Switch
               checked={mostrarDesactivados}
               onChange={(event) => setMostrarDesactivados(event.currentTarget.checked)}
               color="red"
-              size="md"
+              size={isMobile ? "sm" : "md"}
               label={
-                <Text>
+                <Text size={isMobile ? "sm" : "md"}>
                   {mostrarDesactivados ? 
-                    <Badge size="lg" color="red" variant="light">
-                      <IconTrashX size={20}/>
+                    <Badge size={isMobile ? "sm" : "lg"} color="red" variant="light">
+                      <IconTrashX size={isMobile ? 16 : 20}/>
                     </Badge>
                     :
-                    <Badge size="lg" color="gray" variant="light">
-                      <IconTrashOff size={20}/>
+                    <Badge size={isMobile ? "sm" : "lg"} color="gray" variant="light">
+                      <IconTrashOff size={isMobile ? 16 : 20}/>
                     </Badge>
                   }
                 </Text>
               }
-              
             />
-            
-            {/* Buscador en el centro */}
-            <Buscador
-              placeholder="Buscar por nombre o código..."
-              value={busqueda}
-              onChange={setBusqueda} 
-              results={resultadosParaBuscador}
-              onResultSelect={handleResultSelect}
-              style={{ width: '500px', marginLeft: '-80px' }}
-            />
-            
-            {/* Carrito alineado a la derecha */}
+          </Flex>
+          
+          {/* Buscador con tamaño responsive */}
+          <Buscador
+            placeholder="Buscar por nombre o código..."
+            value={busqueda}
+            onChange={setBusqueda} 
+            results={resultadosParaBuscador}
+            onResultSelect={handleResultSelect}
+            width={isMobile ? "100%" : isTablet ? "400px" : "500px"}
+            maxWidth={isMobile ? "100%" : "500px"}
+            size={isMobile ? "sm" : "md"}
+          />
+          
+          {/* Carrito */}
+          <Flex justify={isMobile ? "center" : "flex-end"}>
             <ActionIcon 
               variant="subtle" 
               color="blue" 
-              size="xl" 
+              size={isMobile ? "lg" : "xl"}
               onClick={() => setSidebarAbierto(true)}
               style={{ position: 'relative', cursor: 'pointer' }}
             >
-              <IconShoppingCart size={32} />
+              <IconShoppingCart size={isMobile ? 24 : 32} />
               {cantidadCarrito > 0 && (
                 <Badge 
                   size="sm" 
@@ -338,6 +337,7 @@ function Inventario() {
               )}
             </ActionIcon>
           </Flex>
+        </Flex>
                   
         {/* Tabla de productos */}
         <ProductoList 
@@ -347,108 +347,121 @@ function Inventario() {
           onDesactivar={abrirModalConfirmacionDesactivar} 
           onReactivar={reactivarProducto} 
           mostrarDesactivados={mostrarDesactivados}
+          
         />
         
-        {/* Botones de acción */}
-        <br />
+        {/* Botones de acción responsive */}
         <Flex
           gap="lg"
           justify="center"
           align="center"
-          direction="column" 
+          direction={isMobile ? "column" : "row"}
           wrap="wrap"
           p="md"
+          mt="xl"
         >
-          <Flex gap="lg" justify="center" align="center">
+          <Flex 
+            gap="lg" 
+            justify="center" 
+            align="center"
+            direction={isMobile ? "column" : "row"}
+            w={isMobile ? "100%" : "auto"}
+          >
             <Button 
-              size="md"
+              size={isMobile ? "sm" : "md"}
               variant="light"
               onClick={() => abrirModalProducto()}
+              fullWidth={isMobile}
             >
               Registrar Nuevo Producto
             </Button>
             
             <Button 
-              size="md" 
+              size={isMobile ? "sm" : "md"}
               variant="light"
               onClick={abrirModalLaboratorio}
+              fullWidth={isMobile}
             >
               Registrar Nuevo Laboratorio
             </Button>
           </Flex>
 
-          <Flex mt="md" justify="center">
-            <Button 
-              size="md" 
-              variant="light"
-              onClick={generarReporteExcel}
-            >
-              Generar Reporte Excel
-            </Button>
-          </Flex>
+          <Button 
+            size={isMobile ? "sm" : "md"}
+            variant="light"
+            onClick={generarReporteExcel}
+            fullWidth={isMobile}
+            mt={isMobile ? "md" : 0}
+          >
+            Generar Reporte Excel
+          </Button>
         </Flex>
 
         {/* Modal de confirmación para desactivar producto */}
-      {modalConfirmacionDesactivar.abierto && (
-        <Modal 
-          titulo={
-            <span className="titulo-gradiente">Confirmar Eliminación</span>
-          }
-          onClose={cerrarModalConfirmacionDesactivar}
-        >
-          <div style={{ padding: '1rem' }}>
-            <Center>
-              <ActionIcon 
-                      variant="subtle" 
-                      color="red" 
-                      size="xxl" 
-                      
-                  >
-                    <IconTrash size={60}/> 
-              </ActionIcon>
-            </Center>
-            <Text size="lg" mb="md">
-              ¿Estás seguro de que deseas desactivar el producto?
-            </Text>
-            <Text size="sm" color="dimmed" mb="xl">
-              Producto: <strong>{modalConfirmacionDesactivar.producto?.nombre}</strong>
-              <br />
-              Código: <strong>{modalConfirmacionDesactivar.producto?.codigo}</strong>
-              <br />
-              <br />
-              El producto se moverá a la lista de productos desactivados y no estará disponible para ventas.
-            </Text>
-            
-            <div className="mantine-form-actions">
-              <Button 
-                color="red" 
-                onClick={confirmarDesactivarProducto}
-                className="btn-agregar"
-              >
-                Sí, Desactivar
-              </Button>
-              <Button 
-                variant="light" 
-                onClick={cerrarModalConfirmacionDesactivar}
-                className="btn-cancelar"
-              >
-                Cancelar
-              </Button>
+        {modalConfirmacionDesactivar.abierto && (
+          <Modal 
+            titulo={<span className="titulo-gradiente">Confirmar Eliminación</span>}
+            onClose={cerrarModalConfirmacionDesactivar}
+            tamaño={isMobile ? 'normal' : 'normal'}
+          >
+            <div style={{ padding: isMobile ? '0.5rem' : '1rem' }}>
+              <Center>
+                <ActionIcon variant="subtle" color="red" size={isMobile ? "xl" : "xxl"}>
+                  <IconTrash size={isMobile ? 40 : 60}/> 
+                </ActionIcon>
+              </Center>
+              <Text size={isMobile ? "md" : "lg"} mb="md" ta="center">
+                ¿Estás seguro de que deseas desactivar el producto?
+              </Text>
+              <Text size={isMobile ? "xs" : "sm"} color="dimmed" mb="xl" ta="center">
+                Producto: <strong>{modalConfirmacionDesactivar.producto?.nombre}</strong>
+                <br />
+                Código: <strong>{modalConfirmacionDesactivar.producto?.codigo}</strong>
+                <br />
+                <br />
+                El producto se moverá a la lista de productos desactivados y no estará disponible para ventas.
+              </Text>
+              
+              <div className="mantine-form-actions" style={{ 
+                flexDirection: isMobile ? 'column' : 'row',
+                gap: isMobile ? '0.5rem' : '1rem'
+              }}>
+                <Button 
+                  color="red" 
+                  onClick={confirmarDesactivarProducto}
+                  className="btn-agregar"
+                  fullWidth={isMobile}
+                  size={isMobile ? "sm" : "md"}
+                >
+                  Sí, Desactivar
+                </Button>
+                <Button 
+                  variant="light" 
+                  onClick={cerrarModalConfirmacionDesactivar}
+                  className="btn-cancelar"
+                  fullWidth={isMobile}
+                  size={isMobile ? "sm" : "md"}
+                >
+                  Cancelar
+                </Button>
+              </div>
             </div>
-          </div>
-        </Modal>
-      )}
+          </Modal>
+        )}
+
         {/* Modal Agregar/Editar Producto */}
         {modalProducto.abierto && (
           <Modal 
             titulo={modalProducto.producto ? "Editar Producto" : "Agregar Nuevo Producto"}
             onClose={cerrarModalProducto}
+            tamaño={isMobile ? 'normal' : 'grande'}
           >
             <ProductoForm
               laboratorios={laboratorios}
               producto={modalProducto.producto}
               onSubmit={handleSubmitProducto}
               onCancel={cerrarModalProducto}
+              isMobile={isMobile}
             />
           </Modal>
         )}
@@ -458,6 +471,7 @@ function Inventario() {
           <Modal 
             titulo="Agregar Nuevo Laboratorio"
             onClose={cerrarModalLaboratorio}
+            tamaño={isMobile ? 'normal' : 'normal'}
           >
             <LaboratorioForm
               onSubmit={(datosLaboratorio) => {
@@ -465,26 +479,27 @@ function Inventario() {
                 cerrarModalLaboratorio();
               }}
               onCancel={cerrarModalLaboratorio}
+              isMobile={isMobile}
             />
           </Modal>
         )}
       </Container>
 
-      {/* Sidebar del Carrito */}
+      {/* Sidebar del Carrito responsive */}
       <Drawer
         opened={sidebarAbierto}
         onClose={() => setSidebarAbierto(false)}
         position="right"
-        size="md"
-        padding="md"
+        size={isMobile ? "100%" : isTablet ? "md" : "md"}
+        padding={isMobile ? "xs" : "md"}
       >
         <Flex justify="space-between" align="center" mb="lg">
-          <ThemeIcon size="xl" variant="light">
-            <IconShoppingCartFilled/>  
+          <ThemeIcon size={isMobile ? "lg" : "xl"} variant="light">
+            <IconShoppingCartFilled size={isMobile ? 20 : 24}/>  
           </ThemeIcon>
-            <Text>
-              Carrito de Compras
-            </Text>
+          <Text size={isMobile ? "md" : "lg"} fw={600}>
+            Carrito de Compras
+          </Text>
         </Flex>
         
         <VentaForm
@@ -495,7 +510,7 @@ function Inventario() {
           onVaciarCarrito={vaciarCarrito}
           onRealizarVenta={handleRealizarVenta}
           onCancel={() => setSidebarAbierto(false)}
-          
+          isMobile={isMobile}
         />
       </Drawer>
     </>

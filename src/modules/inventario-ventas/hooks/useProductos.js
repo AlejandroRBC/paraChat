@@ -1,346 +1,208 @@
 import { useState, useEffect } from 'react';
-
-// Datos de ejemplo
-const productosMock = [
-  {
-    id: 1,
-    codigo: 'MED001',
-    lote: 'LOTE1A45',
-    nombre: 'Amoxicilina',
-    presentacion: 'Cápsulas 500mg',
-    precio_base: 12.50,
-    precio_venta: 20.00,
-    stock: 5,
-    fecha_expiracion: '2026-03-15',
-    laboratorio: 'PharmaGen',
-    porcentaje_g: 40,
-    estado: 'activado'
-  },
-  {
-    id: 2,
-    codigo: 'MED002',
-    lote: 'LOTE2B67',
-    nombre: 'Losartán',
-    presentacion: 'Tabletas 50mg',
-    precio_base: 25.00,
-    precio_venta: 38.00,
-    stock: 12,
-    fecha_expiracion: '2025-11-20',
-    laboratorio: 'BioLife',
-    porcentaje_g: 35,
-    estado: 'desactivado'
-  },
-  {
-    id: 3,
-    codigo: 'MED003',
-    lote: 'LOTE3C89',
-    nombre: 'Salbutamol',
-    presentacion: 'Inhalador',
-    precio_base: 45.00,
-    precio_venta: 65.00,
-    stock: 30,
-    fecha_expiracion: '2026-06-01',
-    laboratorio: 'AeroPharm',
-    porcentaje_g: 50,
-    estado: 'activado'
-  },
-  {
-    id: 4,
-    codigo: 'MED004',
-    lote: 'LOTE4D01',
-    nombre: 'Omeprazol',
-    presentacion: 'Cápsulas 20mg',
-    precio_base: 9.80,
-    precio_venta: 14.70,
-    stock: 210,
-    fecha_expiracion: '2025-09-10',
-    laboratorio: 'GastroLab',
-    porcentaje_g: 30,
-    estado: 'activado'
-  },
-  {
-    id: 5,
-    codigo: 'MED005',
-    lote: 'LOTE5E23',
-    nombre: 'Metformina',
-    presentacion: 'Tabletas 850mg',
-    precio_base: 18.00,
-    precio_venta: 27.50,
-    stock: 0,
-    fecha_expiracion: '2026-01-25',
-    laboratorio: 'Diabetech',
-    porcentaje_g: 45,
-    estado: 'activado'
-  },
-  {
-    id: 6,
-    codigo: 'MED006',
-    lote: 'LOTE6F45',
-    nombre: 'Losartan',
-    presentacion: 'Tabletas 100mg',
-    precio_base: 5.50,
-    precio_venta: 9.00,
-    stock: 3,
-    fecha_expiracion: '2027-02-14',
-    laboratorio: 'Bayer',
-    porcentaje_g: 50,
-    estado: 'activado'
-  },
-  {
-    id: 7,
-    codigo: 'MED007',
-    lote: 'LOTE7G67',
-    nombre: 'Clonazepam',
-    presentacion: 'Gotas 2.5mg/ml',
-    precio_base: 35.00,
-    precio_venta: 52.50,
-    stock:0,
-    fecha_expiracion: '2025-10-05',
-    laboratorio: 'NeuroCorp',
-    porcentaje_g: 30,
-    estado: 'desactivado'
-  },
-  {
-    id: 8,
-    codigo: 'MED008',
-    lote: 'LOTE8H89',
-    nombre: 'Vitaminas C + Zinc',
-    presentacion: 'Efervescente',
-    precio_base: 15.00,
-    precio_venta: 24.00,
-    stock: 0,
-    fecha_expiracion: '2026-12-30',
-    laboratorio: 'VitaMax',
-    porcentaje_g: 60,
-    estado: 'desactivado'
-  },
-  {
-    id: 9,
-    codigo: 'MED009',
-    lote: 'LOTE9I01',
-    nombre: 'Dexametasona',
-    presentacion: 'Inyección 4mg/ml',
-    precio_base: 22.00,
-    precio_venta: 33.00,
-    stock: 65,
-    fecha_expiracion: '2025-07-01',
-    laboratorio: 'SteroidInc',
-    porcentaje_g: 50,
-    estado: 'activado'
-  },
-  {
-    id: 10,
-    codigo: 'MED010',
-    lote: 'LOTE0J23',
-    nombre: 'Loratadina',
-    presentacion: 'Jarabe 5mg/5ml',
-    precio_base: 11.20,
-    precio_venta: 16.80,
-    stock: 95,
-    fecha_expiracion: '2026-04-18',
-    laboratorio: 'AllergyCure',
-    porcentaje_g: 30,
-    estado: 'activado'
-  },
-  {
-    id: 11,
-    codigo: 'MED011',
-    lote: 'LOTE1K45',
-    nombre: 'Diclofenaco',
-    presentacion: 'Gel Tópico',
-    precio_base: 14.00,
-    precio_venta: 21.00,
-    stock: 75,
-    fecha_expiracion: '2025-11-05',
-    laboratorio: 'PainFree',
-    porcentaje_g: 50,
-    estado: 'desactivado'
-  },
-  {
-    id: 12,
-    codigo: 'MED012',
-    lote: 'LOTE2L67',
-    nombre: 'Acetaminofén',
-    presentacion: 'Supositorios 300mg',
-    precio_base: 7.00,
-    precio_venta: 11.50,
-    stock: 45,
-    fecha_expiracion: '2026-08-01',
-    laboratorio: 'KidsCare',
-    porcentaje_g: 65,
-    estado: 'desactivado'
-  },
-  {
-    id: 13,
-    codigo: 'MED013',
-    lote: 'LOTE3M89',
-    nombre: 'Atorvastatina',
-    presentacion: 'Tabletas 10mg',
-    precio_base: 32.00,
-    precio_venta: 48.00,
-    stock: 150,
-    fecha_expiracion: '2027-01-10',
-    laboratorio: 'CardioPlus',
-    porcentaje_g: 50,
-    estado: 'activado'
-  },
-  {
-    id: 14,
-    codigo: 'MED014',
-    lote: 'LOTE4N01',
-    nombre: 'Furosemida',
-    presentacion: 'Tabletas 40mg',
-    precio_base: 10.50,
-    precio_venta: 15.75,
-    stock: 60,
-    fecha_expiracion: '2025-12-24',
-    laboratorio: 'Diuretik',
-    porcentaje_g: 40,
-    estado: 'activado'
-  },
-  {
-    id: 15,
-    codigo: 'MED015',
-    lote: 'LOTE5O23',
-    nombre: 'Cefalexina',
-    presentacion: 'Suspensión 250mg/5ml',
-    precio_base: 19.50,
-    precio_venta: 29.25,
-    stock: 70,
-    fecha_expiracion: '2026-05-12',
-    laboratorio: 'InfectOut',
-    porcentaje_g: 50,
-    estado: 'activado'
-  },
-  {
-    id: 16,
-    codigo: 'MED016',
-    lote: 'LOTE6P45',
-    nombre: 'Glibenclamida',
-    presentacion: 'Tabletas 5mg',
-    precio_base: 8.50,
-    precio_venta: 12.75,
-    stock: 110,
-    fecha_expiracion: '2025-09-01',
-    laboratorio: 'Diabetech',
-    porcentaje_g: 30,
-    estado: 'activado'
-
-  },
-  {
-    id: 17,
-    codigo: 'MED017',
-    lote: 'LOTE7Q67',
-    nombre: 'Sertralina',
-    presentacion: 'Tabletas 100mg',
-    precio_base: 40.00,
-    precio_venta: 60.00,
-    stock: 50,
-    fecha_expiracion: '2026-07-20',
-    laboratorio: 'NeuroCorp',
-    porcentaje_g: 50,
-    estado: 'activado'
-
-  },
-  {
-    id: 18,
-    codigo: 'MED018',
-    lote: 'LOTE8R89',
-    nombre: 'Hidrocortisona',
-    presentacion: 'Crema 1%',
-    precio_base: 16.00,
-    precio_venta: 25.60,
-    stock: 90,
-    fecha_expiracion: '2027-03-01',
-    laboratorio: 'DermoCares',
-    porcentaje_g: 60,
-    estado: 'activado'
-  },
-  {
-    id: 19,
-    codigo: 'MED019',
-    lote: 'LOTE9S01',
-    nombre: 'Ranitidina',
-    presentacion: 'Tabletas 150mg',
-    precio_base: 13.50,
-    precio_venta: 20.25,
-    stock: 130,
-    fecha_expiracion: '2025-10-15',
-    laboratorio: 'GastroLab',
-    porcentaje_g: 50,
-    estado: 'activado'
-  },
-  {
-    id: 20,
-    codigo: 'MED020',
-    lote: 'LOTE0T23',
-    nombre: 'Vacuna Antigripal',
-    presentacion: 'Jeringa Prellenada',
-    precio_base: 80.00,
-    precio_venta: 120.00,
-    stock: 25,
-    fecha_expiracion: '2026-01-31',
-    laboratorio: 'VaxCorp',
-    porcentaje_g: 50,
-    estado: 'activado'
-
-  }
-
-];
-
-const laboratoriosMock = [
-  { id: 1, nombre: 'Lab Farma', direccion: 'Av. Principal 123' },
-  { id: 2, nombre: 'Lab Salud', direccion: 'Calle Secundaria 456' }
-];
+import inventarioService from '../services/InventarioService';
 
 export const useProductos = () => {
   const [productos, setProductos] = useState([]);
   const [laboratorios, setLaboratorios] = useState([]);
-  
+  const [cargando, setCargando] = useState(false);
 
+  // Cargar datos iniciales
   useEffect(() => {
-    // Simular carga de datos
-      setProductos(productosMock);
-      setLaboratorios(laboratoriosMock);
-    
+    cargarProductos();
+    cargarLaboratorios();
   }, []);
 
-  const agregarProducto = (nuevoProducto) => {
-    const id = Math.max(...productos.map(p => p.id)) + 1;
-    setProductos(prev => [...prev, { ...nuevoProducto, id }]);
+  const cargarProductos = async () => {
+    setCargando(true);
+    try {
+      const datos = await inventarioService.obtenerProductos();
+      // Mapear los datos de la base de datos al formato esperado por el frontend
+      const productosMapeados = datos.map(producto => ({
+        id: producto.id_producto,
+        codigo: producto.codigo || `PROD${String(producto.id_producto).padStart(3, '0')}`,
+        lote: producto.lote,
+        nombre: producto.nombre_prod,
+        presentacion: producto.presentacion,
+        precio_base: producto.precio_compra,
+        precio_venta: producto.precio_venta,
+        stock: producto.stock,
+        fecha_expiracion: producto.fecha_exp,
+        laboratorio: producto.laboratorio_nombre || producto.nombre_labo,
+        porcentaje_g: producto.porcentaje_g,
+        estado: producto.estado === 'activo' ? 'activado' : 'desactivado',
+        id_lab: producto.id_lab,
+        id_proveedor: producto.id_proveedor
+      }));
+      setProductos(productosMapeados);
+    } catch (error) {
+      console.error('Error cargando productos:', error);
+      // En caso de error, usar datos mock como fallback
+      setProductos([]);
+    } finally {
+      setCargando(false);
+    }
   };
 
-  const actualizarProducto = (id, datosActualizados) => {
-    setProductos(prev => prev.map(p => 
-      p.id === id ? { ...p, ...datosActualizados } : p
-    ));
+  const cargarLaboratorios = async () => {
+    try {
+      const datos = await inventarioService.obtenerLaboratorios();
+      setLaboratorios(datos);
+    } catch (error) {
+      console.error('Error cargando laboratorios:', error);
+      // Datos mock como fallback
+      setLaboratorios([
+        { id: 1, nombre: 'Lab Farma', direccion: 'Av. Principal 123' },
+        { id: 2, nombre: 'Lab Salud', direccion: 'Calle Secundaria 456' }
+      ]);
+    }
   };
 
-  const desactivarProducto = (id) => {
-    setProductos(prev => prev.map(p => 
-      p.id === id ? { ...p, estado: 'desactivado' } : p
-    ));
+  const agregarProducto = async (nuevoProducto) => {
+    try {
+      // El precio_venta ahora viene calculado desde el formulario
+      const productoData = {
+        nombre_prod: nuevoProducto.nombre,
+        lote: nuevoProducto.lote,
+        fecha_exp: nuevoProducto.fecha_expiracion,
+        porcentaje_g: nuevoProducto.porcentaje_g,
+        stock: parseInt(nuevoProducto.stock),
+        presentacion: nuevoProducto.presentacion,
+        precio_venta: parseFloat(nuevoProducto.precio_venta), // Usar el precio calculado
+        precio_compra: parseFloat(nuevoProducto.precio_compra),
+        valor_medida: 0,
+        id_lab: obtenerIdLaboratorio(nuevoProducto.laboratorio),
+        id_proveedor: 1
+      };
+  
+      const productoGuardado = await inventarioService.crearProducto(productoData);
+      
+      const productoFrontend = {
+        id: productoGuardado.id_producto,
+        codigo: `PROD${String(productoGuardado.id_producto).padStart(3, '0')}`,
+        lote: productoGuardado.lote,
+        nombre: productoGuardado.nombre_prod,
+        presentacion: productoGuardado.presentacion,
+        precio_base: productoGuardado.precio_compra, // Mostrar precio_compra como precio_base
+        precio_venta: productoGuardado.precio_venta,
+        stock: productoGuardado.stock,
+        fecha_expiracion: productoGuardado.fecha_exp,
+        laboratorio: nuevoProducto.laboratorio,
+        porcentaje_g: productoGuardado.porcentaje_g,
+        estado: 'activado'
+      };
+  
+      setProductos(prev => [...prev, productoFrontend]);
+      return productoFrontend;
+    } catch (error) {
+      console.error('Error agregando producto:', error);
+      throw error;
+    }
+  };
+  
+  const actualizarProducto = async (id, datosActualizados) => {
+    try {
+      const productoData = {
+        nombre_prod: datosActualizados.nombre,
+        lote: datosActualizados.lote,
+        fecha_exp: datosActualizados.fecha_expiracion,
+        porcentaje_g: datosActualizados.porcentaje_g,
+        stock: parseInt(datosActualizados.stock),
+        presentacion: datosActualizados.presentacion,
+        precio_venta: parseFloat(datosActualizados.precio_venta), // Usar el precio calculado
+        precio_compra: parseFloat(datosActualizados.precio_compra),
+        valor_medida: 0,
+        estado: 'activo',
+        id_lab: obtenerIdLaboratorio(datosActualizados.laboratorio),
+        id_proveedor: 1
+      };
+  
+      const productoActualizado = await inventarioService.actualizarProducto(id, productoData);
+      
+      setProductos(prev => prev.map(p => 
+        p.id === id ? { 
+          ...p, 
+          ...datosActualizados,
+          precio_base: productoActualizado.precio_compra,
+          precio_venta: productoActualizado.precio_venta,
+          stock: productoActualizado.stock
+        } : p
+      ));
+      
+      return productoActualizado;
+    } catch (error) {
+      console.error('Error actualizando producto:', error);
+      throw error;
+    }
   };
 
-  const reactivarProducto = (id) => {
-    setProductos(prev => prev.map(p => 
-      p.id === id ? { ...p, estado: 'activado' } : p
-    ));
+  const desactivarProducto = async (id) => {
+    try {
+      await inventarioService.eliminarProducto(id);
+      setProductos(prev => prev.map(p => 
+        p.id === id ? { ...p, estado: 'desactivado' } : p
+      ));
+    } catch (error) {
+      console.error('Error desactivando producto:', error);
+      throw error;
+    }
   };
 
-  const agregarLaboratorio = (nuevoLab) => {
-    const id = Math.max(...laboratorios.map(l => l.id)) + 1;
-    setLaboratorios(prev => [...prev, { ...nuevoLab, id }]);
+  const reactivarProducto = async (id) => {
+    try {
+      const producto = productos.find(p => p.id === id);
+      if (producto) {
+        await inventarioService.actualizarProducto(id, {
+          nombre_prod: producto.nombre,
+          lote: producto.lote,
+          fecha_exp: producto.fecha_expiracion,
+          porcentaje_g: producto.porcentaje_g,
+          stock: producto.stock,
+          presentacion: producto.presentacion,
+          precio_venta: producto.precio_venta,
+          precio_compra: producto.precio_base,
+          valor_medida: 0,
+          estado: 'activo',
+          id_lab: producto.id_lab,
+          id_proveedor: producto.id_proveedor
+        });
+        
+        setProductos(prev => prev.map(p => 
+          p.id === id ? { ...p, estado: 'activado' } : p
+        ));
+      }
+    } catch (error) {
+      console.error('Error reactivando producto:', error);
+      throw error;
+    }
+  };
+
+  const agregarLaboratorio = async (nuevoLab) => {
+    try {
+      const laboratorioGuardado = await inventarioService.crearLaboratorio(nuevoLab);
+      setLaboratorios(prev => [...prev, laboratorioGuardado]);
+      return laboratorioGuardado;
+    } catch (error) {
+      console.error('Error agregando laboratorio:', error);
+      throw error;
+    }
+  };
+
+  // Función auxiliar para obtener ID del laboratorio por nombre
+  const obtenerIdLaboratorio = (nombreLaboratorio) => {
+    const laboratorio = laboratorios.find(lab => lab.nombre === nombreLaboratorio);
+    return laboratorio ? laboratorio.id : 1; // Default al primer laboratorio
   };
 
   return {
     productos,
     laboratorios,
-    
+    cargando,
     agregarProducto,
-    actualizarProducto, 
+    actualizarProducto,
     desactivarProducto,
     reactivarProducto,
-    agregarLaboratorio
+    agregarLaboratorio,
+    recargarProductos: cargarProductos,
+    recargarLaboratorios: cargarLaboratorios
   };
 };

@@ -64,11 +64,11 @@ const filas = productos.map((producto) => {
             <Table.Td >
             {producto.presentacion}
             </Table.Td>
-            <Table.Td >
-            {producto.precio_base}
+            <Table.Td>
+                Bs {producto.precio_base?.toFixed(2)}
             </Table.Td>
-            <Table.Td >
-            {producto.precio_venta}
+            <Table.Td>
+                Bs {producto.precio_venta?.toFixed(2)}
             </Table.Td>
             <Table.Td >
             <Badge 
@@ -84,9 +84,7 @@ const filas = productos.map((producto) => {
             <Table.Td >
             {producto.laboratorio}
             </Table.Td>
-            <Table.Td >
-            {producto.porcentaje_g} %
-            </Table.Td>
+            <Table.Td>{producto.porcentaje_g}%</Table.Td>
             <Table.Td >
             {/* Mostrar botón de agregar al carrito solo si NO estamos en modo "sin stock" */}
             {!mostrarDesactivados && (
