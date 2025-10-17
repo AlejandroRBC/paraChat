@@ -20,7 +20,8 @@ function ProductoList({
 productos,
 onAgregarCarrito, 
 onEditar, 
-onEliminar,
+onReactivar,
+onDesactivar,
 mostrarDesactivados = false 
 }) {
 
@@ -99,15 +100,17 @@ const filas = productos.map((producto) => {
                 </ActionIcon>
             )}
             
-            {/* Mostrar botón de devolver estado */}
+            {/* Mostrar botón de reactivar cuando estamos en modo desactivados */}
             {mostrarDesactivados && (
                 <ActionIcon 
-                    variant="subtle" 
-                    color="orange" 
-                    size="xl" 
-                    
+                variant="subtle" 
+                color="orange" 
+                size="xl" 
+                onClick={() => {
+                    onReactivar(producto.id);
+                }}
                 >
-                    <IconArrowBackUp size={20} />
+                <IconArrowBackUp size={20} />
                 </ActionIcon>
             )}
             
@@ -122,21 +125,18 @@ const filas = productos.map((producto) => {
                 <IconEdit size={20}/>
             </ActionIcon>
             )}
-            {/* Mostrar botón de eliminar solo si NO estamos en modo "sin stock" */}
+            {/* Mostrar botón de desactivar solo en modo activado */}
             {!mostrarDesactivados && (
                 <ActionIcon 
-                    variant="subtle" 
-                    color="red" 
-                    size="xl" 
-                    onClick={() => {
-                        if (window.confirm(`¿Eliminar ${producto.nombre}?`)) {
-                            onEliminar(producto.id);
-                        }
-                    }}
+                variant="subtle" 
+                color="red" 
+                size="xl" 
+                onClick={() => onDesactivar(producto)} // ← Cambiar a llamar al modal
                 >
-                    <IconTrash size={20}/>
+                <IconTrash size={20}/>
                 </ActionIcon>
             )}
+
             </Table.Td>
         </Table.Tr>
         );

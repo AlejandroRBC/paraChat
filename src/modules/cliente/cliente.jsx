@@ -17,13 +17,13 @@ import { ClienteList } from './components/ClienteList';
 import { ClienteForm } from './components/ClienteForm';
 import { Buscador } from '../global/components/buscador/Buscador';
 import { useMediaQuery } from 'react-responsive';
-import Modal from '../global/components/Modal/Modal'; // ← Importa tu Modal
+import Modal from '../global/components/modal/Modal'
 import './cliente.css';
 
 export function ClientePage() {
   const {
     clientes,
-    clientesOriginales,
+    cargando,
     clienteEditando,
     mostrarForm,
     busqueda,
@@ -46,14 +46,22 @@ export function ClientePage() {
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
   const isDesktop = useMediaQuery({ minWidth: 1025 });
 
-  const handleGuardarCliente = (datosCliente) => {
+  const handleGuardarCliente = async (datosCliente) => {
+  try {
     if (clienteEditando) {
-      actualizarCliente({ ...datosCliente, id: clienteEditando.id });
+      await actualizarCliente({
+        ...datosCliente,
+        cod_cli: clienteEditando.cod_cli,
+        estado: clienteEditando.estado // ← MANTENER EL ESTADO ORIGINAL
+      });
     } else {
-      crearCliente(datosCliente);
+      await crearCliente(datosCliente);
     }
     cerrarFormulario();
-  };
+  } catch (error) {
+    console.error('Error guardando cliente:', error);
+  }
+};
 
   const abrirNuevoCliente = () => {
     setClienteEditando(null);
@@ -148,8 +156,9 @@ export function ClientePage() {
                       Lista de Clientes
                     </Title>
                     <Text c="dimmed" size={isMobile ? "xs" : "sm"}>
-                      {clientes.length} de {clientesOriginales.length} clientes activos
+                      {clientes.length} cliente(s) activo(s)
                       {busqueda && ` - Buscando: "${busqueda}"`}
+                      {cargando && " - Cargando..."}
                     </Text>
                   </div>
                 </Group>
@@ -228,53 +237,60 @@ export function ClientePage() {
                   cliente={clienteEditando}
                   onGuardar={handleGuardarCliente}
                   isMobile={isMobile}
+                  clientes={clientes} // ← ESTA PROP ES ESENCIAL
                 />
               </Card>
             </Grid.Col>
           )}
         </Grid>
 
-        {/* Modal de Confirmación de Eliminación */}
-        {mostrarConfirmacion && (
-          <Modal
-              titulo={<span className="titulo-gradiente">Confirmar Eliminación</span>}
-              onClose={cancelarEliminacion}
-              tamaño="normal"
-                >
-            <div className="modal-eliminar-content">
-              <div className="eliminar-icon">
-                <IconTrash size={48} color="#e53e3e" />
-              </div>
-              
-              <Text ta="center" size="lg" fw={600} mb="md">
-                ¿Estás seguro de que quieres eliminar este cliente?
-              </Text>
-              <Text ta="center" c="dimmed" size="sm" mb="xl">
-                ⚠️ El cliente cambiará a estado "desactivado" y no aparecerá en la lista principal.
-              </Text>
+       {/* Modal de Confirmación de Eliminación */}
+{mostrarConfirmacion && clienteAEliminar && (
+  <Modal
+    titulo={<span className="titulo-gradiente">Confirmar Eliminación</span>}
+    onClose={cancelarEliminacion}
+    tamaño="normal"
+  >
+    <div className="modal-eliminar-content">
+      <div className="eliminar-icon">
+        <IconTrash size={48} color="#e53e3e" />
+      </div>
+      
+      <Text ta="center" size="lg" fw={600} mb="md">
+        ¿Estás seguro de que quieres eliminar este cliente?
+      </Text>
+      
+      <Paper withBorder p="md" mb="xl" style={{ textAlign: 'center' }}>
+        <Text fw={500}>{clienteAEliminar.nombre}</Text>
+        <Text size="sm" c="dimmed">CI/NIT: {clienteAEliminar.ci_nit}</Text>
+      </Paper>
+      
+      <Text ta="center" c="dimmed" size="sm" mb="xl">
+        ⚠️ El cliente cambiará a estado "inactivo" y no aparecerá en la lista principal.
+      </Text>
 
-              <Group justify="center" gap="md">
-                <Button 
-                  variant="light" 
-                  onClick={cancelarEliminacion}
-                  size="md"
-                  className="btn-cancelar"
-                >
-                  Cancelar
-                </Button>
-                <Button 
-                  color="red" 
-                  onClick={() => eliminarCliente(clienteAEliminar?.id)}
-                  size="md"
-                  leftSection={<IconTrash size={16} />}
-                  className="btn-confirmar"
-                >
-                  Confirmar Eliminación
-                </Button>
-              </Group>
-            </div>
-          </Modal>
-        )}
+      <Group justify="center" gap="md">
+        <Button 
+          variant="light" 
+          onClick={cancelarEliminacion}
+          size="md"
+          className="btn-cancelar"
+        >
+          Cancelar
+        </Button>
+        <Button 
+          color="red" 
+          onClick={() => eliminarCliente(clienteAEliminar.cod_cli)}  // ← CAMBIÉ AQUÍ
+          size="md"
+          leftSection={<IconTrash size={16} />}
+          className="btn-confirmar"
+        >
+          Confirmar Eliminación
+        </Button>
+      </Group>
+    </div>
+  </Modal>
+)}
       </Container>
     </div>
   );

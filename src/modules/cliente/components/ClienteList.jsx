@@ -3,7 +3,8 @@ import {
   ScrollArea, 
   ActionIcon, 
   Group, 
-  Text 
+  Text,
+  Badge
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 
@@ -14,15 +15,28 @@ export function ClienteList({
   isMobile = false 
 }) {
   const filas = clientes.map((cliente) => (
-    <Table.Tr key={cliente.id}>
+    <Table.Tr key={cliente.cod_cli}>
       <Table.Td>
         <Text fw={500} size={isMobile ? "xs" : "sm"}>{cliente.nombre}</Text>
       </Table.Td>
       <Table.Td>
-        <Text size={isMobile ? "xs" : "sm"}>{cliente.email}</Text>
+        <Text size={isMobile ? "xs" : "sm"}>{cliente.ci_nit}</Text>
       </Table.Td>
       <Table.Td>
-        <Text size={isMobile ? "xs" : "sm"}>{cliente.telefono}</Text>
+        <Badge 
+          color={cliente.descuento > 0 ? "blue" : "gray"} 
+          size={isMobile ? "sm" : "md"}
+        >
+          {cliente.descuento}%
+        </Badge>
+      </Table.Td>
+      <Table.Td>
+        <Badge 
+          color={cliente.estado === 'activo' ? "green" : "red"} 
+          size={isMobile ? "sm" : "md"}
+        >
+          {cliente.estado}
+        </Badge>
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
@@ -38,7 +52,7 @@ export function ClienteList({
             variant="light" 
             color="red"
             size={isMobile ? "sm" : "md"}
-            onClick={() => onEliminar(cliente.id)}
+            onClick={() => onEliminar(cliente)}
           >
             <IconTrash size={isMobile ? 12 : 16} />
           </ActionIcon>
@@ -53,15 +67,16 @@ export function ClienteList({
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Nombre</Table.Th>
-            <Table.Th>Email</Table.Th>
-            <Table.Th>Teléfono</Table.Th>
+            <Table.Th>CI/NIT</Table.Th>
+            <Table.Th>Descuento</Table.Th>
+            <Table.Th>Estado</Table.Th>
             <Table.Th>Acciones</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {filas.length > 0 ? filas : (
             <Table.Tr>
-              <Table.Td colSpan={4} style={{ textAlign: 'center' }}>
+              <Table.Td colSpan={5} style={{ textAlign: 'center' }}>
                 <Text c="dimmed" py="xl" size={isMobile ? "xs" : "sm"}>
                   No hay clientes registrados
                 </Text>

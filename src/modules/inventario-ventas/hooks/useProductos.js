@@ -316,8 +316,16 @@ export const useProductos = () => {
     ));
   };
 
-  const eliminarProducto = (id) => {
-    setProductos(prev => prev.filter(p => p.id !== id));
+  const desactivarProducto = (id) => {
+    setProductos(prev => prev.map(p => 
+      p.id === id ? { ...p, estado: 'desactivado' } : p
+    ));
+  };
+
+  const reactivarProducto = (id) => {
+    setProductos(prev => prev.map(p => 
+      p.id === id ? { ...p, estado: 'activado' } : p
+    ));
   };
 
   const agregarLaboratorio = (nuevoLab) => {
@@ -328,10 +336,11 @@ export const useProductos = () => {
   return {
     productos,
     laboratorios,
-
+    
     agregarProducto,
-    actualizarProducto,
-    eliminarProducto,
+    actualizarProducto, 
+    desactivarProducto,
+    reactivarProducto,
     agregarLaboratorio
   };
 };

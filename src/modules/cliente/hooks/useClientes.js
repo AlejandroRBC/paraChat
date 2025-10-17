@@ -1,89 +1,144 @@
-import { useState, useMemo } from 'react';
-
-const clientesIniciales = [
-  { id: 1, nombre: 'Juan Pérez', email: 'juan@email.com', telefono: '123456789', estado: 'activo' },
-  { id: 2, nombre: 'María García', email: 'maria@email.com', telefono: '987654321', estado: 'activo' },
-  { id: 3, nombre: 'Carlos López', email: 'carlos@email.com', telefono: '555555555', estado: 'activo' },
-];
+import { useState, useMemo, useEffect } from 'react';
+import clienteService from '../services/clienteService';
 
 export function useClientes() {
-  const [clientes, setClientes] = useState(clientesIniciales);
+  const [clientes, setClientes] = useState([]);
   const [clienteEditando, setClienteEditando] = useState(null);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [busqueda, setBusqueda] = useState('');
   const [clienteAEliminar, setClienteAEliminar] = useState(null);
-  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false); // ← ESTADO DEL MODAL
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+  const [cargando, setCargando] = useState(false);
 
-  // Filtrar solo clientes activos
+  // Cargar clientes al inicializar
+  useEffect(() => {
+    cargarClientes();
+  }, []);
+
+  const cargarClientes = async () => {
+    setCargando(true);
+    try {
+      const datos = await clienteService.obtenerClientes();
+      setClientes(datos);
+    } catch (error) {
+      console.error('Error cargando clientes:', error);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // Filtrar solo clientes ACTIVOS
+  const clientesActivos = useMemo(() => {
+    return clientes.filter(cliente => cliente.estado === 'activo');
+  }, [clientes]);
+
+  // Filtrar clientes por búsqueda (solo activos)
   const clientesFiltrados = useMemo(() => {
-    const clientesActivos = clientes.filter(cliente => cliente.estado === 'activo');
-    
     if (!busqueda.trim()) return clientesActivos;
     
     const termino = busqueda.toLowerCase();
     return clientesActivos.filter(cliente => 
       cliente.nombre.toLowerCase().includes(termino) ||
-      cliente.email.toLowerCase().includes(termino) ||
-      cliente.telefono.includes(termino)
+      (cliente.ci_nit && cliente.ci_nit.toLowerCase().includes(termino))
     );
-  }, [clientes, busqueda]);
+  }, [clientesActivos, busqueda]);
 
-  const resultadosBusqueda = useMemo(() => {
-    if (!busqueda.trim()) return [];
-    
-    return clientesFiltrados.map(cliente => ({
-      id: cliente.id,
-      label: cliente.nombre,
-      category: 'Cliente',
-      email: cliente.email,
-      telefono: cliente.telefono,
-      data: cliente
-    }));
-  }, [clientesFiltrados, busqueda]);
-
-  const crearCliente = (nuevoCliente) => {
-    const cliente = {
-      ...nuevoCliente,
-      id: Math.max(0, ...clientes.map(c => c.id)) + 1,
-      estado: 'activo'
-    };
-    setClientes([...clientes, cliente]);
-    setMostrarForm(false);
+  // Buscar cliente inactivo por CI/NIT
+  const buscarClienteInactivoPorCI = (ci_nit) => {
+    return clientes.find(cliente => 
+      cliente.ci_nit === ci_nit && cliente.estado === 'inactivo'
+    );
   };
 
-  const actualizarCliente = (clienteActualizado) => {
-    setClientes(clientes.map(c => 
-      c.id === clienteActualizado.id ? { ...clienteActualizado, estado: 'activo' } : c
-    ));
-    setMostrarForm(false);
+  // CREAR CLIENTE
+  const crearCliente = async (nuevoCliente) => {
+    try {
+      // Buscar si existe cliente inactivo con mismo CI/NIT
+      const clienteInactivo = buscarClienteInactivoPorCI(nuevoCliente.ci_nit);
+      
+      if (clienteInactivo) {
+        // Reactivar el cliente existente
+        const clienteReactivado = await clienteService.actualizarCliente(
+          clienteInactivo.cod_cli, 
+          {
+            nombre: nuevoCliente.nombre,
+            ci_nit: nuevoCliente.ci_nit,
+            descuento: nuevoCliente.descuento,
+            estado: 'activo'
+          }
+        );
+        
+        setClientes(prev => prev.map(c => 
+          c.cod_cli === clienteInactivo.cod_cli ? clienteReactivado : c
+        ));
+        setMostrarForm(false);
+        return clienteReactivado;
+      } else {
+        // Crear nuevo cliente
+        const clienteCreado = await clienteService.crearCliente(nuevoCliente);
+        setClientes(prev => [...prev, clienteCreado]);
+        setMostrarForm(false);
+        return clienteCreado;
+      }
+    } catch (error) {
+      console.error('Error creando cliente:', error);
+      throw error;
+    }
   };
 
-  // Eliminación suave (cambia estado a 'desactivado')
-  const eliminarCliente = (id) => {
-    setClientes(clientes.map(c => 
-      c.id === id ? { ...c, estado: 'desactivado' } : c
-    ));
-    setMostrarConfirmacion(false); // ← Cerrar modal después de eliminar
-    setClienteAEliminar(null);
+  // ACTUALIZAR CLIENTE
+  const actualizarCliente = async (clienteActualizado) => {
+    try {
+      const resultado = await clienteService.actualizarCliente(
+        clienteActualizado.cod_cli, 
+        {
+          nombre: clienteActualizado.nombre,
+          ci_nit: clienteActualizado.ci_nit,
+          descuento: clienteActualizado.descuento,
+          estado: clienteActualizado.estado
+        }
+      );
+      
+      setClientes(prev => prev.map(c => 
+        c.cod_cli === clienteActualizado.cod_cli ? resultado : c
+      ));
+      
+      setMostrarForm(false);
+      setClienteEditando(null);
+      return true;
+    } catch (error) {
+      console.error('Error actualizando cliente:', error);
+      throw error;
+    }
   };
 
-  // Abrir modal de confirmación
+  // ELIMINAR CLIENTE
+  const eliminarCliente = async (id) => {
+    try {
+      await clienteService.eliminarCliente(id);
+      
+      // Actualizar estado localmente 
+      setClientes(prev => prev.map(c => 
+        c.cod_cli === id ? { ...c, estado: 'inactivo' } : c
+      ));
+      
+      setMostrarConfirmacion(false);
+      setClienteAEliminar(null);
+      return true;
+    } catch (error) {
+      console.error('Error eliminando cliente:', error);
+      throw error;
+    }
+  };
+
   const solicitarEliminacion = (cliente) => {
     setClienteAEliminar(cliente);
-    setMostrarConfirmacion(true); // ← Abrir modal
+    setMostrarConfirmacion(true);
   };
 
-  // Cerrar modal de confirmación
   const cancelarEliminacion = () => {
-    setMostrarConfirmacion(false); // ← Cerrar modal
+    setMostrarConfirmacion(false);
     setClienteAEliminar(null);
-  };
-
-  const manejarSeleccionResultado = (resultado) => {
-    const clienteEncontrado = clientes.find(c => c.id === resultado.id && c.estado === 'activo');
-    if (clienteEncontrado) {
-      abrirEditarCliente(clienteEncontrado);
-    }
   };
 
   const abrirEditarCliente = (cliente) => {
@@ -92,22 +147,22 @@ export function useClientes() {
   };
 
   return {
-    clientes: clientesFiltrados,
-    clientesOriginales: clientes,
+    clientes: clientesFiltrados, // ← Esto ahora son solo los activos filtrados
     clienteEditando,
     mostrarForm,
     busqueda,
+    cargando,
     setBusqueda,
-    resultadosBusqueda,
     clienteAEliminar,
-    mostrarConfirmacion, // ← Exportar este estado
+    mostrarConfirmacion,
     setClienteEditando,
     setMostrarForm,
     crearCliente,
     actualizarCliente,
     eliminarCliente,
-    solicitarEliminacion, // ← Exportar esta función
-    cancelarEliminacion,  // ← Exportar esta función
-    manejarSeleccionResultado,
+    solicitarEliminacion,
+    cancelarEliminacion,
+    abrirEditarCliente,
+    recargarClientes: cargarClientes
   };
 }
