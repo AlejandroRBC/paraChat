@@ -64,22 +64,20 @@ export const useCarrito = () => {
 
   const realizarVenta = async (datosCliente) => {
     try {
-      // Determinar el id_cliente basado en el tipo de venta
+      // Determinar el id_cliente
       let id_cliente;
       
       if (datosCliente.ci_nit === '00000' || datosCliente.nombre === 'S/N') {
-        // Venta rápida - usar cliente especial cod_cli = 0
-        id_cliente = 0;
+        id_cliente = 0; // venta rápida
       } else {
-        // Venta normal - buscar cliente por CI/NIT o crear uno nuevo
         id_cliente = await obtenerOcrearCliente(datosCliente);
       }
   
-      // Preparar datos para la venta
+      // Preparar datos de la venta
       const ventaData = {
         total: totalVenta,
         metodo_pago: datosCliente.metodo_pago,
-        id_cliente: id_cliente,
+        id_cliente: id_cliente,     // <--- AQUÍ se envía
         items: carrito.map(item => ({
           id_producto: item.id,
           nombre: item.nombre,
@@ -88,8 +86,6 @@ export const useCarrito = () => {
         }))
       };
   
-      console.log('Enviando datos de venta:', ventaData);
-      
       const resultado = await inventarioService.crearVenta(ventaData);
       return resultado;
     } catch (error) {
@@ -97,6 +93,7 @@ export const useCarrito = () => {
       throw error;
     }
   };
+  
 
   // Función para obtener o crear cliente
 const obtenerOcrearCliente = async (datosCliente) => {
