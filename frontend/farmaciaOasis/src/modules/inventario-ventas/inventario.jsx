@@ -55,7 +55,6 @@ function Inventario() {
     modificarCantidad,
     eliminarDelCarrito,
     vaciarCarrito,
-    realizarVenta,
     totalVenta
   } = useCarrito();
 
@@ -105,15 +104,8 @@ function Inventario() {
     });
   };
 
-  const handleRealizarVenta = async (datosCliente) => {
-    try {
-      const resultado = await realizarVenta(datosCliente);
-      console.log('Venta realizada:', resultado);
-      return resultado;
-    } catch (error) {
-      console.error('Error en venta:', error);
-      throw error;
-    }
+  const handleRealizarVenta = (datosCliente) => {
+    console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
   };
 
   const handleSubmitProducto = (datos) => {

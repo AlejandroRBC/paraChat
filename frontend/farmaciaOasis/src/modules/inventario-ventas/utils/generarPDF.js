@@ -186,7 +186,6 @@
                 <p><strong>Nombre:</strong> ${datosVenta.nombre}</p>
                 <p><strong>CI/NIT:</strong> ${datosVenta.ci_nit || 'S/D'}</p>
                 <p><strong>Método de Pago:</strong> <span class="badge">${datosVenta.metodo_pago.toUpperCase()}</span></p>
-                <p><strong>Tipo:</strong> <span class="badge">${datosVenta.nombre === 'S/N' ? 'VENTA RÁPIDA' : 'VENTA NORMAL'}</span></p>
             </div>
             </div>
 
@@ -448,13 +447,12 @@
             </div>
 
             <div class="section">
-            <div class="section-title">CLIENTE</div>            
-                <div class="client-info">
+            <div class="section-title">CLIENTE</div>
+            <div class="client-info">
                 <p><strong>Nombre:</strong> ${datosVenta.nombre}</p>
                 <p><strong>CI/NIT:</strong> ${datosVenta.ci_nit || 'S/D'}</p>
                 <p><strong>Método de Pago:</strong> <span class="badge">${datosVenta.metodo_pago.toUpperCase()}</span></p>
-                <p><strong>Tipo:</strong> <span class="badge">${datosVenta.nombre === 'S/N' ? 'VENTA RÁPIDA' : 'VENTA NORMAL'}</span></p>
-                </div>
+            </div>
             </div>
 
             <div class="section">

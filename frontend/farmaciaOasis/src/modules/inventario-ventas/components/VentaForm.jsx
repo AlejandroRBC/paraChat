@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { 
   ScrollArea, 
@@ -13,8 +14,7 @@ import {
   Modal,
   TextInput, 
   Select,
-  Alert,
-  Loader
+  Alert
 } from '@mantine/core';
 import { 
   IconPlus, 
@@ -28,7 +28,8 @@ import {
   IconPrinter,
   IconCheck
 } from '@tabler/icons-react';
-import { generarPDFVenta, imprimirComprobante } from '../utils/generarPDF';
+import { generarPDFVenta,
+  imprimirComprobante } from '../utils/generarPDF';
 
 function VentaForm({ 
   carrito, 
@@ -43,7 +44,6 @@ function VentaForm({
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false);
   const [datosVentaConfirmada, setDatosVentaConfirmada] = useState(null);
   const [numeroVentaGenerado, setNumeroVentaGenerado] = useState('');
-  const [cargando, setCargando] = useState(false); // ✅ Estado cargando agregado
   const [datosCliente, setDatosCliente] = useState({
     nombre: '',
     ci_nit: '',
@@ -57,33 +57,25 @@ function VentaForm({
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (carrito.length === 0) {
       alert('El carrito está vacío');
       return;
     }
     
-    try {
-      setCargando(true); // ✅ Activar carga
-      const resultado = await onRealizarVenta(datosCliente);
-      
-      const numeroVenta = resultado.venta.id_venta;
-      setNumeroVentaGenerado(numeroVenta);
-      setDatosVentaConfirmada(datosCliente);
-      setModalExitoAbierto(true);
-      setModalClienteAbierto(false);
-      
-      setDatosCliente({
-        nombre: '',
-        ci_nit: '',
-        metodo_pago: 'efectivo'
-      });
-    } catch (error) {
-      alert('Error al realizar la venta: ' + error.message);
-    } finally {
-      setCargando(false); // ✅ Desactivar carga
-    }
+    const numeroVenta = `V${String(Math.floor(Math.random() * 100000)).padStart(6, '0')}`;
+    setNumeroVentaGenerado(numeroVenta);
+    setDatosVentaConfirmada(datosCliente);
+    onRealizarVenta(datosCliente);
+    setModalExitoAbierto(true);
+    setModalClienteAbierto(false);
+    
+    setDatosCliente({
+      nombre: '',
+      ci_nit: '',
+      metodo_pago: 'efectivo'
+    });
   };
 
   const abrirModalVenta = () => {
@@ -94,31 +86,23 @@ function VentaForm({
     setModalClienteAbierto(true);
   };
 
-  const handleVentaRapida = async () => {
+  const handleVentaRapida = () => {
     if (carrito.length === 0) {
       alert('El carrito está vacío');
       return;
     }
     
-    try {
-      setCargando(true);
-      const datosVentaRapida = {
-        nombre: 'S/N', // Identificador para venta rápida
-        ci_nit: '00000', // CI/NIT especial para venta rápida
-        metodo_pago: 'efectivo'
-      };
-      
-      const resultado = await onRealizarVenta(datosVentaRapida);
-      const numeroVenta = resultado.venta.id_venta;
-      
-      setNumeroVentaGenerado(numeroVenta);
-      setDatosVentaConfirmada(datosVentaRapida);
-      setModalExitoAbierto(true);
-    } catch (error) {
-      alert('Error al realizar la venta: ' + error.message);
-    } finally {
-      setCargando(false);
-    }
+    const numeroVenta = `V${String(Math.floor(Math.random() * 100000)).padStart(6, '0')}`;
+    const datosVentaRapida = {
+      nombre: 'S/N',
+      ci_nit: '00000',
+      metodo_pago: 'efectivo'
+    };
+    
+    setNumeroVentaGenerado(numeroVenta);
+    setDatosVentaConfirmada(datosVentaRapida);
+    onRealizarVenta(datosVentaRapida);
+    setModalExitoAbierto(true);
   };
 
   const cerrarModalExito = () => {
@@ -233,10 +217,9 @@ function VentaForm({
               onClick={abrirModalVenta}
               size="md"
               fullWidth
-              disabled={cargando} // ✅ Deshabilitar durante carga
             >
-              {cargando ? <Loader size="sm" /> : <IconReceiptDollar size={16} />}
-              {cargando ? 'Procesando...' : 'Venta'}
+              <IconReceiptDollar size={16} />
+              Venta
             </Button>
 
             <Button 
@@ -244,10 +227,9 @@ function VentaForm({
               size="md"
               fullWidth
               variant="light"
-              disabled={cargando} // ✅ Deshabilitar durante carga
             >
-              {cargando ? <Loader size="sm" /> : <IconInvoice size={16} />}
-              {cargando ? 'Procesando...' : 'Venta Rápida'}
+              <IconInvoice size={16} />
+              Venta Rápida
             </Button>
           </Group>
           <Flex gap="md" justify="center" align="flex-start" direction="row" wrap="wrap">
@@ -255,7 +237,6 @@ function VentaForm({
               variant="light" 
               onClick={onVaciarCarrito}
               size="md"
-              disabled={cargando} // ✅ Deshabilitar durante carga
             >
               <IconTrash size={16} />
               Vaciar
@@ -267,7 +248,7 @@ function VentaForm({
       {/* Modal Datos del Cliente */}
       <Modal
         opened={modalClienteAbierto}
-        onClose={() => !cargando && setModalClienteAbierto(false)} // ✅ Prevenir cierre durante carga
+        onClose={() => setModalClienteAbierto(false)}
         title={
           <Group gap="sm">
             <IconUser size={20} />
@@ -277,8 +258,6 @@ function VentaForm({
         size="md"
         overlayProps={{ opacity: 0.5, blur: 4 }}
         styles={{ content: { borderRadius: '12px' } }}
-        closeOnClickOutside={!cargando} // ✅ Prevenir cierre durante carga
-        withCloseButton={!cargando} // ✅ Ocultar botón cerrar durante carga
       >
         <Box component="form" onSubmit={handleSubmit}>
           <Stack gap="md">
@@ -288,7 +267,6 @@ function VentaForm({
               value={datosCliente.nombre}
               onChange={(e) => handleChange('nombre', e.target.value)}
               required
-              disabled={cargando} // ✅ Deshabilitar durante carga
             />
             
             <TextInput
@@ -296,7 +274,6 @@ function VentaForm({
               placeholder="Número de identificación"
               value={datosCliente.ci_nit}
               onChange={(e) => handleChange('ci_nit', e.target.value)}
-              disabled={cargando} // ✅ Deshabilitar durante carga
             />
             
             <Select
@@ -310,7 +287,6 @@ function VentaForm({
               value={datosCliente.metodo_pago}
               onChange={(value) => handleChange('metodo_pago', value)}
               required
-              disabled={cargando} // ✅ Deshabilitar durante carga
             />
 
             <Group justify="space-between" mt="md">
@@ -325,10 +301,8 @@ function VentaForm({
                 type="submit" 
                 color="green"
                 size="md"
-                disabled={cargando} // ✅ Deshabilitar durante carga
-                loading={cargando} // ✅ Mostrar indicador de carga
               >
-                {cargando ? 'Procesando...' : 'Confirmar Venta'}
+                Confirmar Venta
               </Button>
               
               <Button 
@@ -336,7 +310,6 @@ function VentaForm({
                 color="gray"
                 onClick={() => setModalClienteAbierto(false)}
                 size="md"
-                disabled={cargando} // ✅ Deshabilitar durante carga
               >
                 Cancelar
               </Button>
@@ -360,6 +333,8 @@ function VentaForm({
           centered
         >
           <Stack gap="md">
+            
+
             <Box
               p="md"
               style={{
@@ -393,6 +368,7 @@ function VentaForm({
           </Stack>
           <br/>
           <Flex
+            
             gap="md"
             justify="center"
             align="center"
