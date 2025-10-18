@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 const API_URL = 'http://localhost:4000/api';
 
 const inventarioService = {
@@ -90,7 +91,75 @@ const inventarioService = {
             console.error('Error al obtener laboratorios:', error);
             throw error;
             }
+        },
+        // VENTAS
+        crearVenta: async (ventaData) => {
+            try {
+            const response = await axios.post(`${API_URL}/ventas`, ventaData);
+            return response.data.data;
+            } catch (error) {
+            console.error('Error al crear venta:', error);
+            throw error;
+            }
+        },
+        
+        obtenerVentas: async () => {
+            try {
+            const response = await axios.get(`${API_URL}/ventas`);
+            return response.data.data;
+            } catch (error) {
+            console.error('Error al obtener ventas:', error);
+            throw error;
+            }
+        },
+        
+        obtenerVenta: async (id) => {
+            try {
+            const response = await axios.get(`${API_URL}/ventas/${id}`);
+            return response.data.data;
+            } catch (error) {
+            console.error('Error al obtener venta:', error);
+            throw error;
+            }
+        },
+        
+        obtenerReporteVentas: async (fechaInicio, fechaFin) => {
+            try {
+            const params = {};
+            if (fechaInicio) params.fecha_inicio = fechaInicio;
+            if (fechaFin) params.fecha_fin = fechaFin;
+            
+            const response = await axios.get(`${API_URL}/ventas-reporte`, { params });
+            return response.data.data;
+            } catch (error) {
+            console.error('Error al obtener reporte de ventas:', error);
+            throw error;
+            }
+        },
+        // Funciones para clientes (para ventas)
+        buscarClientePorCI: async (ci_nit) => {
+            try {
+            const response = await axios.get(`${API_URL}/clientes`);
+            const clientes = response.data.data;
+            return clientes.find(cliente => 
+                cliente.ci_nit === ci_nit && cliente.estado === 'activo'
+            );
+            } catch (error) {
+            console.error('Error al buscar cliente por CI:', error);
+            throw error;
+            }
+        },
+        
+        crearCliente: async (clienteData) => {
+            try {
+            const response = await axios.post(`${API_URL}/clientes`, clienteData);
+            return response.data.data;
+            } catch (error) {
+            console.error('Error al crear cliente:', error);
+            throw error;
+            }
         }
 };
 
 export default inventarioService;
+

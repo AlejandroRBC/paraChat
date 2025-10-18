@@ -10,7 +10,7 @@ function Sidebar({ onClose }) {
     { path: '/historial-ventas', label: 'Historial Ventas', icon: '📊' },
     { path: '/ingresos-egresos', label: 'Ingresos y egresos', icon: '📋' },
     { path: '/clientes', label: 'Clientes', icon: '👥' },
-    { path: '/proveedores', label: 'Proveedores', icon: '🚚' }
+    { path: '/proveedores', label: 'Proveedores y Mercancia', icon: '🚚' }
   ];
 
   const handleNavigation = (path) => {

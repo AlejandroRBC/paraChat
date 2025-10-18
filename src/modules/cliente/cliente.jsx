@@ -201,17 +201,17 @@ export function ClientePage() {
                 p={isMobile ? "md" : "lg"} 
                 radius="md" 
                 className="form-card"
-                style={{
-                  position: isMobile ? 'fixed' : 'sticky',
-                  top: isMobile ? 0 : 20,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  zIndex: 1000,
-                  margin: isMobile ? 0 : 'auto',
-                  height: isMobile ? '100vh' : 'auto',
-                  overflowY: isMobile ? 'auto' : 'visible'
-                }}
+                 style={{
+                    position: 'relative', // ← Esto evita sobreposición
+                    top: 'auto',
+                    left: 'auto', 
+                    right: 'auto',
+                    bottom: 'auto',
+                    zIndex: 1, // ← Bajo z-index para que no se sobreponga
+                    margin: '0 auto', // ← Centrado normal
+                    height: 'auto', // ← Altura automática
+                    overflowY: 'visible' // ← Scroll normal
+                  }}
               >
                 <div className="form-header">
                   <Group justify="space-between" align="center" wrap="nowrap">
@@ -280,7 +280,7 @@ export function ClientePage() {
         </Button>
         <Button 
           color="red" 
-          onClick={() => eliminarCliente(clienteAEliminar.cod_cli)}  // ← CAMBIÉ AQUÍ
+          onClick={() => eliminarCliente(clienteAEliminar.cod_cli)}  
           size="md"
           leftSection={<IconTrash size={16} />}
           className="btn-confirmar"

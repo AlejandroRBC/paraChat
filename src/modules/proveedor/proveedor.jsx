@@ -11,13 +11,12 @@ import {
   Divider,
   Box
 } from '@mantine/core';
-import { IconPlus, IconX, IconTruck, IconTrash } from '@tabler/icons-react';
+import { IconPlus, IconX, IconTruck } from '@tabler/icons-react';
 import { useProveedores } from './hooks/useProveedores';
 import { ProveedorList } from './components/ProveedorList';
 import { ProveedorForm } from './components/ProveedorForm';
 import { Buscador } from '../global/components/buscador/Buscador';
 import { useMediaQuery } from 'react-responsive';
-import Modal from '../global/components/Modal/Modal';
 import './proveedor.css';
 
 export function ProveedorPage() {
@@ -27,17 +26,13 @@ export function ProveedorPage() {
     proveedorEditando,
     mostrarForm,
     busqueda,
+    cargando,
     setBusqueda,
     resultadosBusqueda,
-    proveedorAEliminar,
-    mostrarConfirmacion,
     setProveedorEditando,
     setMostrarForm,
     crearProveedor,
     actualizarProveedor,
-    eliminarProveedor,
-    solicitarEliminacion,
-    cancelarEliminacion,
     manejarSeleccionResultado,
   } = useProveedores();
 
@@ -46,13 +41,20 @@ export function ProveedorPage() {
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
   const isDesktop = useMediaQuery({ minWidth: 1025 });
 
-  const handleGuardarProveedor = (datosProveedor) => {
-    if (proveedorEditando) {
-      actualizarProveedor({ ...datosProveedor, id: proveedorEditando.id });
-    } else {
-      crearProveedor(datosProveedor);
+  const handleGuardarProveedor = async (datosProveedor) => {
+    try {
+      if (proveedorEditando) {
+        await actualizarProveedor({
+          ...datosProveedor,
+          id_proveedor: proveedorEditando.id_proveedor
+        });
+      } else {
+        await crearProveedor(datosProveedor);
+      }
+      cerrarFormulario();
+    } catch (error) {
+      console.error('Error guardando mercancía:', error);
     }
-    cerrarFormulario();
   };
 
   const abrirNuevoProveedor = () => {
@@ -89,7 +91,9 @@ export function ProveedorPage() {
         <Text size="sm" fw={500}>
           {resultado.label}
         </Text>
-        
+        <Text size="xs" c="dimmed">
+          {resultado.telefono} • {resultado.concepto}
+        </Text>
       </div>
       <Text size="xs" c="blue" className="result-category">
         {resultado.category}
@@ -112,10 +116,10 @@ export function ProveedorPage() {
                 className="gradient-title"
                 style={{ fontSize: isMobile ? '28px' : '32px' }}
               >
-                Gestión de Proveedores
+                Proveedores y Mercancía
               </Title>
               <Text c="dimmed" size={isMobile ? "xs" : "sm"}>
-                Administra tu lista de proveedores
+                Administra tu inventario de mercancía
               </Text>
             </div>
           </Group>
@@ -127,7 +131,7 @@ export function ProveedorPage() {
               size={isMobile ? "sm" : "md"}
               fullWidth={isMobile}
             >
-              Nuevo Proveedor
+              Agregar Mercancía
             </Button>
           )}
         </Group>
@@ -146,11 +150,12 @@ export function ProveedorPage() {
                 >
                   <div>
                     <Title order={isMobile ? 3 : 2} className="gradient-title">
-                      Lista de Proveedores
+                      Recepcion de Mercancia
                     </Title>
                     <Text c="dimmed" size={isMobile ? "xs" : "sm"}>
-                      {proveedores.length} de {proveedoresOriginales.length} proveedores activos
+                      {proveedores.length} registro(s)
                       {busqueda && ` - Buscando: "${busqueda}"`}
+                      {cargando && " - Cargando..."}
                     </Text>
                   </div>
                 </Group>
@@ -158,7 +163,7 @@ export function ProveedorPage() {
                 {/* BUSCADOR RESPONSIVE */}
                 <Box className="buscador-container">
                   <Buscador
-                    placeholder="Buscar proveedores..."
+                    placeholder="Buscar Proveedor ..."
                     value={busqueda}
                     onChange={setBusqueda}
                     onSearch={(valor) => console.log('Buscando:', valor)}
@@ -179,7 +184,6 @@ export function ProveedorPage() {
               <ProveedorList
                 proveedores={proveedores}
                 onEditar={abrirEditarProveedor}
-                onEliminar={solicitarEliminacion}
                 isMobile={isMobile}
               />
             </Paper>
@@ -195,25 +199,25 @@ export function ProveedorPage() {
                 radius="md" 
                 className="form-card"
                 style={{
-                  position: isMobile ? 'fixed' : 'sticky',
-                  top: isMobile ? 0 : 20,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  zIndex: 1000,
-                  margin: isMobile ? 0 : 'auto',
-                  height: isMobile ? '100vh' : 'auto',
-                  overflowY: isMobile ? 'auto' : 'visible'
+                  position: 'relative',
+                  top: 'auto',
+                  left: 'auto', 
+                  right: 'auto',
+                  bottom: 'auto',
+                  zIndex: 1,
+                  margin: '0 auto',
+                  height: 'auto',
+                  overflowY: 'visible'
                 }}
               >
                 <div className="form-header">
                   <Group justify="space-between" align="center" wrap="nowrap">
                     <div>
                       <Title order={isMobile ? 4 : 3} className="gradient-title">
-                        {proveedorEditando ? 'Editar Proveedor' : 'Nuevo Proveedor'}
+                        {proveedorEditando ? 'Modificar' : 'Agregar Mercancía'}
                       </Title>
                       <Text c="dimmed" size={isMobile ? "xs" : "sm"}>
-                        {proveedorEditando ? 'Modifica la información' : 'Completa los datos'}
+                        {proveedorEditando ? 'Actualiza la información' : 'Registra nueva mercancía'}
                       </Text>
                     </div>
                     <ActionIcon
@@ -230,56 +234,12 @@ export function ProveedorPage() {
                   proveedor={proveedorEditando}
                   onGuardar={handleGuardarProveedor}
                   isMobile={isMobile}
+                  proveedores={proveedoresOriginales}
                 />
               </Card>
             </Grid.Col>
           )}
         </Grid>
-
-        {/* Modal de Confirmación de Eliminación */}
-        {mostrarConfirmacion && (
-           <Modal
-              titulo={<span className="titulo-gradiente">Confirmar Eliminación</span>}
-              onClose={cancelarEliminacion}
-              tamaño="normal"
-                >
-            <div className="modal-eliminar-content">
-              <div className="eliminar-icon">
-                <IconTrash size={48} color="#e53e3e" />
-              </div>
-              
-              <Text ta="center" size="lg" fw={600} mb="md">
-                ¿Estás seguro de que quieres eliminar este proveedor?
-              </Text>
-              
-             
-
-              <Text ta="center" c="dimmed" size="sm" mb="xl">
-                ⚠️ El proveedor cambiará a estado "desactivado" y no aparecerá en la lista principal.
-              </Text>
-
-              <Group justify="center" gap="md">
-                <Button 
-                  variant="light" 
-                  onClick={cancelarEliminacion}
-                  size="md"
-                  className="btn-cancelar"
-                >
-                  Cancelar
-                </Button>
-                <Button 
-                  color="red" 
-                  onClick={() => eliminarProveedor(proveedorAEliminar?.id)}
-                  size="md"
-                  leftSection={<IconTrash size={16} />}
-                  className="btn-confirmar"
-                >
-                  Confirmar Eliminación
-                </Button>
-              </Group>
-            </div>
-          </Modal>
-        )}
       </Container>
     </div>
   );

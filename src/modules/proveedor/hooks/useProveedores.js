@@ -1,88 +1,101 @@
-import { useState, useMemo } from 'react';
-
-const proveedoresIniciales = [
-  { id: 1, empresa: 'Distribuidora ABC', contacto: 'Roberto Martínez', email: 'roberto@abc.com', telefono: '111222333', estado: 'activo' },
-  { id: 2, empresa: 'Suministros XYZ', contacto: 'Laura González', email: 'laura@xyz.com', telefono: '444555666', estado: 'activo' },
-  { id: 3, empresa: 'Importaciones Global', contacto: 'Carlos Rodríguez', email: 'carlos@global.com', telefono: '777888999', estado: 'activo' },
-];
+import { useState, useMemo, useEffect } from 'react';
+import proveedorService from '../services/proveedorService';
 
 export function useProveedores() {
-  const [proveedores, setProveedores] = useState(proveedoresIniciales);
+  const [proveedores, setProveedores] = useState([]);
   const [proveedorEditando, setProveedorEditando] = useState(null);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [busqueda, setBusqueda] = useState('');
-  const [proveedorAEliminar, setProveedorAEliminar] = useState(null);
-  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false); // ← ESTADO DEL MODAL
+  const [cargando, setCargando] = useState(false);
 
-  // Filtrar solo proveedores activos
+  // Cargar proveedores al inicializar
+  useEffect(() => {
+    cargarProveedores();
+  }, []);
+
+  const cargarProveedores = async () => {
+    setCargando(true);
+    try {
+      const datos = await proveedorService.obtenerProveedores();
+      setProveedores(datos);
+    } catch (error) {
+      console.error('Error cargando proveedores:', error);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // Filtrar proveedores por búsqueda
   const proveedoresFiltrados = useMemo(() => {
-    const proveedoresActivos = proveedores.filter(proveedor => proveedor.estado === 'activo');
-    
-    if (!busqueda.trim()) return proveedoresActivos;
-    
+    if (!busqueda.trim()) return proveedores;
+
     const termino = busqueda.toLowerCase();
-    return proveedoresActivos.filter(proveedor => 
-      proveedor.empresa.toLowerCase().includes(termino) ||
-      proveedor.contacto.toLowerCase().includes(termino) ||
-      proveedor.email.toLowerCase().includes(termino) ||
-      proveedor.telefono.includes(termino)
+    return proveedores.filter(proveedor =>
+      proveedor.nombre.toLowerCase().includes(termino) ||
+      (proveedor.telefono && proveedor.telefono.toLowerCase().includes(termino)) ||
+      (proveedor.concepto && proveedor.concepto.toLowerCase().includes(termino))
     );
   }, [proveedores, busqueda]);
 
+  // Resultados para el buscador
   const resultadosBusqueda = useMemo(() => {
     if (!busqueda.trim()) return [];
-    
+
     return proveedoresFiltrados.map(proveedor => ({
-      id: proveedor.id,
-      label: proveedor.empresa,
+      id: proveedor.id_proveedor,
+      label: proveedor.nombre,
       category: 'Proveedor',
-      contacto: proveedor.contacto,
-      email: proveedor.email,
       telefono: proveedor.telefono,
+      concepto: proveedor.concepto,
       data: proveedor
     }));
   }, [proveedoresFiltrados, busqueda]);
 
-  const crearProveedor = (nuevoProveedor) => {
-    const proveedor = {
-      ...nuevoProveedor,
-      id: Math.max(0, ...proveedores.map(p => p.id)) + 1,
-      estado: 'activo'
-    };
-    setProveedores([...proveedores, proveedor]);
-    setMostrarForm(false);
+  // CREAR PROVEEDOR
+  const crearProveedor = async (nuevoProveedor) => {
+    try {
+      const proveedorCreado = await proveedorService.crearProveedor(nuevoProveedor);
+      setProveedores(prev => [...prev, proveedorCreado]);
+      setMostrarForm(false);
+      return proveedorCreado;
+    } catch (error) {
+      console.error('Error creando proveedor:', error);
+      throw error;
+    }
   };
 
-  const actualizarProveedor = (proveedorActualizado) => {
-    setProveedores(proveedores.map(p => 
-      p.id === proveedorActualizado.id ? { ...proveedorActualizado, estado: 'activo' } : p
-    ));
-    setMostrarForm(false);
-  };
+  // ACTUALIZAR PROVEEDOR
+  const actualizarProveedor = async (proveedorActualizado) => {
+    try {
+      const resultado = await proveedorService.actualizarProveedor(
+        proveedorActualizado.id_proveedor,
+        {
+          nombre: proveedorActualizado.nombre,
+          telefono: proveedorActualizado.telefono,
+          cantidad: proveedorActualizado.cantidad,
+          concepto: proveedorActualizado.concepto,
+          precio_unitario: proveedorActualizado.precio_unitario,
+          precio_total: proveedorActualizado.precio_total
+        }
+      );
 
-  // Eliminación suave
-  const eliminarProveedor = (id) => {
-    setProveedores(proveedores.map(p => 
-      p.id === id ? { ...p, estado: 'desactivado' } : p
-    ));
-    setMostrarConfirmacion(false);
-    setProveedorAEliminar(null);
-  };
+      setProveedores(prev =>
+        prev.map(p =>
+          p.id_proveedor === proveedorActualizado.id_proveedor ? resultado : p
+        )
+      );
 
-  // Abrir modal de confirmación
-  const solicitarEliminacion = (proveedor) => {
-    setProveedorAEliminar(proveedor);
-    setMostrarConfirmacion(true);
-  };
-
-  // Cerrar modal de confirmación
-  const cancelarEliminacion = () => {
-    setMostrarConfirmacion(false);
-    setProveedorAEliminar(null);
+      setMostrarForm(false);
+      setProveedorEditando(null);
+      return true;
+    } catch (error) {
+      console.error('Error actualizando proveedor:', error);
+      throw error;
+    }
   };
 
   const manejarSeleccionResultado = (resultado) => {
-    const proveedorEncontrado = proveedores.find(p => p.id === resultado.id && p.estado === 'activo');
+    const proveedorEncontrado = proveedores.find(p => p.id_proveedor === resultado.id);
     if (proveedorEncontrado) {
       abrirEditarProveedor(proveedorEncontrado);
     }
@@ -99,17 +112,15 @@ export function useProveedores() {
     proveedorEditando,
     mostrarForm,
     busqueda,
+    cargando,
     setBusqueda,
     resultadosBusqueda,
-    proveedorAEliminar,
-    mostrarConfirmacion,
     setProveedorEditando,
     setMostrarForm,
     crearProveedor,
     actualizarProveedor,
-    eliminarProveedor,
-    solicitarEliminacion,
-    cancelarEliminacion,
     manejarSeleccionResultado,
+    abrirEditarProveedor,
+    recargarProveedores: cargarProveedores
   };
 }

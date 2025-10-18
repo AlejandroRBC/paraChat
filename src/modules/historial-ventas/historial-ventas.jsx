@@ -95,7 +95,7 @@ function HistorialVentas() {
         v.id_venta,
         v.fecha,
         v.hora,
-        v.nombre_cliente,
+        v.cliente,
         v.ci_nit,
         v.metodo_pago,
         v.productos,

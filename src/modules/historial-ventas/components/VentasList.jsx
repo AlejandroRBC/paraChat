@@ -1,4 +1,4 @@
-
+//src/modules/historial-ventas/components/VentaList.jsx
 import { IconAlertTriangle,
   IconPackage, 
   IconCheck, 
@@ -50,7 +50,7 @@ function VentasList({ ventas }) {
             {venta.hora}
           </Table.Td>
           <Table.Td className="mantine-Table-td">
-            {venta.nombre_cliente}
+            {venta.cliente}
           </Table.Td>
           <Table.Td className="mantine-Table-td">
             {venta.ci_nit}

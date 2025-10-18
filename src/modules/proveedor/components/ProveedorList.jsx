@@ -3,29 +3,38 @@ import {
   ScrollArea, 
   ActionIcon, 
   Group, 
-  Text 
+  Text
 } from '@mantine/core';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconEdit } from '@tabler/icons-react';
 
 export function ProveedorList({ 
   proveedores, 
-  onEditar, 
-  onEliminar,
+  onEditar,
   isMobile = false 
 }) {
   const filas = proveedores.map((proveedor) => (
-    <Table.Tr key={proveedor.id}>
+    <Table.Tr key={proveedor.id_proveedor}>
       <Table.Td>
-        <Text fw={500} size={isMobile ? "xs" : "sm"}>{proveedor.empresa}</Text>
-      </Table.Td>
-      <Table.Td>
-        <Text size={isMobile ? "xs" : "sm"}>{proveedor.contacto}</Text>
-      </Table.Td>
-      <Table.Td>
-        <Text size={isMobile ? "xs" : "sm"}>{proveedor.email}</Text>
+        <Text fw={500} size={isMobile ? "xs" : "sm"}>{proveedor.nombre}</Text>
       </Table.Td>
       <Table.Td>
         <Text size={isMobile ? "xs" : "sm"}>{proveedor.telefono}</Text>
+      </Table.Td>
+      <Table.Td>
+        <Text size={isMobile ? "xs" : "sm"}>{proveedor.cantidad}</Text>
+      </Table.Td>
+      <Table.Td>
+        <Text size={isMobile ? "xs" : "sm"}>{proveedor.concepto}</Text>
+      </Table.Td>
+      <Table.Td>
+        <Text size={isMobile ? "xs" : "sm"}>
+          {proveedor.precio_unitario ? `Bs ${proveedor.precio_unitario}` : 'Bs 0'}
+        </Text>
+      </Table.Td>
+      <Table.Td>
+        <Text size={isMobile ? "xs" : "sm"}>
+          {proveedor.precio_total ? `Bs ${proveedor.precio_total}` : 'Bs 0'}
+        </Text>
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
@@ -37,14 +46,6 @@ export function ProveedorList({
           >
             <IconEdit size={isMobile ? 12 : 16} />
           </ActionIcon>
-          <ActionIcon 
-            variant="light" 
-            color="red"
-            size={isMobile ? "sm" : "md"}
-            onClick={() => onEliminar(proveedor.id)}
-          >
-            <IconTrash size={isMobile ? 12 : 16} />
-          </ActionIcon>
         </Group>
       </Table.Td>
     </Table.Tr>
@@ -55,19 +56,21 @@ export function ProveedorList({
       <Table verticalSpacing={isMobile ? "xs" : "sm"} fontSize={isMobile ? "xs" : "sm"}>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Empresa</Table.Th>
-            <Table.Th>Contacto</Table.Th>
-            <Table.Th>Email</Table.Th>
-            <Table.Th>Teléfono</Table.Th>
+            <Table.Th>Nombre Proveedor</Table.Th>
+            <Table.Th>Teléfono Proveedor</Table.Th>
+            <Table.Th>Cantidad</Table.Th>
+            <Table.Th>Concepto</Table.Th>
+            <Table.Th>Precio Unit.</Table.Th>
+            <Table.Th>Precio Total</Table.Th>
             <Table.Th>Acciones</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {filas.length > 0 ? filas : (
             <Table.Tr>
-              <Table.Td colSpan={5} style={{ textAlign: 'center' }}>
+              <Table.Td colSpan={7} style={{ textAlign: 'center' }}>
                 <Text c="dimmed" py="xl" size={isMobile ? "xs" : "sm"}>
-                  No hay proveedores registrados
+                  No hay mercancía registrada
                 </Text>
               </Table.Td>
             </Table.Tr>

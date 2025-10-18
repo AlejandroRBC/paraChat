@@ -89,10 +89,17 @@ const filas = productos.map((producto) => {
             {/* Mostrar botón de agregar al carrito solo si NO estamos en modo "sin stock" */}
             {!mostrarDesactivados && (
                 <ActionIcon 
-                    variant="subtle" 
-                    color="green" 
-                    size="xl" 
-                    onClick={() => onAgregarCarrito(producto)}
+                variant="subtle" 
+                color="green" 
+                size="xl" 
+                onClick={() => {
+                    if (producto.stock <= 0) {
+                        alert('Producto sin stock disponible');
+                        return;
+                    }
+                    onAgregarCarrito(producto);
+                    }}
+                    disabled={producto.stock <= 0}
                 >
                     <IconShoppingCartPlus size={20} />
                 </ActionIcon>

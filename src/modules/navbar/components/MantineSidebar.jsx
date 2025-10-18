@@ -19,7 +19,7 @@ const data = [
   { link: '/historial-ventas', label: 'Historial Ventas', icon: IconReceipt2 },
   { link: '/ingresos-egresos', label: 'Ingresos y Egresos', icon: IconListDetails },
   { link: '/clientes', label: 'Clientes', icon: IconUsers },
-  { link: '/proveedores', label: 'Proveedores', icon: IconTruck },
+  { link: '/proveedores', label: 'Proveedores y Mercancia', icon: IconTruck },
 ];
 
 export function MantineSidebar({ onClose }) {
