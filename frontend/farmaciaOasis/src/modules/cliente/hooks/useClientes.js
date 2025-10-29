@@ -43,6 +43,28 @@ export function useClientes() {
     );
   }, [clientesActivos, busqueda]);
 
+  // ✅ AGREGADO: Resultados para el buscador (igual que useProveedores)
+  const resultadosBusqueda = useMemo(() => {
+    if (!busqueda.trim()) return [];
+
+    return clientesFiltrados.map(cliente => ({
+      id: cliente.cod_cli,
+      label: cliente.nombre,
+      category: 'Cliente',
+      nombre: cliente.nombre,
+      ci_nit: cliente.ci_nit,
+      data: cliente
+    }));
+  }, [clientesFiltrados, busqueda]);
+
+  // ✅ AGREGADO: Manejar selección de resultado (igual que useProveedores)
+  const manejarSeleccionResultado = (resultado) => {
+    const clienteEncontrado = clientes.find(c => c.cod_cli === resultado.id);
+    if (clienteEncontrado) {
+      abrirEditarCliente(clienteEncontrado);
+    }
+  };
+
   // Buscar cliente inactivo por CI/NIT
   const buscarClienteInactivoPorCI = (ci_nit) => {
     return clientes.find(cliente => 
@@ -147,12 +169,14 @@ export function useClientes() {
   };
 
   return {
-    clientes: clientesFiltrados, // ← Esto ahora son solo los activos filtrados
+    clientes: clientesFiltrados,
     clienteEditando,
     mostrarForm,
     busqueda,
     cargando,
     setBusqueda,
+    // ✅ AGREGADOS: Estas son las props que faltaban
+    resultadosBusqueda,
     clienteAEliminar,
     mostrarConfirmacion,
     setClienteEditando,
@@ -162,6 +186,8 @@ export function useClientes() {
     eliminarCliente,
     solicitarEliminacion,
     cancelarEliminacion,
+    // ✅ AGREGADO: Esta función es esencial
+    manejarSeleccionResultado,
     abrirEditarCliente,
     recargarClientes: cargarClientes
   };

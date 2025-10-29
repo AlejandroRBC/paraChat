@@ -91,19 +91,23 @@ export function ClientePage() {
 
   const gridSpans = getGridSpans();
 
-  const renderizarResultado = (resultado) => (
-    <Group justify="space-between" w="100%">
-      <div>
-        <Text size="sm" fw={500}>
-          {resultado.label}
+  const renderizarResultado = (resultado) => {
+    return (
+      <Group justify="space-between" w="100%">
+        <div>
+          <Text size="sm" fw={500}>
+            {resultado.label}
+          </Text>
+          <Text size="xs" c="dimmed">
+            CI/NIT: {resultado.ci_nit}
+          </Text>
+        </div>
+        <Text size="xs" c="blue" className="result-category">
+          {resultado.category}
         </Text>
-      </div>
-      <Text size="xs" c="blue" className="result-category">
-        {resultado.category}
-      </Text>
-    </Group>
-  );
-
+      </Group>
+    );
+  };
   return (
     <div className="cliente-page">
       <Container size="xl" py="xl" px={isMobile ? "xs" : "md"}>

@@ -1,6 +1,7 @@
+// components/ProductosVencerModal.jsx
 import { Modal, Table, Badge, Text, Group, Paper, Title, Alert, ScrollArea, Box, ActionIcon } from '@mantine/core';
 import { IconCalendarExclamation, IconCalendar, IconAlertTriangle, IconCheck, IconX } from '@tabler/icons-react';
-import '../dashboard.css';  // ✅ CSS separado
+import '../dashboard.css';
 
 function ProductosVencerModal({ productos, opened, onClose }) {
   const getBadgeColor = (dias) => {
@@ -31,12 +32,13 @@ function ProductosVencerModal({ productos, opened, onClose }) {
       <Table.Tr 
         key={producto.id}
         className="vencer-product-row"
-        style={{ borderLeft: `3px solid ${borderColor}` }}  // ✅ Solo color dinámico
+        style={{ borderLeft: `3px solid ${borderColor}` }}
       >
         <Table.Td className="vencer-product-cell">
           <Group gap="sm">
             <IconCalendar size={16} color={badgeColor} />
             <div>
+              {/* ✅ CORREGIDO: producto.nombre en lugar de producto.nombre_prod */}
               <Text fw={600} size="sm" c="dark.8">{producto.nombre}</Text>
               <Text size="xs" c="dimmed">ID: {producto.id}</Text>
             </div>
@@ -46,8 +48,11 @@ function ProductosVencerModal({ productos, opened, onClose }) {
           <Text fw={500} size="sm" c="dark.7">{producto.laboratorio}</Text>
         </Table.Td>
         <Table.Td className="vencer-product-cell">
+          {/* ✅ CORREGIDO: producto.fechaVencimiento en lugar de producto.fecha_exp */}
           <Text fw={500} size="sm">
-            {new Date(producto.fechaVencimiento).toLocaleDateString('es-ES')}
+            {new Date(new Date(producto.fechaVencimiento).getTime() + 24 * 60 * 60 * 1000).toLocaleDateString('es-ES')}
+
+
           </Text>
         </Table.Td>
         <Table.Td className="vencer-product-cell">
@@ -100,21 +105,7 @@ function ProductosVencerModal({ productos, opened, onClose }) {
       centered
       withCloseButton={false}
       scrollAreaComponent={ScrollArea.Autosize}
-      styles={{
-        content: {
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          border: '1px solid #e9ecef'
-        },
-        header: {
-          background: 'white',
-          borderBottom: '1px solid #f1f3f5',
-          marginBottom: 0,
-          padding: '20px',
-          position: 'relative'
-        }
-      }}
     >
-      {/* X TRANSPARENTE FIJA EN LA ESQUINA SUPERIOR DERECHA */}
       <ActionIcon 
         variant="subtle" 
         color="gray" 
@@ -128,11 +119,10 @@ function ProductosVencerModal({ productos, opened, onClose }) {
 
       {productos.length === 0 ? (
         <Alert color="green" title="Todo en orden" icon={<IconCalendar size={16} />} radius="md">
-          No hay productos por vencer en los próximos 60 días.
+          No hay productos por vencer en los próximos 30 días.
         </Alert>
       ) : (
         <>
-          {/* ALERTA CON BORDE IZQUIERDO GRUESO Y HOVER */}
           <Box className="vencer-alert-container">
             <Alert 
               color="blue" 

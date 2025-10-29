@@ -150,7 +150,7 @@ export const useMovimientos = () => {
 
   // Función para buscar movimientos por nombre y lote
   const buscarMovimientos = (terminoBusqueda) => {
-    if (!terminoBusqueda) return movimientos; // Si no hay búsqueda, devolver todos
+    if (!terminoBusqueda) return movimientos; 
 
     const termino = terminoBusqueda.toLowerCase().trim();
 

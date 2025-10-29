@@ -1,32 +1,12 @@
 import { 
-  IconBell,
-  IconTrashOff,
-  IconShoppingCart,
-  IconTrashX,
-  IconTrash,
-  IconShoppingCartFilled,
-  IconX
+  IconBell,IconTrashOff,IconShoppingCart,IconTrashX,IconTrash,IconShoppingCartFilled,IconX
 } from '@tabler/icons-react';
 import { 
-  Center,
-  ThemeIcon,
-  Stack,
-  Switch,
-  Badge,
-  Text,
-  Container,
-  Flex,
-  ActionIcon,
-  Button,
-  Space,
-  Group,
-  Drawer,
-  AppShell
-} from '@mantine/core';
+  Center,ThemeIcon,Stack,Switch,Badge,Text,Container,Flex,ActionIcon,Button,Space,Group,Drawer,AppShell} from '@mantine/core';
 import { useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useProductos } from './hooks/useProductos';
-import { useCarrito } from './hooks/useCarrito';
+import { useCarrito} from './hooks/useCarrito';
 import { useModales } from './hooks/useModales'; 
 
 import { Buscador  } from "./../global/components/buscador/Buscador";
@@ -45,8 +25,11 @@ function Inventario() {
     agregarProducto,
     actualizarProducto,
     desactivarProducto,
+    actualizarStockProducto,
     reactivarProducto,
-    agregarLaboratorio
+    agregarLaboratorio,
+    
+    recargarProductos 
   } = useProductos();
 
   const {
@@ -55,8 +38,15 @@ function Inventario() {
     modificarCantidad,
     eliminarDelCarrito,
     vaciarCarrito,
-    totalVenta
-  } = useCarrito();
+    realizarVenta,
+    totalVenta,
+    hayStockDisponible,
+    obtenerStockDisponible
+  } = useCarrito(
+    productos, 
+    actualizarStockProducto, 
+    recargarProductos 
+  );
 
   const {
     modalProducto,
@@ -66,6 +56,7 @@ function Inventario() {
     abrirModalLaboratorio,
     cerrarModalLaboratorio,
   } = useModales();
+  
   
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
   const [mostrarDesactivados, setMostrarDesactivados] = useState(false);
@@ -104,9 +95,21 @@ function Inventario() {
     });
   };
 
-  const handleRealizarVenta = (datosCliente) => {
-    console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
-  };
+// En la función handleRealizarVenta, cambia a:
+const handleRealizarVenta = async (datosCliente) => {
+  try {
+    console.log('Realizando venta:', { datosCliente, carrito, totalVenta });
+    
+    // ✅ LLAMAR A LA FUNCIÓN DEL HOOK QUE CONECTA CON EL BACKEND
+    const resultado = await realizarVenta(datosCliente);
+    
+    console.log('Venta realizada exitosamente:', resultado);
+    return resultado; // ✅ IMPORTANTE: Retornar el resultado
+  } catch (error) {
+    console.error('Error en handleRealizarVenta:', error);
+    throw error; // ✅ Propagar el error
+  }
+};
 
   const handleSubmitProducto = (datos) => {
     if (modalProducto.producto) {
@@ -131,13 +134,40 @@ function Inventario() {
     return coincideBusqueda && p.estado === 'activado';
   });
   
-  const resultadosParaBuscador = productosFiltrados.map(p => ({
-    id: p.id,
-    codigo: p.codigo.toUpperCase(),
-    name: p.nombre, 
-    value: p.precio_venta,
-    label: p.laboratorio, 
-  }));
+  // 1. En la transformación de resultados, agrega los campos que necesita la estructura:
+const resultadosParaBuscador = productosFiltrados.map(p => ({
+  id: p.id,
+  label: p.nombre,                    
+  nombre: p.nombre,                   
+  codigo: p.codigo.toUpperCase(),     
+  precio_venta: p.precio_venta,       
+  laboratorio: p.laboratorio,  
+  lote: p.lote,       
+  category: 'Producto',              
+  stock: p.stock,                     
+  data: p                             
+}));
+
+// 2. La función renderizarResultado (igual a la de clientes):
+const renderizarResultado = (resultado) => {
+  return (
+    <Group justify="space-between" w="100%">
+      <div>
+        <Text size="sm" fw={500}>
+          {resultado.label}
+        </Text>
+        <Text size="xs" c="dimmed">
+          Lote: {resultado.lote} • Stock: {resultado.stock}
+        </Text>
+      </div>
+      <Text size="xs" c="blue" className="result-category">
+        {resultado.category}
+      </Text>
+    </Group>
+  );
+};
+
+
   
   const handleResultSelect = (result) => {
     console.log("Producto seleccionado:", result);
@@ -308,6 +338,7 @@ function Inventario() {
               value={busqueda}
               onChange={setBusqueda} 
               results={resultadosParaBuscador}
+               renderResult={renderizarResultado}
               onResultSelect={handleResultSelect}
               style={{ width: '500px', marginLeft: '-80px' }}
             />
@@ -346,7 +377,9 @@ function Inventario() {
           onDesactivar={abrirModalConfirmacionDesactivar} 
           onReactivar={reactivarProducto} 
           mostrarDesactivados={mostrarDesactivados}
-          
+          obtenerStockDisponible={obtenerStockDisponible}
+          hayStockDisponible={hayStockDisponible} 
+
         />
         
         {/* Botones de acción responsive */}

@@ -22,23 +22,50 @@ onAgregarCarrito,
 onEditar, 
 onReactivar,
 onDesactivar,
-mostrarDesactivados = false 
+mostrarDesactivados = false,
+obtenerStockDisponible,
+hayStockDisponible 
 }) {
+    //  Función mejorada para determinar si mostrar botón deshabilitado
+    const puedeAgregarAlCarrito = (producto) => {
+        if (mostrarDesactivados) return false;
+        if (producto.estado !== 'activado') return false;
+        
+        // ✅ SOLO impedir cuando el stock disponible sea 0
+        const stockDisponible = obtenerStockDisponible ? obtenerStockDisponible(producto.id) : producto.stock;
+        return stockDisponible > 0;
+      };
+    const getTooltipMessage = (producto) => {
+        if (mostrarDesactivados) return "Producto desactivado";
+        if (producto.estado !== 'activado') return "Producto inactivo";
+        if (!hayStockDisponible || !hayStockDisponible(producto)) {
+          const stockDisponible = obtenerStockDisponible ? obtenerStockDisponible(producto.id) : producto.stock;
+          return `Sin stock disponible. Stock: ${stockDisponible}`;
+        }
+        return "Agregar al carrito";
+      };
 
-const getBadgeColor = (metodo) => {
+
+
+      
+      const getBadgeColor = (producto) => {
+        const stockDisponible = obtenerStockDisponible ? obtenerStockDisponible(producto.id) : producto.stock;
+        
+        if (stockDisponible === 0) {
+          return '#FF0000'; // Rojo - sin stock
+        }
+        if (stockDisponible <= 5) {
+          return '#FF8000'; // Naranja - stock bajo (1-5)
+        }
+        if (stockDisponible <= 15) {
+          return '#FFD700'; // Amarillo - stock medio (6-15)
+        }
+        return '#28a745'; // Verde - stock bueno (16+)
+      };
     
-    if (metodo <= 10 ) {
-        return '#FF0000';
-    }
-    if (metodo > 10 && metodo < 30) {
-        return '#FF8000';
-    }
-    if (metodo >= 30 ) {
-        return '#28a745';
-    }
-    return'#6c757d';
-    };
-if (productos.length === 0) {
+    
+    
+      if (productos.length === 0) {
     return (
         <div >
             <p>No hay productos registrados.</p>
@@ -46,6 +73,8 @@ if (productos.length === 0) {
     );
 }
 const filas = productos.map((producto) => {
+    const stockDisponible = obtenerStockDisponible ? obtenerStockDisponible(producto.id) : producto.stock;
+    const puedeAgregar = puedeAgregarAlCarrito(producto);
     return (
 
         <Table.Tr 
@@ -70,13 +99,19 @@ const filas = productos.map((producto) => {
             <Table.Td>
                 Bs {producto.precio_venta?.toFixed(2)}
             </Table.Td>
-            <Table.Td >
-            <Badge 
-                color={getBadgeColor(producto.stock)}
-                size="sm"
-            >
-            {producto.stock}
-            </Badge>
+            <Table.Td>
+                <Badge 
+                    color={getBadgeColor(producto)}
+                    size="sm"
+                    title={`Stock disponible: ${stockDisponible}`}
+                >
+                    {stockDisponible}
+                    {obtenerStockDisponible && stockDisponible !== producto.stock && (
+                    <span style={{fontSize: '0.7em', opacity: 0.7}}>
+                        {" "}({producto.stock} total)
+                    </span>
+                    )}
+                </Badge>
             </Table.Td>
             <Table.Td >
             {producto.fecha_expiracion}
@@ -87,14 +122,16 @@ const filas = productos.map((producto) => {
             <Table.Td>{producto.porcentaje_g}%</Table.Td>
             <Table.Td >
             {/* Mostrar botón de agregar al carrito solo si NO estamos en modo "sin stock" */}
-            {!mostrarDesactivados && (
+                {!mostrarDesactivados && (
                 <ActionIcon 
-                    variant="subtle" 
-                    color="green" 
-                    size="xl" 
-                    onClick={() => onAgregarCarrito(producto)}
+                variant={puedeAgregar ? "subtle" : "light"}
+                color={puedeAgregar ? "green" : "gray"}
+                size="xl" 
+                onClick={() => puedeAgregar && onAgregarCarrito(producto)}
+                disabled={!puedeAgregar}
+                title={getTooltipMessage(producto)} // ✅ Tooltip informativo
                 >
-                    <IconShoppingCartPlus size={20} />
+                <IconShoppingCartPlus size={20} />
                 </ActionIcon>
             )}
             

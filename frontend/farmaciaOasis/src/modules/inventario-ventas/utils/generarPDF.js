@@ -169,8 +169,8 @@
             <div class="header">
             <div class="company-info">
                 <h1>FARMACIA OASIS</h1>
-                <p>La Paz, Bolivia | Tel: +591-2-XXXXXXX</p>
-                <p>Email: ventas@farmaciaoasis.bo</p>
+                <p>La Paz, Bolivia </p>
+                
             </div>
             <div class="invoice-info">
                 <div class="label">ID DE LA VENTA</div>
@@ -238,7 +238,7 @@
 
             <!-- FOOTER -->
             <div class="footer">
-            <p>Gracias por su compra. Conserve su comprobante para reclamaciones.</p>
+            <p>Gracias por su compra.</p>
             <p>Generado el ${dayjs().format('DD/MM/YYYY HH:mm:ss')}</p>
             </div>
         </div>
@@ -436,8 +436,8 @@
             <div class="header">
             <div class="company-info">
                 <h1>FARMACIA OASIS</h1>
-                <p>La Paz, Bolivia | Tel: +591-2-XXXXXXX</p>
-                <p>Email: ventas@farmaciaoasis.bo</p>
+                <p>La Paz, Bolivia </p>
+                
             </div>
             <div class="invoice-info">
                 <div class="label">ID DE LA VENTA</div>
@@ -501,7 +501,7 @@
             </div>
 
             <div class="footer">
-            <p>Gracias por su compra. Conserve su comprobante para reclamaciones.</p>
+            <p>Gracias por su compra.</p>
             <p>Generado el ${dayjs().format('DD/MM/YYYY HH:mm:ss')}</p>
             </div>
         </div>

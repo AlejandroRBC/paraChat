@@ -1,4 +1,4 @@
-// components/MetricCard.jsx - VERSIÓN SIN CSS INLINE
+// components/MetricCard.jsx
 import { Paper, Text, Group, ThemeIcon, Badge } from '@mantine/core';
 import { 
   IconCurrencyDollar, 
@@ -8,7 +8,7 @@ import {
   IconArrowUpRight,
   IconArrowDownRight
 } from '@tabler/icons-react';
-import '../dashboard.css';  // ✅ CSS separado
+import '../dashboard.css';
 
 function MetricCard({ 
   valor, 
@@ -18,9 +18,12 @@ function MetricCard({
   porcentaje, 
   tendencia 
 }) {
-  const formattedValue = typeof valor === 'number' && sufijo === 'Bs' 
-    ? `Bs ${valor.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`
-    : valor.toLocaleString();
+  // ✅ CORREGIDO: Formato correcto para números
+  const formattedValue = typeof valor === 'number' 
+    ? sufijo === 'Bs' 
+      ? `Bs ${valor.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : valor.toLocaleString('es-ES')
+    : valor;
 
   // Iconos según el tipo de métrica
   const getIcon = () => {
@@ -41,7 +44,7 @@ function MetricCard({
       radius="lg"
       shadow="md"
       className="metric-card"
-      style={{ borderLeft: `8px solid ${color}`, }}  // ✅ Solo el color dinámico queda inline
+      style={{ borderLeft: `8px solid ${color}` }}
     >
       <Group justify="space-between" align="flex-start">
         <div style={{ flex: 1 }}>
@@ -54,15 +57,17 @@ function MetricCard({
           </Text>
 
           {/* Badge de tendencia REAL */}
-          <Badge 
-            color={tendenciaColor} 
-            variant="light" 
-            leftSection={tendenciaIcon}
-            size="sm"
-            style={{ borderRadius: '12px' }}
-          >
-            {porcentaje} vs ayer
-          </Badge>
+          {porcentaje && (
+            <Badge 
+              color={tendenciaColor} 
+              variant="light" 
+              leftSection={tendenciaIcon}
+              size="sm"
+              style={{ borderRadius: '12px' }}
+            >
+              {porcentaje} vs ayer
+            </Badge>
+          )}
         </div>
 
         {/* Icono principal */}

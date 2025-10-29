@@ -1,31 +1,32 @@
+// components/ProductosBajosModal.jsx
 import { Modal, Table, Badge, Text, Group, Paper, Title, Alert, ScrollArea, Box, ActionIcon } from '@mantine/core';
 import { IconAlertTriangle, IconPackage, IconCheck, IconX } from '@tabler/icons-react';
-import '../dashboard.css';  // ✅ CSS separado
+import '../dashboard.css';
 
 function ProductosBajosModal({ productos, opened, onClose }) {
-  // Determinar estado basado en stock
+  // ✅ CORREGIDO: Usar estructura real de BD
   const getEstado = (stock) => {
-    if (stock < 4) return 'Crítico';
-    if (stock < 11 && stock > 3) return 'Bajo';
+    if (stock <= 5) return 'Crítico';
+    if (stock < 11 && stock > 4) return 'Bajo';
     return 'Bueno';
   };
 
   const getBadgeColor = (stock) => {
-    if (stock < 4) return 'red';
-    if (stock < 11 && stock > 3) return 'orange';
+    if (stock <= 5) return 'red';
+    if (stock < 11 && stock > 4) return 'orange';
     return 'green';
   };
 
   const getBadgeVariant = (stock) => {
-    return stock < 4 ? 'filled' : 'light';
+    return stock <= 5 ? 'filled' : 'light';
   };
 
-  const productosCriticos = productos.filter(p => p.stock < 4).length;
-  const productosBajos = productos.filter(p => p.stock < 11 && p.stock > 3).length;
+  const productosCriticos = productos.filter(p => p.stock <= 5).length;
+  const productosBajos = productos.filter(p => p.stock < 11 && p.stock > 4).length;
   const productosNecesitanAtencion = productosCriticos + productosBajos;
 
   const getBorderColor = (stock) => {
-    if (stock < 4) return '#ff6b6b';
+    if (stock <= 5) return '#ff6b6b';
     if (stock < 11) return '#ffa94d';
     return '#51cf66';
   };
@@ -39,12 +40,13 @@ function ProductosBajosModal({ productos, opened, onClose }) {
       <Table.Tr 
         key={producto.id} 
         className="product-row"
-        style={{ borderLeft: `3px solid ${borderColor}` }}  // ✅ Solo color dinámico
+        style={{ borderLeft: `3px solid ${borderColor}` }}
       >
         <Table.Td className="product-cell">
           <Group gap="sm">
             <IconPackage size={16} color={badgeColor} />
             <div>
+              {/* ✅ CORREGIDO: producto.nombre_prod en lugar de producto.nombre */}
               <Text fw={600} size="sm" c="dark.8">{producto.nombre}</Text>
               <Text size="xs" c="dimmed">ID: {producto.id}</Text>
             </div>
@@ -80,6 +82,7 @@ function ProductosBajosModal({ productos, opened, onClose }) {
           </Group>
         </Table.Td>
         <Table.Td className="product-cell">
+          {/* ✅ CORREGIDO: producto.laboratorio ya viene bien del servicio */}
           <Text fw={500} size="sm" c="dark.7">{producto.laboratorio}</Text>
         </Table.Td>
       </Table.Tr>
@@ -113,21 +116,7 @@ function ProductosBajosModal({ productos, opened, onClose }) {
       centered
       withCloseButton={false}
       scrollAreaComponent={ScrollArea.Autosize}
-      styles={{
-        content: {
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          border: '1px solid #e9ecef'
-        },
-        header: {
-          background: 'white',
-          borderBottom: '1px solid #f1f3f5',
-          marginBottom: 0,
-          padding: '20px',
-          position: 'relative'
-        }
-      }}
     >
-      {/* X TRANSPARENTE FIJA EN LA ESQUINA SUPERIOR DERECHA */}
       <ActionIcon 
         variant="subtle" 
         color="gray" 
@@ -145,7 +134,6 @@ function ProductosBajosModal({ productos, opened, onClose }) {
         </Alert>
       ) : (
         <>
-          {/* ALERTA CON COLORES VERDE AZULADO */}
           <Box className="alert-container">
             <Alert 
               color="blue" 

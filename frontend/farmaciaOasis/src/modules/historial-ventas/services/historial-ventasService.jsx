@@ -7,7 +7,7 @@ const HistorialVentasService = {
   // Obtener todas las ventas con detalle de productos y cliente
   obtenerVentasDetalle: async () => {
     try {
-      const response = await axios.get(`${API_URL}/ventas-detalle`);
+      const response = await axios.get(`${API_URL}/ventas`);
       console.log('Respuesta completa del backend:', response);
       
       // Ajusta según la estructura real de tu respuesta

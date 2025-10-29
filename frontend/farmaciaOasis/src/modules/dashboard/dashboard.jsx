@@ -1,3 +1,4 @@
+// dashboard.jsx (ya lo tienes, solo asegurar que use los datos reales)
 import { useState } from 'react';
 import { useDashboard } from './hooks/useDashboard';
 import { 
@@ -5,9 +6,10 @@ import {
   Grid, 
   Group, 
   Button, 
-  LoadingOverlay
+  LoadingOverlay,
+  Alert
 } from '@mantine/core';
-import { useMediaQuery } from 'react-responsive'; // ✅ NUEVO
+import { useMediaQuery } from 'react-responsive';
 import Header from './components/Header';
 import MetricCard from './components/MetricCard';
 import ProductosBajosModal from './components/ProductosBajosModal';
@@ -24,15 +26,14 @@ function Dashboard() {
     ventasMensuales,
     topProductos,
     loading,
+    error,
     calcularPorcentaje,
     determinarTendencia
   } = useDashboard();
 
-  // ✅ RESPONSIVE HOOKS
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 });
   
-
   const [mostrarBajos, setMostrarBajos] = useState(false);
   const [mostrarVencer, setMostrarVencer] = useState(false);
 
@@ -44,19 +45,29 @@ function Dashboard() {
     );
   }
 
+  if (error) {
+    return (
+      <Container size="xl" py="md">
+        <Alert color="red" title="Error" variant="filled">
+          {error}
+        </Alert>
+      </Container>
+    );
+  }
+
   return (
     <Container 
-      size={isMobile ? "sm" : isTablet ? "md" : "xl"} // ✅ RESPONSIVE
+      size={isMobile ? "sm" : isTablet ? "md" : "xl"}
       py="md" 
       className="dashboard-main-container"
     >
-      {/* 1. HEADER */}
+      {/* HEADER */}
       <Header 
         productosBajos={productosBajos}
         productosPorVencer={productosPorVencer}
       />
 
-      {/* 2. MÉTRICAS - RESPONSIVE */}
+      {/* MÉTRICAS CON DATOS REALES */}
       <Grid mt="xl">
         <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}> {/* ✅ RESPONSIVE */}
           <MetricCard
@@ -68,7 +79,7 @@ function Dashboard() {
             tendencia={determinarTendencia(metricas.totalHoy, metricas.totalAyer)}
           />
         </Grid.Col>
-        <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}> {/* ✅ RESPONSIVE */}
+        <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}>
           <MetricCard
             valor={metricas.productosVendidos}
             etiqueta="Productos Vendidos"
@@ -77,7 +88,7 @@ function Dashboard() {
             tendencia={determinarTendencia(metricas.productosVendidos, metricas.productosAyer)}
           />
         </Grid.Col>
-        <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}> {/* ✅ RESPONSIVE */}
+        <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}>
           <MetricCard
             valor={metricas.ventasHoy}
             etiqueta="Ventas Hoy"
@@ -88,70 +99,62 @@ function Dashboard() {
         </Grid.Col>
       </Grid>
 
-      {/* 3. DASHBOARD (Gráfica de ventas) - RESPONSIVE */}
+      {/* GRÁFICA Y TOP PRODUCTOS CON DATOS REALES */}
       <Grid mt="xl">
-        <Grid.Col span={{ 
-          base: 12, 
-          lg: isMobile ? 12 : isTablet ? 8 : 8 // ✅ RESPONSIVE MEJORADO
-        }}>
+        <Grid.Col span={{ base: 12, lg: isMobile ? 12 : isTablet ? 8 : 8 }}>
           <VentasChart data={ventasMensuales} />
         </Grid.Col>
-
-        {/* 4. TOP PRODUCTOS - RESPONSIVE */}
-        <Grid.Col span={{ 
-          base: 12, 
-          lg: isMobile ? 12 : isTablet ? 4 : 4 // ✅ RESPONSIVE MEJORADO
-        }}>
+        <Grid.Col span={{ base: 12, lg: isMobile ? 12 : isTablet ? 4 : 4 }}>
           <TopProductos productos={topProductos} />
         </Grid.Col>
       </Grid>
 
-      {/* 5. BOTONES - RESPONSIVE */}
+      {/* BOTONES PARA MODALES CON DATOS REALES */}
       <Group 
         className="dashboard-buttons-container" 
         mt="xl" 
         justify="center"
-        direction={isMobile ? "column" : "row"} // ✅ RESPONSIVE
-        gap={isMobile ? "md" : "xl"} // ✅ RESPONSIVE
+        direction={isMobile ? "column" : "row"}
+        gap={isMobile ? "md" : "xl"}
       >
         <Button 
-          size={isMobile ? "sm" : "md"} // ✅ RESPONSIVE
+          size={isMobile ? "sm" : "md"}
           variant="gradient"
           gradient={{ from: 'blue', to: 'cyan', deg: 135 }}
           leftSection="⚠️"
           onClick={() => setMostrarBajos(true)}
           className="dashboard-button"
-          fullWidth={isMobile} // ✅ RESPONSIVE
+          fullWidth={isMobile}
+          disabled={productosBajos.length === 0}
         >
-          {isMobile ? 'STOCK BAJO' : 'PRODUCTOS POR ACABARSE'} {/* ✅ RESPONSIVE */}
+          {isMobile ? 'STOCK BAJO' : `PRODUCTOS POR ACABARSE (${productosBajos.length})`}
         </Button>
         
         <Button 
-          size={isMobile ? "sm" : "md"} // ✅ RESPONSIVE
+          size={isMobile ? "sm" : "md"}
           variant="gradient"
           gradient={{ from: 'blue', to: 'cyan', deg: 135 }}
           leftSection="📅"
           onClick={() => setMostrarVencer(true)}
           className="dashboard-button"
-          fullWidth={isMobile} // ✅ RESPONSIVE
+          fullWidth={isMobile}
+          disabled={productosPorVencer.length === 0}
         >
-          {isMobile ? 'POR VENCER' : 'PRODUCTOS POR VENCER'} {/* ✅ RESPONSIVE */}
+          {isMobile ? 'POR VENCER' : `PRODUCTOS POR VENCER (${productosPorVencer.length})`}
         </Button>
       </Group>
 
-      {/* MODALES */}
+      {/* MODALES CON DATOS REALES */}
       <ProductosBajosModal
         productos={productosBajos}
-        opened={!!mostrarBajos}
+        opened={mostrarBajos}
         onClose={() => setMostrarBajos(false)}
-        size={isMobile ? "sm" : "xl"} // ✅ RESPONSIVE
       />
 
       <ProductosVencerModal
         productos={productosPorVencer}
-        opened={!!mostrarVencer}
+        opened={mostrarVencer}
         onClose={() => setMostrarVencer(false)}
-        size={isMobile ? "sm" : "xl"} // ✅ RESPONSIVE
       />
     </Container>
   );

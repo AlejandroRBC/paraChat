@@ -30,13 +30,14 @@ function HistorialVentas() {
   // Media queries para responsive
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
-  const isDesktop = useMediaQuery({ minWidth: 1025 });
+  
 
   const handleBusquedaChange = (valor) => {
     setBusqueda(valor);
   };
 
   const handleFiltroChange = (value) => {
+    console.log('Cambiando filtro a:', value);
     setFiltroTipo(value);
   };
 
@@ -127,20 +128,33 @@ function HistorialVentas() {
   };
 
   const handleAplicarIntervalo = (fechaInicio, fechaFin) => {
+    console.log('Aplicando intervalo:', fechaInicio, 'a', fechaFin);
     setDateRange({ start: fechaInicio, end: fechaFin });
     setIsModalOpen(false);
   };
 
   const handleLimpiarIntervalo = () => {
+    console.log('Limpiando intervalo');
     setDateRange({ start: null, end: null });
   };
 
+  // CORREGIDO: Las opciones deben coincidir con las del hook
   const opcionesReporte = [
     { value: 'general', label: 'General' },
+    { value: 'hoy', label: 'Hoy' },
     { value: 'semana', label: 'Semana Actual' },
     { value: 'mes', label: 'Mes Actual' },
     { value: 'año', label: 'Año Actual' },
   ];
+
+  // Debug info
+  console.log('Estado actual:', {
+    filtroTipo,
+    busqueda,
+    dateRange,
+    ventasCount: ventas.length,
+    ventasOriginalesCount: ventasOriginales.length
+  });
 
   if (loading) {
     return <div className="cargando">Cargando historial de ventas...</div>;
@@ -153,7 +167,6 @@ function HistorialVentas() {
   return (
     <div className="historial-ventas-container">
       {/* Header Responsive */}
-      
       <div className={`historial-header ${isMobile ? 'mobile' : ''}`}>
         <div className="historial-icon-container">
           <IconCurrencyDollar size={isMobile ? 24 : 30} /> 
@@ -296,14 +309,16 @@ function HistorialVentas() {
         </div>
       </div>
 
-      {/* Lista de Ventas o Mensaje de no datos - DENTRO del contenedor */}
+      
+
+      {/* Lista de Ventas o Mensaje de no datos */}
       {ventas.length === 0 ? (
         <Paper p="xl" withBorder radius="lg" className="no-data-message">
           <Stack align="center" gap="md">
             <Text size="lg" c="dimmed" ta="center">
-              
-                "No hay ventas registradas"
-              
+              {filtroTipo !== 'general' || dateRange.start || busqueda 
+                ? "No hay ventas que coincidan con los filtros aplicados" 
+                : "No hay ventas registradas"}
             </Text>
           </Stack>
         </Paper>

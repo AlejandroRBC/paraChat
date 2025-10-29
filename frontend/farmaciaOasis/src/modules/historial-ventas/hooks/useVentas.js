@@ -1,4 +1,3 @@
-//src/modules/historial-ventas/hooks/useVentas.js
 import { useState, useEffect, useMemo } from 'react'; 
 import HistorialVentasService from '../services/historial-ventasService'; 
 
@@ -21,9 +20,43 @@ export function useVentas() {
         .split('x')[0] 
         .split('=')[0]  
         .trim();
-      
       return nombreMedicamento.includes(textoBusqueda);
     });
+  };
+
+  const obtenerLunesSemanaActual = (fecha) => {
+    const fechaCopy = new Date(fecha);
+    const dia = fechaCopy.getDay();
+    const diff = fechaCopy.getDate() - dia + (dia === 0 ? -6 : 1);
+    return new Date(fechaCopy.setDate(diff));
+  };
+
+  const obtenerDomingoSemanaActual = (fecha) => {
+    const lunes = obtenerLunesSemanaActual(fecha);
+    const domingo = new Date(lunes);
+    domingo.setDate(lunes.getDate() + 6);
+    return domingo;
+  };
+
+  const parsearFecha = (fechaString) => {
+    if (!fechaString) return null;
+    
+    try {
+      if (fechaString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [año, mes, dia] = fechaString.split('-').map(Number);
+        return new Date(año, mes - 1, dia, 12, 0, 0, 0);
+      }
+      
+      if (fechaString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [dia, mes, año] = fechaString.split('/').map(Number);
+        return new Date(año, mes - 1, dia, 12, 0, 0, 0);
+      }
+      
+      const fecha = new Date(fechaString);
+      return isNaN(fecha.getTime()) ? null : fecha;
+    } catch {
+      return null;
+    }
   };
 
   useEffect(() => {
@@ -31,31 +64,23 @@ export function useVentas() {
       try {
         setLoading(true);
         setError(null);
-        console.log('Cargando ventas desde el backend...');
 
-        // Usa la función correcta del servicio
         const datos = await HistorialVentasService.obtenerVentasDetalle();
-        console.log('Datos recibidos del backend:', datos);
 
-        // Verifica que datos sea un array
         if (!Array.isArray(datos)) {
-          console.error('Los datos recibidos no son un array:', datos);
           setError('Formato de datos incorrecto');
           setearVentas([]);
           return;
         }
 
-        // Ordenar por fecha y hora descendente
         const ventasOrdenadas = datos.sort((a, b) => {
           const fechaA = new Date(`${a.fecha} ${a.hora}`);
           const fechaB = new Date(`${b.fecha} ${b.hora}`);
           return fechaB - fechaA;
         });
 
-        console.log('Ventas ordenadas:', ventasOrdenadas);
         setearVentas(ventasOrdenadas);
       } catch (err) {
-        console.error('Error completo:', err);
         setError(`Error al cargar el historial de ventas: ${err.message}`);
         setearVentas([]);
       } finally {
@@ -66,78 +91,95 @@ export function useVentas() {
     cargarVentas();
   }, []);
 
-  // FILTROS CON DEBUG DETALLADO
   const ventasFiltradas = useMemo(() => {
-    console.log('=== APLICANDO FILTROS ===');
-    console.log('Filtro tipo:', filtroTipo);
-    console.log('Búsqueda:', busqueda);
-    console.log('Date range:', dateRange);
-    console.log('Total ventas originales:', ventas.length);
-    
-    const mismaFecha = (fecha1, fecha2) => {
-      return (
-        fecha1.getFullYear() === fecha2.getFullYear() &&
-        fecha1.getMonth() === fecha2.getMonth() &&
-        fecha1.getDate() === fecha2.getDate()
-      );
-    };
+    let resultado = [...ventas];
 
-    const resultado = ventas.filter(venta => {
-      // 1. Filtro de búsqueda
+    if (busqueda) {
       const textoBusqueda = busqueda.toLowerCase().trim();
-      const coincideBusqueda = 
+      resultado = resultado.filter(venta =>
         busqueda === '' ||
         (venta.id && venta.id.toString() === busqueda) ||
         (venta.id_venta && venta.id_venta.toString() === busqueda) ||
-        buscarSoloMedicamentos(venta.productos, textoBusqueda);
+        buscarSoloMedicamentos(venta.productos, textoBusqueda)
+      );
+    }
 
-      // 2. Filtro por tipo de período
+    if (filtroTipo !== 'general') {
       const ahora = new Date();
-      const fechaVenta = new Date(venta.fecha);
-      let coincideTipo = true;
-
+      
       switch (filtroTipo) {
         case 'hoy':
-          coincideTipo = mismaFecha(fechaVenta, ahora);
+          resultado = resultado.filter(venta => {
+            const fechaVenta = parsearFecha(venta.fecha);
+            const hoy = new Date();
+            return fechaVenta && 
+              fechaVenta.getDate() === hoy.getDate() &&
+              fechaVenta.getMonth() === hoy.getMonth() &&
+              fechaVenta.getFullYear() === hoy.getFullYear();
+          });
           break;
-        case 'semana':
-          const inicioSemana = new Date(ahora);
-          inicioSemana.setDate(ahora.getDate() - ahora.getDay());
-          inicioSemana.setHours(0,0,0,0);
-          coincideTipo = fechaVenta >= inicioSemana;
-          break;
-        case 'mes':
-          const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
-          coincideTipo = fechaVenta >= inicioMes;
-          break;
-        case 'año':
-          const inicioAño = new Date(ahora.getFullYear(), 0, 1);
-          coincideTipo = fechaVenta >= inicioAño;
-          break;
-        default:
-          coincideTipo = true;
-      }
-
-      // 3. Filtro por intervalo personalizado
-      let coincideIntervalo = true;
-      if (dateRange.start && dateRange.end) {
-        const inicio = new Date(dateRange.start);
-        const fin = new Date(dateRange.end);
-        fin.setHours(23, 59, 59, 999); 
         
-        // Rango normal
-        coincideIntervalo = fechaVenta >= inicio && fechaVenta <= fin;
+        case 'semana':
+          { const lunesSemana = obtenerLunesSemanaActual(ahora);
+          lunesSemana.setHours(0, 0, 0, 0);
+          
+          const domingoSemana = obtenerDomingoSemanaActual(ahora);
+          domingoSemana.setHours(23, 59, 59, 999);
+          
+          resultado = resultado.filter(venta => {
+            const fechaVenta = parsearFecha(venta.fecha);
+            return fechaVenta && fechaVenta >= lunesSemana && fechaVenta <= domingoSemana;
+          });
+          break; }
+        
+        case 'mes':
+          { const añoActual = ahora.getFullYear();
+          const mesActual = ahora.getMonth();
+          
+          resultado = resultado.filter(venta => {
+            if (!venta.fecha) return false;
+            
+            const match = venta.fecha.match(/^(\d{4})-(\d{2})-/);
+            if (!match) return false;
+            
+            const añoVenta = parseInt(match[1]);
+            const mesVenta = parseInt(match[2]) - 1;
+            
+            return añoVenta === añoActual && mesVenta === mesActual;
+          });
+          break; }
+        
+        case 'año':
+          { const año = ahora.getFullYear();
+          resultado = resultado.filter(venta => {
+            if (!venta.fecha) return false;
+            
+            const match = venta.fecha.match(/^(\d{4})-/);
+            if (!match) return false;
+            
+            const añoVenta = parseInt(match[1]);
+            return añoVenta === año;
+          });
+          break; }
+        
+        default:
+          break;
       }
+    }
 
-      // Resultado final
-      const resultadoFinal = coincideBusqueda && coincideTipo && coincideIntervalo;
-      return resultadoFinal;
-    });
+    if (dateRange.start && dateRange.end) {
+      const inicio = new Date(dateRange.start);
+      inicio.setHours(0, 0, 0, 0);
+      
+      const fin = new Date(dateRange.end);
+      fin.setHours(23, 59, 59, 999);
+      
+      resultado = resultado.filter(venta => {
+        const fechaVenta = parsearFecha(venta.fecha);
+        return fechaVenta && fechaVenta >= inicio && fechaVenta <= fin;
+      });
+    }
 
-    console.log('=== RESULTADO FILTRADO ===');
-    console.log('Ventas filtradas:', resultado.length);
-    console.log('IDs encontrados:', resultado.map(v => v.id || v.id_venta));
-    
     return resultado;
   }, [ventas, busqueda, filtroTipo, dateRange]);
 

@@ -1,16 +1,18 @@
-// components/TopProductos.jsx - VERSIÓN CON CLASES CSS PERSONALIZADAS
+// components/TopProductos.jsx
 import { Paper, Title, Table, Badge, Text, Group, ThemeIcon, Progress, Stack, ScrollArea, Box } from '@mantine/core';
 import { IconCrown, IconStar, IconTrendingUp, IconAward } from '@tabler/icons-react';
-import '../dashboard.css';  // ✅ CSS separado
+import '../dashboard.css';
 
 function TopProductos({ productos }) {
-  // MOSTRAR TODOS los productos, no hacer slice
+  // ✅ CORREGIDO: Usar todos los productos de BD
   const todosProductos = productos;
   const totalProductos = productos.length;
   
   // Calcular venta máxima para la barra de progreso
-  const maxVentas = Math.max(...todosProductos.map(p => p.ventas));
-  
+  const maxVentas = todosProductos.length > 0 
+    ? Math.max(...todosProductos.map(p => p.ventas || 0))
+    : 1;
+
   // Colores para cada posición
   const getPositionColor = (index) => {
     const colors = {
@@ -42,14 +44,11 @@ function TopProductos({ productos }) {
 
   const rows = todosProductos.map((producto, index) => {
     const positionColors = getPositionColor(index);
-    const porcentaje = (producto.ventas / maxVentas) * 100;
+    const porcentaje = maxVentas > 0 ? ((producto.ventas || 0) / maxVentas) * 100 : 0;
     const progressColor = getProgressColor(index);
     
     return (
-      <Table.Tr 
-        key={producto.nombre} 
-        className="mantine-Table-tr" // ✅ Usando tus clases CSS
-      >
+      <Table.Tr key={producto.nombre} className="mantine-Table-tr">
         <Table.Td className="mantine-Table-td">
           <Badge 
             size="md"
@@ -67,6 +66,7 @@ function TopProductos({ productos }) {
         
         <Table.Td className="mantine-Table-td">
           <Stack gap={2}>
+            {/* ✅ CORREGIDO: producto.nombre en lugar de producto.nombre_prod */}
             <Text fw={700} size="sm" c="dark.8" lineClamp={1}>
               {producto.nombre}
             </Text>
@@ -75,7 +75,8 @@ function TopProductos({ productos }) {
               variant="light" 
               color="gray"
             >
-              {producto.categoria}
+              {/* ✅ CORREGIDO: producto.categoria en lugar de producto.presentacion */}
+              {producto.categoria || 'General'}
             </Badge>
           </Stack>
         </Table.Td>
@@ -88,7 +89,7 @@ function TopProductos({ productos }) {
                   <IconTrendingUp size={12} />
                 </ThemeIcon>
                 <Text fw={800} size="sm" c="blue.6">
-                  {producto.ventas.toLocaleString('es-ES')}
+                  {(producto.ventas || 0).toLocaleString('es-ES')}
                 </Text>
               </Group>
               <Text size="xs" c="dimmed" fw={600}>
@@ -109,14 +110,7 @@ function TopProductos({ productos }) {
   });
 
   return (
-    <Paper 
-      p="lg" 
-      withBorder 
-      radius="lg" 
-      shadow="md"
-      className="top-productos-container"
-    >
-      {/* Header compacto */}
+    <Paper p="lg" withBorder radius="lg" shadow="md" className="top-productos-container">
       <Box className="top-productos-header">
         <Group justify="space-between" align="flex-start" mb="md">
           <Group gap="sm">
@@ -147,37 +141,29 @@ function TopProductos({ productos }) {
         </Group>
       </Box>
 
-      {/* Tabla con scroll */}
       <Box className="top-productos-content" style={{ height: '400px' }}>
-        <ScrollArea 
-          h={400}
-          className="mantine-ScrollArea-root"
-          scrollbarSize={6}
-          type="auto"
-        >
-          <Table 
-            className="mantine-Table-table"
-            verticalSpacing="sm"
-          >
+        <ScrollArea h={400} className="mantine-ScrollArea-root" scrollbarSize={6} type="auto">
+          <Table className="mantine-Table-table" verticalSpacing="sm">
             <Table.Thead className="mantine-Table-thead">
               <Table.Tr className="mantine-Table-tr">
-                <Table.Th className="mantine-Table-th">
-                  Pos
-                </Table.Th>
-                <Table.Th className="mantine-Table-th">
-                  Producto
-                </Table.Th>
-                <Table.Th className="mantine-Table-th">
-                  Ventas
-                </Table.Th>
+                <Table.Th className="mantine-Table-th">Pos</Table.Th>
+                <Table.Th className="mantine-Table-th">Producto</Table.Th>
+                <Table.Th className="mantine-Table-th">Ventas</Table.Th>
               </Table.Tr>
             </Table.Thead>
-            <Table.Tbody className="mantine-Table-tbody">{rows}</Table.Tbody>
+            <Table.Tbody className="mantine-Table-tbody">
+              {rows.length > 0 ? rows : (
+                <Table.Tr>
+                  <Table.Td colSpan={3} style={{ textAlign: 'center', padding: '2rem' }}>
+                    <Text c="dimmed">No hay datos de productos vendidos</Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
+            </Table.Tbody>
           </Table>
         </ScrollArea>
       </Box>
 
-      {/* Footer compacto */}
       <Box className="top-productos-footer">
         <Group justify="space-between" mt="md" p="sm">
           <Group gap="xs">
@@ -187,7 +173,7 @@ function TopProductos({ productos }) {
             <div>
               <Text fw={700} size="xs" c="dark.7">Total Vendido</Text>
               <Text fw={800} size="sm" c="green.6">
-                {todosProductos.reduce((sum, p) => sum + p.ventas, 0).toLocaleString('es-ES')}
+                {todosProductos.reduce((sum, p) => sum + (p.ventas || 0), 0).toLocaleString('es-ES')}
               </Text>
             </div>
           </Group>
