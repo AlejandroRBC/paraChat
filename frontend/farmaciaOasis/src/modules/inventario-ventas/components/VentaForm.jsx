@@ -79,7 +79,7 @@ const handleVentaRapida = async () => {
   try {
     const datosVentaRapida = {
       nombre: 'S/N',
-      ci_nit: '00000',
+      ci_nit: '123',
       metodo_pago: 'efectivo'
     };
     
