@@ -18,6 +18,7 @@ function VentaForm({
   onRealizarVenta, 
   onCancel
 }) {
+  
   const [detallesVentaReal, setDetallesVentaReal] = useState(null);
   const [modalClienteAbierto, setModalClienteAbierto] = useState(false);
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false);
@@ -377,13 +378,14 @@ const imprimirConDatosReales = () => {
               <Text fw={600}>¡Venta Realizada!</Text>
             </Group>
           }
-          size="md"
+          size="auto" 
           centered
         >
           <Stack gap="md">
             
 
             <Box
+            
               p="md"
               style={{
                 border: '2px solid #1871c1',
@@ -391,7 +393,7 @@ const imprimirConDatosReales = () => {
                 backgroundColor: '#f0f7ff'
               }}
             >
-              <Text fw={600} mb="xs">Comprobante: #{numeroVentaGenerado}</Text>
+              <Text fw={600} mb="xs">Nro. Venta: #{numeroVentaGenerado}</Text>
               <Text size="sm" c="dimmed">Cliente: {datosVentaConfirmada.nombre}</Text>
               <Text size="sm" c="dimmed">Total: Bs {totalVenta.toFixed(2)}</Text>
             </Box>

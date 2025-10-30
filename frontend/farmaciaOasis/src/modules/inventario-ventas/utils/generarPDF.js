@@ -169,7 +169,7 @@
             <div class="header">
             <div class="company-info">
                 <h1>FARMACIA OASIS</h1>
-                <p>La Paz, Bolivia </p>
+                <p>El Alto, La Paz, Bolivia </p>
                 
             </div>
             <div class="invoice-info">
@@ -436,7 +436,7 @@
             <div class="header">
             <div class="company-info">
                 <h1>FARMACIA OASIS</h1>
-                <p>La Paz, Bolivia </p>
+                <p>El Alto, La Paz, Bolivia </p>
                 
             </div>
             <div class="invoice-info">
