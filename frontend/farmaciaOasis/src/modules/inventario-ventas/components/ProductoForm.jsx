@@ -357,7 +357,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
               textAlign: 'center'
             }}
           >
-            Bs {precioVentaCalculado.toFixed(2)}
+            Bs {precioVentaCalculado}
           </div>
           <Text size="sm" c="dimmed" mt="xs">
             Precio de Compra: Bs {(parseFloat(formData.precio_compra) || 0).toFixed(2)} + 

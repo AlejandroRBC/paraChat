@@ -100,6 +100,9 @@ const modificarCantidad = (id, cambio) => {
       // Llamar al servicio
       const resultado = await ventasService.crearVenta(ventaData);
       
+      // ✅ CAPTURAR EL TOTAL REAL DEL BACKEND
+      const totalReal = resultado.total || totalVenta;
+      
       // ✅ GUARDAR LOS DATOS COMPLETOS DE LA VENTA PARA EL PDF
       const ventaCompleta = {
         ...resultado,
@@ -107,7 +110,8 @@ const modificarCantidad = (id, cambio) => {
         productosVendidos: carrito.map(item => ({
           ...item,
           subtotal: item.precio_venta * item.cantidad
-        }))
+        })),
+        total: totalReal // ✅ AGREGAR EL TOTAL REAL
       };
       
       // Recargar productos desde la base de datos
@@ -120,7 +124,7 @@ const modificarCantidad = (id, cambio) => {
       vaciarCarrito();
       
       console.log('Venta realizada exitosamente:', ventaCompleta);
-      return ventaCompleta; // ✅ Retornar datos completos
+      return ventaCompleta; // ✅ Retornar datos completos con total real
       
     } catch (error) {
       console.error('Error al realizar venta:', error);

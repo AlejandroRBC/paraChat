@@ -30,7 +30,7 @@ function VentaForm({
     metodo_pago: 'efectivo'
   });
 
-  // En handleSubmit:
+// En handleSubmit:
 const handleSubmit = async (e) => {
   e.preventDefault();
   if (carrito.length === 0) {
@@ -50,8 +50,11 @@ const handleSubmit = async (e) => {
       ventaId: ventaRealizada.id_venta
     });
     
-    // ✅ GUARDAR LOS DETALLES COMPLETOS DE LA VENTA
-    setDetallesVentaReal(ventaRealizada);
+    // ✅ GUARDAR LOS DETALLES COMPLETOS DE LA VENTA INCLUYENDO EL TOTAL REAL
+    setDetallesVentaReal({
+      ...ventaRealizada,
+      totalReal: ventaRealizada.total // ✅ ESTE ES EL TOTAL REAL DEL BACKEND
+    });
     
     setModalExitoAbierto(true);
     setModalClienteAbierto(false);
@@ -90,8 +93,11 @@ const handleVentaRapida = async () => {
       ventaId: ventaRealizada.id_venta
     });
     
-    // ✅ GUARDAR LOS DETALLES COMPLETOS
-    setDetallesVentaReal(ventaRealizada);
+    // ✅ GUARDAR LOS DETALLES COMPLETOS CON TOTAL REAL
+    setDetallesVentaReal({
+      ...ventaRealizada,
+      totalReal: ventaRealizada.total // ✅ TOTAL REAL DEL BACKEND
+    });
     
     setModalExitoAbierto(true);
   } catch (error) {
@@ -133,8 +139,8 @@ const generarPDFConDatosReales = () => {
   // ✅ USAR LOS DATOS REALES DE LA VENTA EN LUGAR DEL CARRITO
   generarPDFVenta(
     datosVentaConfirmada,
-    detallesVentaReal.productosVendidos || carrito, // ✅ Priorizar datos reales
-    detallesVentaReal.total || totalVenta, // ✅ Priorizar total real
+    detallesVentaReal.productosVendidos || carrito,
+    detallesVentaReal.total || totalVenta,
     numeroVentaGenerado
   );
 };
@@ -234,7 +240,7 @@ const imprimirConDatosReales = () => {
                   
                   <Group gap="xs">
                     <Text fw={600} size="sm">
-                      Bs {(item.precio_venta * item.cantidad).toFixed(2)}
+                      Bs {(item.precio_venta * item.cantidad)}
                     </Text>
                     <ActionIcon 
                       variant="subtle" 
@@ -255,7 +261,7 @@ const imprimirConDatosReales = () => {
           <Group justify="space-between" mb="md">
             <Text fw={700} size="lg">Total:</Text>
             <Text fw={700} size="xl" c="blue.6">
-              Bs {totalVenta.toFixed(2)}
+              Bs {totalVenta}
             </Text>
           </Group>
         </Box>
@@ -341,7 +347,7 @@ const imprimirConDatosReales = () => {
             <Group justify="space-between" mt="md">
               <Text fw={700} size="lg">Total a Pagar:</Text>
               <Text fw={700} size="xl" c="blue.6">
-                Bs {totalVenta.toFixed(2)}
+                Bs {totalVenta}
               </Text>
             </Group>
 
@@ -384,19 +390,20 @@ const imprimirConDatosReales = () => {
           <Stack gap="md">
             
 
-            <Box
-            
-              p="md"
-              style={{
-                border: '2px solid #1871c1',
-                borderRadius: '8px',
-                backgroundColor: '#f0f7ff'
-              }}
-            >
-              <Text fw={600} mb="xs">Nro. Venta: #{numeroVentaGenerado}</Text>
-              <Text size="sm" c="dimmed">Cliente: {datosVentaConfirmada.nombre}</Text>
-              <Text size="sm" c="dimmed">Total: Bs {totalVenta.toFixed(2)}</Text>
-            </Box>
+          <Box
+            p="md"
+            style={{
+              border: '2px solid #1871c1',
+              borderRadius: '8px',
+              backgroundColor: '#f0f7ff'
+            }}
+          >
+            <Text fw={600} mb="xs">Nro. Venta: #{numeroVentaGenerado}</Text>
+            <Text size="sm" c="dimmed">Cliente: {datosVentaConfirmada.nombre}</Text>
+            <Text size="sm" c="dimmed">
+              Total: Bs {detallesVentaReal?.totalReal?.toFixed(2) || totalVenta.toFixed(2)}
+            </Text>
+          </Box>
 
             <Group grow>
               <Button

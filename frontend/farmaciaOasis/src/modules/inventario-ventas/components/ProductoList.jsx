@@ -94,10 +94,10 @@ const filas = productos.map((producto) => {
             {producto.presentacion}
             </Table.Td>
             <Table.Td>
-                Bs {producto.precio_base?.toFixed(2)}
+                Bs {producto.precio_base}
             </Table.Td>
             <Table.Td>
-                Bs {producto.precio_venta?.toFixed(2)}
+                Bs {producto.precio_venta}
             </Table.Td>
             <Table.Td>
                 <Badge 
