@@ -69,7 +69,7 @@ const handleSubmit = async (e) => {
   }
 };
 
-
+// En handleVentaRapida:
 const handleVentaRapida = async () => {
   if (carrito.length === 0) {
     alert('El carrito está vacío');
@@ -79,7 +79,7 @@ const handleVentaRapida = async () => {
   try {
     const datosVentaRapida = {
       nombre: 'S/N',
-      ci_nit: '123', // ✅ Este CI especial indicará "sin cliente"
+      ci_nit: '00000',
       metodo_pago: 'efectivo'
     };
     

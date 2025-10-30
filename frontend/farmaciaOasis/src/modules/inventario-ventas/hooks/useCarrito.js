@@ -82,25 +82,11 @@ const modificarCantidad = (id, cambio) => {
   };
 
   
- 
   const realizarVenta = async (datosCliente) => {
     try {
-      // ✅ PRIMERO: Buscar o crear cliente y obtener su ID
-      let clienteId = null;
-      
-      // Solo procesar cliente si tiene CI válido (no es venta rápida)
-      if (datosCliente.ci_nit && 
-          datosCliente.ci_nit !== '123' && 
-          datosCliente.ci_nit !== 'S/N' && 
-          datosCliente.ci_nit.trim() !== '') {
-        
-        clienteId = await ventasService.buscarOCrearCliente(datosCliente);
-        console.log('ID del cliente obtenido:', clienteId);
-      }
-  
-      // Preparar datos para el backend CON EL ID DEL CLIENTE
+      // Preparar datos para el backend
       const ventaData = {
-        cliente: clienteId, // ✅ Ahora enviamos el ID, no el CI
+        cliente: datosCliente.ci_nit !== '00000' ? datosCliente.ci_nit : null,
         metodo_pago: datosCliente.metodo_pago,
         productos: carrito.map(item => ({
           id: item.id,
@@ -120,10 +106,7 @@ const modificarCantidad = (id, cambio) => {
       // ✅ GUARDAR LOS DATOS COMPLETOS DE LA VENTA PARA EL PDF
       const ventaCompleta = {
         ...resultado,
-        datosCliente: {
-          ...datosCliente,
-          id: clienteId // ✅ Incluir el ID del cliente
-        },
+        datosCliente: datosCliente,
         productosVendidos: carrito.map(item => ({
           ...item,
           subtotal: item.precio_venta * item.cantidad
@@ -141,7 +124,7 @@ const modificarCantidad = (id, cambio) => {
       vaciarCarrito();
       
       console.log('Venta realizada exitosamente:', ventaCompleta);
-      return ventaCompleta;
+      return ventaCompleta; // ✅ Retornar datos completos con total real
       
     } catch (error) {
       console.error('Error al realizar venta:', error);
@@ -156,6 +139,7 @@ const modificarCantidad = (id, cambio) => {
       throw error;
     }
   };
+
   const totalVenta = carrito.reduce((total, item) => total + (item.precio_venta * item.cantidad), 0);
 
   return {
