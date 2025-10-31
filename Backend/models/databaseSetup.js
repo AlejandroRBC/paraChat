@@ -40,7 +40,7 @@ const createTables = () => {
     presentacion TEXT,
     precio_venta REAL,
     precio_compra REAL,
-    valor_medida REAL,
+    medida REAL,
     estado TEXT,
     id_lab INTEGER,
     id_proveedor INTEGER,

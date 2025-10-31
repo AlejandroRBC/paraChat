@@ -1,11 +1,9 @@
-
-
 import { useState } from 'react';
 import { 
-  ScrollArea, Box, Group, Text, Button, ActionIcon,Flex, ThemeIcon,Badge,Stack,Modal,TextInput, Select,Alert
+  ScrollArea, Box, Group, Text, Button, ActionIcon,Flex, ThemeIcon,Badge,Stack,Modal,TextInput, Select,Alert, Radio
 } from '@mantine/core';
 import { 
-  IconPlus, IconMinus, IconTrash, IconUser,IconShoppingCartExclamation,IconReceiptDollar,IconInvoice,IconDownload,IconPrinter,IconCheck
+  IconPlus, IconMinus, IconTrash, IconUser,IconShoppingCartExclamation,IconReceiptDollar,IconInvoice,IconDownload,IconPrinter,IconCheck, IconQrcode, IconCash, IconCurrencyDollar
 } from '@tabler/icons-react';
 import { generarPDFVenta,
   imprimirComprobante } from '../utils/generarPDF';
@@ -23,99 +21,98 @@ function VentaForm({
   const [detallesVentaReal, setDetallesVentaReal] = useState(null);
   const [modalClienteAbierto, setModalClienteAbierto] = useState(false);
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false);
+  const [modalPagoRapidoAbierto, setModalPagoRapidoAbierto] = useState(false); // ✅ NUEVO MODAL
   const [datosVentaConfirmada, setDatosVentaConfirmada] = useState(null);
   const [numeroVentaGenerado, setNumeroVentaGenerado] = useState('');
+  const [metodoPagoRapido, setMetodoPagoRapido] = useState('efectivo'); // ✅ ESTADO PARA MÉTODO DE PAGO RÁPIDO
+  
   const [datosCliente, setDatosCliente] = useState({
     nombre: '',
     ci_nit: '',
     metodo_pago: 'efectivo'
   });
 
-// En handleSubmit:
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (carrito.length === 0) {
-    alert('El carrito está vacío');
-    return;
-  }
-  
-  try {
-    // ✅ LLAMAR A LA FUNCIÓN REALIZAR VENTA Y CAPTURAR LOS DATOS COMPLETOS
-    const ventaRealizada = await onRealizarVenta(datosCliente);
-    
-    // ✅ MOSTRAR NOTIFICACIÓN SI EL CLIENTE FUE REACTIVADO
-    if (ventaRealizada.clienteReactivado) {
-      alert('ℹ️ El cliente estaba inactivo y ha sido reactivado automáticamente.');
+  // En handleSubmit:
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (carrito.length === 0) {
+      alert('El carrito está vacío');
+      return;
     }
     
-    // ✅ USAR LOS DATOS REALES DE LA VENTA EN LUGAR DEL CARRITO LOCAL
-    const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
-    setNumeroVentaGenerado(numeroVenta);
-    setDatosVentaConfirmada({
-      ...datosCliente,
-      ventaId: ventaRealizada.id_venta
-    });
-    
-    // ✅ GUARDAR LOS DETALLES COMPLETOS DE LA VENTA INCLUYENDO EL TOTAL REAL
-    setDetallesVentaReal({
-      ...ventaRealizada,
-      totalReal: ventaRealizada.total
-    });
-    
-    setModalExitoAbierto(true);
-    setModalClienteAbierto(false);
-    
-    setDatosCliente({
-      nombre: '',
-      ci_nit: '',
-      metodo_pago: 'efectivo'
-    });
-  } catch (error) {
-    alert('Error al realizar la venta: ' + error.message);
-  }
-};
-// En handleVentaRapida:
-const handleVentaRapida = async () => {
-  if (carrito.length === 0) {
-    alert('El carrito está vacío');
-    return;
-  }
-  
-  try {
-    const datosVentaRapida = {
-      nombre: 'S/N',
-      ci_nit: '123',
-      metodo_pago: 'efectivo'
-    };
-    
-    // ✅ CAPTURAR DATOS COMPLETOS DE LA VENTA
-    const ventaRealizada = await onRealizarVenta(datosVentaRapida);
-    
-    //  ✅ MOSTRAR NOTIFICACIÓN SI EL CLIENTE FUE REACTIVADO
-    // if (ventaRealizada.clienteReactivado) {
-    //   alert('ℹ️ El cliente estaba inactivo y ha sido reactivado automáticamente.');
-    // }
-    
-    const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
-    setNumeroVentaGenerado(numeroVenta);
-    setDatosVentaConfirmada({
-      ...datosVentaRapida,
-      ventaId: ventaRealizada.id_venta
-    });
-    
-    // ✅ GUARDAR LOS DETALLES COMPLETOS CON TOTAL REAL
-    setDetallesVentaReal({
-      ...ventaRealizada,
-      totalReal: ventaRealizada.total
-    });
-    
-    setModalExitoAbierto(true);
-  } catch (error) {
-    alert('Error al realizar la venta rápida: ' + error.message);
-  }
-};
+    try {
+      const ventaRealizada = await onRealizarVenta(datosCliente);
+      
+      if (ventaRealizada.clienteReactivado) {
+        alert('ℹ️ El cliente estaba inactivo y ha sido reactivado automáticamente.');
+      }
+      
+      const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
+      setNumeroVentaGenerado(numeroVenta);
+      setDatosVentaConfirmada({
+        ...datosCliente,
+        ventaId: ventaRealizada.id_venta
+      });
+      
+      setDetallesVentaReal({
+        ...ventaRealizada,
+        totalReal: ventaRealizada.total
+      });
+      
+      setModalExitoAbierto(true);
+      setModalClienteAbierto(false);
+      
+      setDatosCliente({
+        nombre: '',
+        ci_nit: '',
+        metodo_pago: 'efectivo'
+      });
+    } catch (error) {
+      alert('Error al realizar la venta: ' + error.message);
+    }
+  };
 
-// ✅ AGREGAR ESTADO PARA LOS DETALLES REALES DE LA VENTA
+  // ✅ NUEVA FUNCIÓN MEJORADA PARA VENTA RÁPIDA
+  const handleVentaRapida = async () => {
+    if (carrito.length === 0) {
+      alert('El carrito está vacío');
+      return;
+    }
+    
+    // ✅ ABRIR MODAL DE SELECCIÓN DE PAGO EN LUGAR DE PROCESAR DIRECTAMENTE
+    setModalPagoRapidoAbierto(true);
+  };
+
+  // ✅ NUEVA FUNCIÓN PARA CONFIRMAR VENTA RÁPIDA CON MÉTODO DE PAGO
+  const confirmarVentaRapida = async () => {
+    try {
+      const datosVentaRapida = {
+        nombre: 'S/N',
+        ci_nit: '123',
+        metodo_pago: metodoPagoRapido 
+      };
+      
+      const ventaRealizada = await onRealizarVenta(datosVentaRapida);
+      
+      const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
+      setNumeroVentaGenerado(numeroVenta);
+      setDatosVentaConfirmada({
+        ...datosVentaRapida,
+        ventaId: ventaRealizada.id_venta
+      });
+      
+      setDetallesVentaReal({
+        ...ventaRealizada,
+        totalReal: ventaRealizada.total
+      });
+      
+      setModalExitoAbierto(true);
+      setModalPagoRapidoAbierto(false); // ✅ CERRAR MODAL DE PAGO
+    } catch (error) {
+      alert('Error al realizar la venta rápida: ' + error.message);
+      setModalPagoRapidoAbierto(false);
+    }
+  };
 
   const handleChange = (name, value) => {
     setDatosCliente(prev => ({
@@ -123,7 +120,6 @@ const handleVentaRapida = async () => {
       [name]: value
     }));
   };
-
 
   const abrirModalVenta = () => {
     if (carrito.length === 0) {
@@ -133,42 +129,41 @@ const handleVentaRapida = async () => {
     setModalClienteAbierto(true);
   };
   
-
   const cerrarModalExito = () => {
     setModalExitoAbierto(false);
     onVaciarCarrito();
     onCancel();
   };
+
   // ✅ FUNCIÓN MEJORADA PARA GENERAR PDF CON DATOS REALES
-const generarPDFConDatosReales = () => {
-  if (!detallesVentaReal) {
-    console.error('No hay detalles de venta disponibles');
-    return;
-  }
+  const generarPDFConDatosReales = () => {
+    if (!detallesVentaReal) {
+      console.error('No hay detalles de venta disponibles');
+      return;
+    }
 
-  // ✅ USAR LOS DATOS REALES DE LA VENTA EN LUGAR DEL CARRITO
-  generarPDFVenta(
-    datosVentaConfirmada,
-    detallesVentaReal.productosVendidos || carrito,
-    detallesVentaReal.total || totalVenta,
-    numeroVentaGenerado
-  );
-};
+    generarPDFVenta(
+      datosVentaConfirmada,
+      detallesVentaReal.productosVendidos || carrito,
+      detallesVentaReal.total || totalVenta,
+      numeroVentaGenerado
+    );
+  };
 
-// ✅ FUNCIÓN MEJORADA PARA IMPRIMIR CON DATOS REALES
-const imprimirConDatosReales = () => {
-  if (!detallesVentaReal) {
-    console.error('No hay detalles de venta disponibles');
-    return;
-  }
+  // ✅ FUNCIÓN MEJORADA PARA IMPRIMIR CON DATOS REALES
+  const imprimirConDatosReales = () => {
+    if (!detallesVentaReal) {
+      console.error('No hay detalles de venta disponibles');
+      return;
+    }
 
-  imprimirComprobante(
-    datosVentaConfirmada,
-    detallesVentaReal.productosVendidos || carrito, // ✅ Priorizar datos reales
-    detallesVentaReal.total || totalVenta, // ✅ Priorizar total real
-    numeroVentaGenerado
-  );
-};
+    imprimirComprobante(
+      datosVentaConfirmada,
+      detallesVentaReal.productosVendidos || carrito,
+      detallesVentaReal.total || totalVenta,
+      numeroVentaGenerado
+    );
+  };
 
   if (carrito.length === 0 && !datosVentaConfirmada) {
     return (
@@ -212,9 +207,8 @@ const imprimirConDatosReales = () => {
                   </Badge>
                 </Group>
 
-                {/* ✅ Agregar información de stock */}
                 <Text size="xs" c="dimmed" mb="xs">
-                  Stock disponible: {item.stock - item.cantidad} {/* Esto sería mejor si pasamos la función */}
+                  Stock disponible: {item.stock - item.cantidad}
                 </Text>
                 
                 {item.presentacion && (
@@ -288,7 +282,7 @@ const imprimirConDatosReales = () => {
             </Button>
 
             <Button 
-              onClick={handleVentaRapida}
+              onClick={handleVentaRapida} // ✅ AHORA ABRE EL MODAL DE PAGO
               size="md"
               fullWidth
               variant="light"
@@ -310,7 +304,7 @@ const imprimirConDatosReales = () => {
         </Stack>
       </Box>
 
-      {/* Modal Datos del Cliente */}
+      {/* Modal Datos del Cliente (EXISTENTE) */}
       <Modal
         opened={modalClienteAbierto}
         onClose={() => setModalClienteAbierto(false)}
@@ -330,7 +324,21 @@ const imprimirConDatosReales = () => {
               label="Nombre del Cliente"
               placeholder="Ingrese nombre completo"
               value={datosCliente.nombre}
-              onChange={(e) => handleChange('nombre', e.target.value)}
+              onChange={(e) => {
+                const valor = e.target.value;
+                if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.'-]*$/.test(valor) && valor.length <= 100) {
+                  handleChange('nombre', valor);
+                }
+              }}
+              onBlur={(e) => {
+                const valor = e.target.value.trim();
+                handleChange('nombre', valor);
+              }}
+              error={
+                datosCliente.nombre && datosCliente.nombre.length < 2 
+                  ? 'El nombre debe tener al menos 2 caracteres' 
+                  : null
+              }
               required
             />
             
@@ -338,7 +346,23 @@ const imprimirConDatosReales = () => {
               label="CI / NIT"
               placeholder="Número de identificación"
               value={datosCliente.ci_nit}
-              onChange={(e) => handleChange('ci_nit', e.target.value)}
+              onChange={(e) => {
+                const valor = e.target.value;
+                if (/^[0-9a-zA-Z]*$/.test(valor) && valor.length <= 15) {
+                  handleChange('ci_nit', valor);
+                }
+              }}
+              onBlur={(e) => {
+                const valor = e.target.value.trim();
+                handleChange('ci_nit', valor);
+              }}
+              error={
+                datosCliente.ci_nit && datosCliente.ci_nit.length < 3 
+                  ? 'El CI/NIT debe tener al menos 3 caracteres' 
+                  : datosCliente.ci_nit && !/^[0-9a-zA-Z]+$/.test(datosCliente.ci_nit)
+                  ? 'Solo se permiten números y letras'
+                  : null
+              }
             />
             
             <Select
@@ -354,6 +378,18 @@ const imprimirConDatosReales = () => {
               required
             />
 
+            {datosCliente.nombre && datosCliente.nombre.length < 2 && (
+              <Alert variant="light" color="yellow" size="sm">
+                El nombre debe tener al menos 2 caracteres
+              </Alert>
+            )}
+
+            {datosCliente.ci_nit && datosCliente.ci_nit.length < 3 && (
+              <Alert variant="light" color="yellow" size="sm">
+                El CI/NIT debe tener al menos 3 caracteres
+              </Alert>
+            )}
+
             <Group justify="space-between" mt="md">
               <Text fw={700} size="lg">Total a Pagar:</Text>
               <Text fw={700} size="xl" c="blue.6">
@@ -361,29 +397,124 @@ const imprimirConDatosReales = () => {
               </Text>
             </Group>
 
-            <Group grow mt="md">
-              <Button 
-                type="submit" 
-                color="green"
-                size="md"
-              >
-                Confirmar Venta
-              </Button>
+            {(() => {
+              const nombreValido = datosCliente.nombre && datosCliente.nombre.length >= 2;
+              const ciNitValido = !datosCliente.ci_nit || (datosCliente.ci_nit.length >= 3 && /^[0-9a-zA-Z]+$/.test(datosCliente.ci_nit));
+              const metodoPagoValido = datosCliente.metodo_pago;
               
-              <Button 
-                variant="light" 
-                color="gray"
-                onClick={() => setModalClienteAbierto(false)}
-                size="md"
-              >
-                Cancelar
-              </Button>
-            </Group>
+              const formularioValido = nombreValido && ciNitValido && metodoPagoValido;
+              
+              return (
+                <Group grow mt="md">
+                  <Button 
+                    type="submit" 
+                    color="green"
+                    size="md"
+                    disabled={!formularioValido}
+                  >
+                    Confirmar Venta
+                  </Button>
+                  
+                  <Button 
+                    variant="light" 
+                    color="gray"
+                    onClick={() => setModalClienteAbierto(false)}
+                    size="md"
+                  >
+                    Cancelar
+                  </Button>
+                </Group>
+              );
+            })()}
           </Stack>
         </Box>
       </Modal>
 
-      {/* Modal Éxito y Opciones */}
+      {/* ✅ NUEVO MODAL PARA SELECCIÓN DE PAGO EN VENTA RÁPIDA */}
+      <Modal
+        opened={modalPagoRapidoAbierto}
+        onClose={() => setModalPagoRapidoAbierto(false)}
+        title={
+          <Group gap="sm">
+            <IconCurrencyDollar size={20} />
+            <Text fw={600}>Método de Pago - Venta Rápida</Text>
+          </Group>
+        }
+        size="sm"
+        overlayProps={{ opacity: 0.5, blur: 4 }}
+        styles={{ content: { borderRadius: '12px' } }}
+      >
+        <Stack gap="lg">
+          <Box>
+            <Text fw={600} size="lg" ta="center" c="blue.6">
+              Total: Bs {totalVenta}
+            </Text>
+            <Text size="sm" c="dimmed" ta="center">
+              {carrito.length} producto(s) en el carrito
+            </Text>
+          </Box>
+
+          <Radio.Group
+            value={metodoPagoRapido}
+            onChange={setMetodoPagoRapido}
+            name="metodoPagoRapido"
+            label="Seleccione el método de pago:"
+            withAsterisk
+          >
+            <Stack mt="xs" gap="sm">
+              <Radio 
+                value="efectivo" 
+                label={
+                  <Group gap="sm">
+                    <IconCash size={18} color="green" />
+                    <Text>Efectivo</Text>
+                  </Group>
+                } 
+              />
+              <Radio 
+                value="qr" 
+                label={
+                  <Group gap="sm">
+                    <IconQrcode size={18} color="blue" />
+                    <Text>QR</Text>
+                  </Group>
+                } 
+              />
+              <Radio 
+                value="mixto" 
+                label={
+                  <Group gap="sm">
+                    <IconCurrencyDollar size={18} color="orange" />
+                    <Text>Mixto</Text>
+                  </Group>
+                } 
+              />
+            </Stack>
+          </Radio.Group>
+
+          <Group grow mt="md">
+            <Button 
+              onClick={confirmarVentaRapida}
+              color="green"
+              size="md"
+            >
+              <IconCheck size={16} />
+              Confirmar Venta
+            </Button>
+            
+            <Button 
+              variant="light" 
+              color="gray"
+              onClick={() => setModalPagoRapidoAbierto(false)}
+              size="md"
+            >
+              Cancelar
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {/* Modal Éxito y Opciones (EXISTENTE) */}
       {datosVentaConfirmada && (
         <Modal
           opened={modalExitoAbierto}
@@ -398,22 +529,21 @@ const imprimirConDatosReales = () => {
           centered
         >
           <Stack gap="md">
-            
-
-          <Box
-            p="md"
-            style={{
-              border: '2px solid #1871c1',
-              borderRadius: '8px',
-              backgroundColor: '#f0f7ff'
-            }}
-          >
-            <Text fw={600} mb="xs">Nro. Venta: #{numeroVentaGenerado}</Text>
-            <Text size="sm" c="dimmed">Cliente: {datosVentaConfirmada.nombre}</Text>
-            <Text size="sm" c="dimmed">
-              Total: Bs {detallesVentaReal?.totalReal?.toFixed(2) || totalVenta.toFixed(2)}
-            </Text>
-          </Box>
+            <Box
+              p="md"
+              style={{
+                border: '2px solid #1871c1',
+                borderRadius: '8px',
+                backgroundColor: '#f0f7ff'
+              }}
+            >
+              <Text fw={600} mb="xs">Nro. Venta: #{numeroVentaGenerado}</Text>
+              <Text size="sm" c="dimmed">Cliente: {datosVentaConfirmada.nombre}</Text>
+              <Text size="sm" c="dimmed">Método de Pago: {datosVentaConfirmada.metodo_pago.toUpperCase()}</Text>
+              <Text size="sm" c="dimmed">
+                Total: Bs {detallesVentaReal?.totalReal?.toFixed(2) || totalVenta.toFixed(2)}
+              </Text>
+            </Box>
 
             <Group grow>
               <Button
@@ -431,11 +561,9 @@ const imprimirConDatosReales = () => {
                 Imprimir
               </Button>
             </Group>
-
           </Stack>
           <br/>
           <Flex
-            
             gap="md"
             justify="center"
             align="center"
@@ -449,7 +577,6 @@ const imprimirConDatosReales = () => {
               Continuar
             </Button>
           </Flex>
-
         </Modal>
       )}
     </>
