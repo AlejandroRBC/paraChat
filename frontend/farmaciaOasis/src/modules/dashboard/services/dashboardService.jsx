@@ -3,8 +3,13 @@ import axios from 'axios';
 
 const API_BASE = 'http://localhost:4000/api';
 
+/**
+ * Servicio para todas las consultas del dashboard a la API
+ */
 export const dashboardService = {
-  // 1. Obtener métricas del día (ventas hoy vs ayer) - BD REAL
+  /**
+   * Obtiene métricas del día actual vs día anterior
+   */
   async obtenerMetricasHoy() {
     try {
       const response = await axios.get(`${API_BASE}/dashboard/metricas-hoy`);
@@ -29,7 +34,9 @@ export const dashboardService = {
     }
   },
 
-  // 2. Obtener productos con stock bajo (stock ≤ 10) - BD REAL
+  /**
+   * Obtiene productos con stock bajo (stock ≤ 10 unidades)
+   */
   async obtenerProductosStockBajo() {
     try {
       const response = await axios.get(`${API_BASE}/dashboard/productos-stock-bajo`);
@@ -40,7 +47,9 @@ export const dashboardService = {
     }
   },
 
-  // 3. Obtener productos próximos a vencer (días restantes ≤ 30) - BD REAL
+  /**
+   * Obtiene productos próximos a vencer (≤ 30 días restantes)
+   */
   async obtenerProductosPorVencer() {
     try {
       const response = await axios.get(`${API_BASE}/dashboard/productos-por-vencer`);
@@ -51,7 +60,9 @@ export const dashboardService = {
     }
   },
 
-  // 4. Obtener ventas mensuales para la gráfica - BD REAL
+  /**
+   * Obtiene datos de ventas mensuales para gráficas
+   */
   async obtenerVentasMensuales() {
     try {
       const response = await axios.get(`${API_BASE}/dashboard/ventas-mensuales`);
@@ -62,7 +73,9 @@ export const dashboardService = {
     }
   },
 
-  // 5. Obtener top productos más vendidos - BD REAL
+  /**
+   * Obtiene ranking de productos más vendidos
+   */
   async obtenerTopProductos() {
     try {
       const response = await axios.get(`${API_BASE}/dashboard/top-productos`);

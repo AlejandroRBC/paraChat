@@ -7,11 +7,19 @@ import {
 } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
 
+/**
+ * Componente para mostrar lista de proveedores en formato tabla
+ * Diseño responsive con acciones de edición
+ */
 export function ProveedorList({ 
   proveedores, 
   onEditar,
   isMobile = false 
 }) {
+  /**
+   * Genera las filas de la tabla con datos de proveedores
+   * Adapta tamaños y estilos según el dispositivo
+   */
   const filas = proveedores.map((proveedor) => (
     <Table.Tr key={proveedor.id_proveedor}>
       <Table.Td>
@@ -38,6 +46,7 @@ export function ProveedorList({
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
+          {/* Botón para editar proveedor */}
           <ActionIcon 
             variant="light" 
             color="yellow" 
@@ -66,6 +75,7 @@ export function ProveedorList({
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
+          {/* Mensaje cuando no hay proveedores */}
           {filas.length > 0 ? filas : (
             <Table.Tr>
               <Table.Td colSpan={7} style={{ textAlign: 'center' }}>

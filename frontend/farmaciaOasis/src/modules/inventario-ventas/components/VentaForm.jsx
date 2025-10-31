@@ -1,4 +1,5 @@
 
+
 import { useState } from 'react';
 import { 
   ScrollArea, Box, Group, Text, Button, ActionIcon,Flex, ThemeIcon,Badge,Stack,Modal,TextInput, Select,Alert
@@ -42,6 +43,11 @@ const handleSubmit = async (e) => {
     // ✅ LLAMAR A LA FUNCIÓN REALIZAR VENTA Y CAPTURAR LOS DATOS COMPLETOS
     const ventaRealizada = await onRealizarVenta(datosCliente);
     
+    // ✅ MOSTRAR NOTIFICACIÓN SI EL CLIENTE FUE REACTIVADO
+    if (ventaRealizada.clienteReactivado) {
+      alert('ℹ️ El cliente estaba inactivo y ha sido reactivado automáticamente.');
+    }
+    
     // ✅ USAR LOS DATOS REALES DE LA VENTA EN LUGAR DEL CARRITO LOCAL
     const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
     setNumeroVentaGenerado(numeroVenta);
@@ -53,7 +59,7 @@ const handleSubmit = async (e) => {
     // ✅ GUARDAR LOS DETALLES COMPLETOS DE LA VENTA INCLUYENDO EL TOTAL REAL
     setDetallesVentaReal({
       ...ventaRealizada,
-      totalReal: ventaRealizada.total // ✅ ESTE ES EL TOTAL REAL DEL BACKEND
+      totalReal: ventaRealizada.total
     });
     
     setModalExitoAbierto(true);
@@ -68,7 +74,6 @@ const handleSubmit = async (e) => {
     alert('Error al realizar la venta: ' + error.message);
   }
 };
-
 // En handleVentaRapida:
 const handleVentaRapida = async () => {
   if (carrito.length === 0) {
@@ -79,12 +84,17 @@ const handleVentaRapida = async () => {
   try {
     const datosVentaRapida = {
       nombre: 'S/N',
-      ci_nit: '00000',
+      ci_nit: '123',
       metodo_pago: 'efectivo'
     };
     
     // ✅ CAPTURAR DATOS COMPLETOS DE LA VENTA
     const ventaRealizada = await onRealizarVenta(datosVentaRapida);
+    
+    //  ✅ MOSTRAR NOTIFICACIÓN SI EL CLIENTE FUE REACTIVADO
+    // if (ventaRealizada.clienteReactivado) {
+    //   alert('ℹ️ El cliente estaba inactivo y ha sido reactivado automáticamente.');
+    // }
     
     const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
     setNumeroVentaGenerado(numeroVenta);
@@ -96,7 +106,7 @@ const handleVentaRapida = async () => {
     // ✅ GUARDAR LOS DETALLES COMPLETOS CON TOTAL REAL
     setDetallesVentaReal({
       ...ventaRealizada,
-      totalReal: ventaRealizada.total // ✅ TOTAL REAL DEL BACKEND
+      totalReal: ventaRealizada.total
     });
     
     setModalExitoAbierto(true);

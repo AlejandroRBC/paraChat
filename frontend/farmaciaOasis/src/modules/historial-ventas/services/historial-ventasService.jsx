@@ -3,14 +3,21 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:4000/api';  
 
+/**
+ * Servicio para gestionar las operaciones del historial de ventas
+ * Proporciona métodos para obtener y filtrar datos de ventas
+ */
 const HistorialVentasService = {
-  // Obtener todas las ventas con detalle de productos y cliente
+  /**
+   * Obtiene todas las ventas con detalles completos
+   * Incluye información de productos y clientes
+   */
   obtenerVentasDetalle: async () => {
     try {
       const response = await axios.get(`${API_URL}/ventas`);
       console.log('Respuesta completa del backend:', response);
       
-      // Ajusta según la estructura real de tu respuesta
+      // Maneja diferentes estructuras de respuesta del backend
       if (response.data && response.data.data) {
         return response.data.data;
       } else if (response.data) {
@@ -23,13 +30,16 @@ const HistorialVentasService = {
     }
   },
 
-  // Función alternativa que puede usar el hook
+  /**
+   * Función alternativa para obtener ventas
+   * Puede usarse como backup o para endpoints diferentes
+   */
   obtenerVentas: async () => {
     try {
       const response = await axios.get(`${API_URL}/ventas-detalle`);
       console.log('Datos de ventas obtenidos:', response.data);
       
-      // Ajusta según tu estructura de respuesta
+      // Maneja diferentes estructuras de respuesta
       if (response.data && response.data.data) {
         return response.data.data;
       } else if (response.data) {
@@ -42,7 +52,9 @@ const HistorialVentasService = {
     }
   },
 
-  // Filtrar ventas por cliente
+  /**
+   * Filtra ventas por ID de cliente específico
+   */
   obtenerVentasPorCliente: async (id_cliente) => {
     try {
       const response = await axios.get(`${API_URL}/ventas-detalle`);
@@ -54,7 +66,9 @@ const HistorialVentasService = {
     }
   },
 
-  // Filtrar ventas por rango de fechas
+  /**
+   * Filtra ventas por rango de fechas
+   */
   obtenerVentasPorFecha: async (fechaInicio, fechaFin) => {
     try {
       const response = await axios.get(`${API_URL}/ventas-detalle`);

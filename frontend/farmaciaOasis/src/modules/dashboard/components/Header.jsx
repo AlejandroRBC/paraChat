@@ -1,4 +1,3 @@
-// components/Header.jsx - VERSIÓN COMPLETA SIN CSS INLINE
 import { useState, useEffect, useRef } from 'react';
 import { 
   Group, 
@@ -16,17 +15,22 @@ import {
 } from '@tabler/icons-react';
 import '../dashboard.css'; 
 
+/**
+ * Header principal del dashboard con sistema de notificaciones
+ * Muestra alertas de stock bajo y productos por vencer
+ */
 function Header({ productosBajos = [], productosPorVencer = [] }) {
+  // Estados
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [fechaHora, setFechaHora] = useState({ hora: '' });
   const audioPlayedRef = useRef(false);
 
-  // Calcular notificaciones
+  // Cálculo de notificaciones
   const notificacionesStock = productosBajos.filter(p => p.stock <= 5).length;
   const notificacionesVencimiento = productosPorVencer.filter(p => p.diasRestantes <= 10).length;
   const totalNotificaciones = notificacionesStock + notificacionesVencimiento;
 
-  // Actualizar hora
+  // Actualizar hora en tiempo real
   useEffect(() => {
     const actualizarFechaHora = () => {
       const ahora = new Date();
@@ -39,7 +43,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
     return () => clearInterval(intervalo);
   }, []);
 
-  // Efecto para sonido de notificación
+  // Sonido de notificación (solo una vez)
   useEffect(() => {
     if (totalNotificaciones > 0 && !audioPlayedRef.current) {
       reproducirSonido();
@@ -47,6 +51,9 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
     }
   }, [totalNotificaciones]);
 
+  /**
+   * Reproduce sonido de alerta usando Web Audio API
+   */
   const reproducirSonido = () => {
     try {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -65,15 +72,12 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.5);
       
-    // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      console.log('Audio no soportado');
-      // Fallback simple
+      // Fallback para navegadores sin Web Audio API
       try {
         const beep = new Audio("data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUgBjiN1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUgBjiN1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUgBmWf2fS7bCgF");
         beep.volume = 0.3;
         beep.play().catch(() => console.log('No se pudo reproducir sonido'));
-      // eslint-disable-next-line no-unused-vars
       } catch (e) {
         console.log('Sonido no disponible');
       }
@@ -83,7 +87,8 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
   return (
     <div className="dashboard-header">
       <Group justify="center" align="center">
-        {/* Título Centrado */}
+        
+        {/* Título y subtítulo centrados */}
         <Stack gap={2} align="center">
           <Text className="dashboard-title">
             MÉTRICAS
@@ -98,7 +103,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
           </Text>
         </Stack>
 
-        {/* Notificaciones */}
+        {/* Menú de notificaciones */}
         <Menu 
           shadow="md" 
           width={350} 
@@ -114,7 +119,6 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
               className="notification-bell"
             >
               <IconBell size={25} />
-              
               {totalNotificaciones > 0 && (
                 <Badge 
                   size="sm" 
@@ -130,6 +134,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
           </Menu.Target>
 
           <Menu.Dropdown>
+            {/* Encabezado del menú de notificaciones */}
             <Menu.Label className="notification-menu-label">
               <span>🔔 Sistema de Alertas</span>
               {totalNotificaciones > 0 && (
@@ -141,7 +146,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
 
             <Menu.Divider />
 
-            {/* ALERTA STOCK BAJO */}
+            {/* Sección: Alertas de Stock Bajo */}
             {notificacionesStock > 0 ? (
               <Menu.Item 
                 className="notification-item"
@@ -169,7 +174,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
               </Menu.Item>
             )}
 
-            {/* ALERTA VENCIMIENTO */}
+            {/* Sección: Alertas de Vencimiento */}
             {notificacionesVencimiento > 0 ? (
               <Menu.Item 
                 className="notification-item"
@@ -199,6 +204,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
 
             <Menu.Divider />
             
+            {/* Pie con hora de actualización */}
             <Menu.Item className="notification-time">
               <Text size="xs" c="dimmed" ta="center">
                 Actualizado: {fechaHora.hora}

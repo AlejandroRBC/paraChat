@@ -1,47 +1,50 @@
-// components/VentasChart.jsx - VERSIÓN CON SELECTOR DE AÑOS
 import { useState, useMemo } from 'react';
 import { Paper, Title, Text, Group, Badge, ThemeIcon, Button, Select } from '@mantine/core';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { IconTrendingUp, IconCurrencyDollar, IconChartLine, IconPackage, IconReceipt, IconCalendar } from '@tabler/icons-react';
 import '../dashboard.css';
 
+/**
+ * Gráfico de ventas interactivo con selector de años y tipo de visualización
+ * Muestra tendencias mensuales con métricas detalladas
+ */
 function VentasChart({ data }) {
   const [tipoGrafica, setTipoGrafica] = useState('monto');
   const [añoSeleccionado, setAñoSeleccionado] = useState('');
   
-  // ✅ Extraer años únicos de los datos
+  // Extraer años únicos de los datos para el selector
   const añosDisponibles = useMemo(() => {
     const años = [...new Set(data.map(item => item.año))].sort((a, b) => b - a);
     return años.map(año => ({ value: año, label: año }));
   }, [data]);
 
-  // ✅ Filtrar datos por año seleccionado (o usar todos si no hay selección)
+  // Filtrar datos por año seleccionado
   const datosFiltrados = useMemo(() => {
     if (!añoSeleccionado) return data;
     return data.filter(item => item.año === añoSeleccionado);
   }, [data, añoSeleccionado]);
 
-  // ✅ Establecer el año más reciente por defecto
+  // Establecer año más reciente por defecto
   useMemo(() => {
     if (añosDisponibles.length > 0 && !añoSeleccionado) {
       setAñoSeleccionado(añosDisponibles[0].value);
     }
   }, [añosDisponibles, añoSeleccionado]);
 
-  // ✅ CORREGIDO: Manejar array vacío en todos los reduce
+  // Cálculo de métricas principales
   const totalVentas = datosFiltrados.reduce((sum, item) => sum + (item.ventas || 0), 0);
   const totalProductos = datosFiltrados.reduce((sum, item) => sum + (item.productos || 0), 0);
   const totalNroVentas = datosFiltrados.reduce((sum, item) => sum + (item.nroVentas || 0), 0);
   const promedioVentas = datosFiltrados.length > 0 ? totalVentas / datosFiltrados.length : 0;
   const promedioNroVentas = datosFiltrados.length > 0 ? totalNroVentas / datosFiltrados.length : 0;
   
-  // ✅ CORREGIDO: Manejar array vacío en tendencia
+  // Cálculo de tendencia (crecimiento vs mes anterior)
   const crecimiento = datosFiltrados.length > 1 ? 
     ((datosFiltrados[datosFiltrados.length - 1][tipoGrafica === 'monto' ? 'ventas' : 'nroVentas'] - 
       datosFiltrados[datosFiltrados.length - 2][tipoGrafica === 'monto' ? 'ventas' : 'nroVentas']) / 
      datosFiltrados[datosFiltrados.length - 2][tipoGrafica === 'monto' ? 'ventas' : 'nroVentas'] * 100).toFixed(1) : 0;
   
-  // ✅ CORREGIDO: Manejar array vacío en mejor/peor mes
+  // Identificar mejor y peor mes según tipo de gráfica
   const mejorMes = datosFiltrados.length > 0 
     ? (tipoGrafica === 'monto' 
         ? datosFiltrados.reduce((max, item) => (item.ventas || 0) > (max.ventas || 0) ? item : max, datosFiltrados[0])
@@ -54,10 +57,11 @@ function VentasChart({ data }) {
         : datosFiltrados.reduce((min, item) => (item.nroVentas || 0) < (min.nroVentas || 0) ? item : min, datosFiltrados[0]))
     : { mes: 'N/A', ventas: 0, nroVentas: 0 };
 
+  // Valores dinámicos según tipo de gráfica seleccionada
   const totalActual = tipoGrafica === 'monto' ? totalVentas : totalNroVentas;
   const promedioActual = tipoGrafica === 'monto' ? promedioVentas : promedioNroVentas;
 
-  // Datos para la gráfica según el tipo seleccionado
+  // Preparar datos para la gráfica según selección
   const datosGrafica = tipoGrafica === 'monto' 
     ? datosFiltrados.map(item => ({ ...item, valor: item.ventas || 0, nombre: 'Monto Ventas' }))
     : datosFiltrados.map(item => ({ ...item, valor: item.nroVentas || 0, nombre: 'Número de Ventas' }));
@@ -66,7 +70,7 @@ function VentasChart({ data }) {
 
   return (
     <Paper p="xl" withBorder radius="lg" shadow="md" className="ventas-chart-container">
-      {/* Header con título y métricas en la misma línea */}
+      {/* Header con título, métricas y selector de año */}
       <Group justify="space-between" align="center" mb="xl">
         <Group gap="sm">
           <ThemeIcon size="lg" color="blue" variant="light">
@@ -82,7 +86,7 @@ function VentasChart({ data }) {
           </div>
         </Group>
 
-        {/* Métricas en la derecha */}
+        {/* Métricas rápidas y selector de año */}
         <Group gap="xl">
           {/* Total Acumulado */}
           <div style={{ textAlign: 'center' }}>
@@ -105,38 +109,36 @@ function VentasChart({ data }) {
           </div>
 
           {/* Selector de Años */}
-<div style={{ textAlign: 'center' }}>
-  <Badge color="grape" variant="light" size="sm" mb={4}>
-    AÑO
-  </Badge>
-  <Select
-    value={añoSeleccionado}
-    onChange={setAñoSeleccionado}
-    data={[
-      ...añosDisponibles
-    ]}
-    placeholder="Año"
-    styles={{
-      input: {
-        fontWeight: 700,
-        textAlign: 'center',
-        color: 'var(--mantine-color-grape-6)',
-        border: 'none',
-        background: 'transparent',
-        fontSize: '16px',
-        padding: '0 12px',
-        height: 'auto',
-        minHeight: '30px',
-        lineHeight: '1.2'
-      },
-      root: {
-        width: '100%',
-        maxWidth: '90px'
-      }
-    }}
-    size="xs"
-  />
-</div>
+          <div style={{ textAlign: 'center' }}>
+            <Badge color="grape" variant="light" size="sm" mb={4}>
+              AÑO
+            </Badge>
+            <Select
+              value={añoSeleccionado}
+              onChange={setAñoSeleccionado}
+              data={[...añosDisponibles]}
+              placeholder="Año"
+              styles={{
+                input: {
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  color: 'var(--mantine-color-grape-6)',
+                  border: 'none',
+                  background: 'transparent',
+                  fontSize: '16px',
+                  padding: '0 12px',
+                  height: 'auto',
+                  minHeight: '30px',
+                  lineHeight: '1.2'
+                },
+                root: {
+                  width: '100%',
+                  maxWidth: '90px'
+                }
+              }}
+              size="xs"
+            />
+          </div>
         </Group>
       </Group>
 
@@ -167,7 +169,7 @@ function VentasChart({ data }) {
         </Button>
       </Group>
 
-      {/* Gráfica dinámica según selección */}
+      {/* Gráfica lineal interactiva */}
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={datosGrafica}>
@@ -228,7 +230,7 @@ function VentasChart({ data }) {
         </ResponsiveContainer>
       </div>
 
-      {/* Footer con métricas dinámicas */}
+      {/* Panel de métricas detalladas */}
       <Group direction="column" gap="md" mt="lg" p="md" className="ventas-chart-footer">
         <Group justify="space-around" w="100%">
           <Group gap="md" className="metric-group">
@@ -287,6 +289,7 @@ function VentasChart({ data }) {
           </Group>
         </Group>
 
+        {/* Métricas adicionales */}
         <Group justify="space-around" w="100%">
           <Group gap="md" className="metric-group">
             <ThemeIcon className="metric-icon" color="cyan" variant="light">

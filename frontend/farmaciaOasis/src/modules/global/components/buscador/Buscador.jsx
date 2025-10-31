@@ -1,220 +1,221 @@
-// src/modules/global/components/buscador/buscador.jsx
 import { useState, useEffect, useRef } from 'react';
 import { TextInput, Box, Text, Group, ActionIcon, Kbd } from '@mantine/core';
 import { 
-IconSearch, 
-IconX, 
-IconArrowRight,
-IconCommand 
+  IconSearch, 
+  IconX, 
+  IconArrowRight,
+  IconCommand 
 } from '@tabler/icons-react';
 import { useColors } from '../../hooks/useColors';
 import classes from './buscador.module.css';
 
+/**
+ * Componente de búsqueda avanzado con resultados en tiempo real
+ * Soporta atajos de teclado, búsqueda en tiempo real y selección de resultados
+ */
 export function Buscador({
-placeholder = 'Buscar...',
-value = '',
-onChange = () => {},
-onSearch = () => {},
-onClear = () => {},
-size = 'md',
-width = '100%',
-maxWidth = '400px',
-withShortcut = true,
-withSearchButton = false,
-autoFocus = false,
-disabled = false,
-loading = false,
-results = [],
-renderResult = null,
-onResultSelect = null,
-...props
+  placeholder = 'Buscar...',
+  value = '',
+  onChange = () => {},
+  onSearch = () => {},
+  onClear = () => {},
+  size = 'md',
+  width = '100%',
+  maxWidth = '400px',
+  withShortcut = true,
+  withSearchButton = false,
+  autoFocus = false,
+  disabled = false,
+  loading = false,
+  results = [],
+  renderResult = null,
+  onResultSelect = null,
+  ...props
 }) {
-const colors = useColors();
-const [isFocused, setIsFocused] = useState(false);
-const [showResults, setShowResults] = useState(false);
-const inputRef = useRef(null);
+  const colors = useColors();
+  const [isFocused, setIsFocused] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const inputRef = useRef(null);
 
-// Manejar atajo de teclado (Ctrl+K / Cmd+K)
-useEffect(() => {
+  // Manejar atajo de teclado (Escape para cerrar)
+  useEffect(() => {
     const handleKeyDown = (event) => {
-    
-    
-    if (event.key === 'Escape') {
+      if (event.key === 'Escape') {
         setShowResults(false);
         inputRef.current?.blur();
-    }
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-}, []);
+  }, []);
 
-// Mostrar resultados cuando hay valor y está enfocado
-useEffect(() => {
+  // Mostrar/ocultar resultados basado en valor y foco
+  useEffect(() => {
     if (value.trim() && isFocused && results.length > 0) {
-    setShowResults(true);
+      setShowResults(true);
     } else {
-    setShowResults(false);
+      setShowResults(false);
     }
-}, [value, isFocused, results]);
+  }, [value, isFocused, results]);
 
-const handleChange = (event) => {
+  const handleChange = (event) => {
     onChange(event.currentTarget.value);
-};
+  };
 
-const handleClear = () => {
+  const handleClear = () => {
     onChange('');
     onClear();
     inputRef.current?.focus();
-};
+  };
 
-const handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     onSearch(value);
     setShowResults(false);
-};
+  };
 
-const handleResultClick = (result) => {
+  const handleResultClick = (result) => {
     if (onResultSelect) {
-    onResultSelect(result);
-    setShowResults(false);
-    
+      onResultSelect(result);
+      setShowResults(false);
     }
-};
+  };
 
-
-const handleInputFocus = () => {
+  const handleInputFocus = () => {
     setIsFocused(true);
     if (value.trim() && results.length > 0) {
-    setShowResults(true);
+      setShowResults(true);
     }
-};
+  };
 
-const handleInputBlur = () => {
+  const handleInputBlur = () => {
     // Pequeño delay para permitir clicks en los resultados
     setTimeout(() => {
-    setIsFocused(false);
-    setShowResults(false);
+      setIsFocused(false);
+      setShowResults(false);
     }, 200);
-};
+  };
 
-return (
+  return (
     <Box 
-    className={classes.container}
-    style={{ 
+      className={classes.container}
+      style={{ 
         width: width,
         maxWidth: maxWidth 
-    }}
+      }}
     >
-    <form onSubmit={handleSubmit} className={classes.form}>
+      <form onSubmit={handleSubmit} className={classes.form}>
         <TextInput
-        ref={inputRef}
-        value={value}
-        onChange={handleChange}
-        onFocus={handleInputFocus}
-        onBlur={handleInputBlur}
-        placeholder={placeholder}
-        disabled={disabled}
-        autoFocus={autoFocus}
-        size={size}
-        classNames={{
+          ref={inputRef}
+          value={value}
+          onChange={handleChange}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          placeholder={placeholder}
+          disabled={disabled}
+          autoFocus={autoFocus}
+          size={size}
+          classNames={{
             root: classes.root,
             input: classes.input,
             section: classes.section,
-        }}
-        styles={{
+          }}
+          styles={{
             input: {
-            borderRadius: '12px',
-            fontWeight: 500,
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            border: '2px solid transparent',
-            background: `linear-gradient(135deg, ${colors.background.white} 0%, ${colors.background.light} 100%)`,
-            boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
-            '&:focus, &:focus-within': {
+              borderRadius: '12px',
+              fontWeight: 500,
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              border: '2px solid transparent',
+              background: `linear-gradient(135deg, ${colors.background.white} 0%, ${colors.background.light} 100%)`,
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
+              '&:focus, &:focus-within': {
                 borderColor: colors.primary.cyan,
                 boxShadow: `0 0 0 3px ${colors.primary.cyan}20, 0 10px 30px rgba(4, 191, 191, 0.2)`,
                 transform: 'translateY(-2px)',
-            },
-            '&:hover:not(:disabled):not(:focus)': {
+              },
+              '&:hover:not(:disabled):not(:focus)': {
                 boxShadow: '0 6px 20px rgba(0, 0, 0, 0.12)',
                 transform: 'translateY(-1px)',
+              }
             }
-            }
-        }}
-        leftSection={
+          }}
+          leftSection={
             <IconSearch 
-            size={18} 
-            className={classes.searchIcon}
-            style={{
+              size={18} 
+              className={classes.searchIcon}
+              style={{
                 color: isFocused ? colors.primary.cyan : colors.text.muted
-            }}
+              }}
             />
-        }
-        rightSectionWidth={value ? 80 : withShortcut ? 60 : 40}
-        rightSection={
+          }
+          rightSectionWidth={value ? 80 : withShortcut ? 60 : 40}
+          rightSection={
             <Group gap="xs" className={classes.rightSection}>
-            {value && (
+              {/* Botón limpiar cuando hay valor */}
+              {value && (
                 <ActionIcon
-                variant="subtle"
-                size="sm"
-                onClick={handleClear}
-                className={classes.clearButton}
+                  variant="subtle"
+                  size="sm"
+                  onClick={handleClear}
+                  className={classes.clearButton}
                 >
-                <IconX size={14} />
+                  <IconX size={14} />
                 </ActionIcon>
-            )}
-            
-
-            {withSearchButton && value && (
+              )}
+              
+              {/* Botón de búsqueda (opcional) */}
+              {withSearchButton && value && (
                 <ActionIcon
-                type="submit"
-                size="sm"
-                variant="gradient"
-                
-                className={classes.searchButton}
-                loading={loading}
+                  type="submit"
+                  size="sm"
+                  variant="gradient"
+                  className={classes.searchButton}
+                  loading={loading}
                 >
-                <IconArrowRight size={14} />
+                  <IconArrowRight size={14} />
                 </ActionIcon>
-            )}
+              )}
             </Group>
-        }
-        {...props}
+          }
+          {...props}
         />
-    </form>
+      </form>
 
-    {/* Panel de resultados */}
-    {showResults && results.length > 0 && (
+      {/* Panel de resultados desplegable */}
+      {showResults && results.length > 0 && (
         <Box className={classes.resultsPanel}>
-        <Box className={classes.resultsContainer}>
+          <Box className={classes.resultsContainer}>
             {results.map((result, index) => (
-            <Box
+              <Box
                 key={result.id || index}
                 className={classes.resultItem}
                 onClick={() => handleResultClick(result)}
-            >
+              >
                 {renderResult ? (
-                renderResult(result)
+                  // Renderizado personalizado del resultado
+                  renderResult(result)
                 ) : (
-                <Group justify="space-between" w="100%">
+                  // Renderizado por defecto
+                  <Group justify="space-between" w="100%">
                     <Text size="sm" className={classes.resultText}>
-                    {result.name}
+                      {result.name}
                     </Text>
                     <Text size="sm" className={classes.resultText}>
-                        {result.label}
+                      {result.label}
                     </Text>
                     <Text size="sm" className={classes.resultText}>
-                        {result.value} Bs
+                      {result.value} Bs
                     </Text>
-                </Group>
+                  </Group>
                 )}
-            </Box>
+              </Box>
             ))}
+          </Box>
         </Box>
-        </Box>
-    )}
+      )}
     </Box>
-);
+  );
 }
 
 export default Buscador;

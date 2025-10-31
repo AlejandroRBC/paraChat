@@ -10,4 +10,5 @@ router.get("/por-fecha", ventasController.getVentasPorFecha);
 router.get("/:id", ventasController.getVentaDetails);
 router.post("/", ventasController.create);
 
+
 module.exports = router;

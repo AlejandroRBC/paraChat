@@ -24,7 +24,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
     const { codigo, lote, nombre, precio_compra, porcentaje_g, stock, fecha_expiracion, laboratorio } = formData;
     
     // Campos obligatorios no vacíos
-    if (!codigo.trim() || !lote.trim() || !nombre.trim() || !precio_compra || !porcentaje_g || !stock || !fecha_expiracion || !laboratorio) {
+    if ( !lote.trim() || !nombre.trim() || !precio_compra || !porcentaje_g || !stock || !fecha_expiracion || !laboratorio) {
       return false;
     }
     
@@ -247,7 +247,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
 
       <div className="mantine-form-grid">
         {/* Código */}
-        <div className="mantine-form-group">
+        {/* <div className="mantine-form-group">
           <label htmlFor="codigo">Código</label>
           <input
             id="codigo"
@@ -259,7 +259,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
             required
           />
           {errores.codigo && <span style={{color: 'red', fontSize: '0.75rem'}}>{errores.codigo}</span>}
-        </div>
+        </div> */}
         
         {/* Lote */}
         <div className="mantine-form-group">

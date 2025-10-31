@@ -19,6 +19,10 @@ import { Buscador } from '../global/components/buscador/Buscador';
 import { useMediaQuery } from 'react-responsive';
 import './proveedor.css';
 
+/**
+ * Página principal de gestión de proveedores y mercancía
+ * Incluye lista, formulario y búsqueda con diseño responsive
+ */
 export function ProveedorPage() {
   const {
     proveedores,
@@ -41,6 +45,9 @@ export function ProveedorPage() {
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
   const isDesktop = useMediaQuery({ minWidth: 1025 });
 
+  /**
+   * Maneja el guardado de proveedores (creación y actualización)
+   */
   const handleGuardarProveedor = async (datosProveedor) => {
     try {
       if (proveedorEditando) {
@@ -57,22 +64,33 @@ export function ProveedorPage() {
     }
   };
 
+  /**
+   * Abre el formulario en modo creación
+   */
   const abrirNuevoProveedor = () => {
     setProveedorEditando(null);
     setMostrarForm(true);
   };
 
+  /**
+   * Abre el formulario en modo edición
+   */
   const abrirEditarProveedor = (proveedor) => {
     setProveedorEditando(proveedor);
     setMostrarForm(true);
   };
 
+  /**
+   * Cierra el formulario y limpia el estado
+   */
   const cerrarFormulario = () => {
     setMostrarForm(false);
     setProveedorEditando(null);
   };
 
-  // Calcular spans responsive
+  /**
+   * Calcula los spans del grid según el dispositivo y estado del formulario
+   */
   const getGridSpans = () => {
     if (isMobile) {
       return mostrarForm ? { lista: 12, form: 12 } : { lista: 12, form: 12 };
@@ -85,6 +103,9 @@ export function ProveedorPage() {
 
   const gridSpans = getGridSpans();
 
+  /**
+   * Renderiza cada resultado de búsqueda con formato específico
+   */
   const renderizarResultado = (resultado) => (
     <Group justify="space-between" w="100%">
       <div>
@@ -104,6 +125,7 @@ export function ProveedorPage() {
   return (
     <div className="proveedor-page">
       <Container size="xl" py="xl" px={isMobile ? "xs" : "md"}>
+        
         {/* Header Responsive */}
         <Group justify="space-between" mb="xl" wrap={isMobile ? "wrap" : "nowrap"} gap={isMobile ? "md" : "lg"}>
           <Group gap="md" wrap="nowrap">
@@ -124,6 +146,7 @@ export function ProveedorPage() {
             </div>
           </Group>
           
+          {/* Botón nuevo proveedor (solo visible cuando el formulario está cerrado) */}
           {!mostrarForm && (
             <Button 
               leftSection={<IconPlus size={isMobile ? 14 : 18} />}
@@ -137,6 +160,7 @@ export function ProveedorPage() {
         </Group>
 
         <Grid gutter={isMobile ? "md" : "xl"} align="start">
+          
           {/* Lista de proveedores */}
           <Grid.Col span={gridSpans.lista}>
             <Paper withBorder p={isMobile ? "sm" : "md"} radius="md" className="list-container">
@@ -150,7 +174,7 @@ export function ProveedorPage() {
                 >
                   <div>
                     <Title order={isMobile ? 3 : 2} className="gradient-title">
-                      Recepcion de Mercancia
+                      Recepción de Mercancía
                     </Title>
                     <Text c="dimmed" size={isMobile ? "xs" : "sm"}>
                       {proveedores.length} registro(s)
@@ -160,7 +184,7 @@ export function ProveedorPage() {
                   </div>
                 </Group>
                 
-                {/* BUSCADOR RESPONSIVE */}
+                {/* Componente de búsqueda responsive */}
                 <Box className="buscador-container">
                   <Buscador
                     placeholder="Buscar Proveedor ..."
@@ -181,6 +205,8 @@ export function ProveedorPage() {
                 </Box>
               </div>
               <Divider my="md" />
+              
+              {/* Lista de proveedores */}
               <ProveedorList
                 proveedores={proveedores}
                 onEditar={abrirEditarProveedor}
@@ -189,7 +215,7 @@ export function ProveedorPage() {
             </Paper>
           </Grid.Col>
 
-          {/* Formulario */}
+          {/* Formulario de proveedor (condicional) */}
           {mostrarForm && (
             <Grid.Col span={gridSpans.form}>
               <Card 
@@ -220,6 +246,7 @@ export function ProveedorPage() {
                         {proveedorEditando ? 'Actualiza la información' : 'Registra nueva mercancía'}
                       </Text>
                     </div>
+                    {/* Botón cerrar formulario */}
                     <ActionIcon
                       size={isMobile ? "md" : "lg"}
                       onClick={cerrarFormulario}
@@ -230,6 +257,8 @@ export function ProveedorPage() {
                   </Group>
                 </div>
                 <Divider my="md" />
+                
+                {/* Formulario de proveedor */}
                 <ProveedorForm
                   proveedor={proveedorEditando}
                   onGuardar={handleGuardarProveedor}

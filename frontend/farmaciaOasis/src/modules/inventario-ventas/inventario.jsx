@@ -97,13 +97,9 @@ function Inventario() {
 
 // En la función handleRealizarVenta, cambia a:
 const handleRealizarVenta = async (datosCliente) => {
-  try {
-    console.log('Realizando venta:', { datosCliente, carrito, totalVenta });
-    
+  try {   
     // ✅ LLAMAR A LA FUNCIÓN DEL HOOK QUE CONECTA CON EL BACKEND
     const resultado = await realizarVenta(datosCliente);
-    
-    console.log('Venta realizada exitosamente:', resultado);
     return resultado; // ✅ IMPORTANTE: Retornar el resultado
   } catch (error) {
     console.error('Error en handleRealizarVenta:', error);
@@ -193,7 +189,7 @@ const renderizarResultado = (resultado) => {
     titulo.font = { bold: true, size: 16 };
     titulo.alignment = { horizontal: "center" };
 
-    // Encabezados
+    // Encabezadosz 
     worksheet.addRow([]);
     const encabezados = [
       "Nº",

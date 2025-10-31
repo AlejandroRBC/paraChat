@@ -20,6 +20,10 @@ import { useMediaQuery } from 'react-responsive';
 import Modal from '../global/components/modal/Modal'
 import './cliente.css';
 
+/**
+ * Página principal de gestión de clientes
+ * Incluye lista, formulario, búsqueda y eliminación
+ */
 export function ClientePage() {
   const {
     clientes,
@@ -46,39 +50,54 @@ export function ClientePage() {
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
   const isDesktop = useMediaQuery({ minWidth: 1025 });
 
+  /**
+   * Maneja el guardado de clientes (creación y actualización)
+   * Preserva el estado original del cliente al editar
+   */
   const handleGuardarCliente = async (datosCliente) => {
-  try {
-    if (clienteEditando) {
-      await actualizarCliente({
-        ...datosCliente,
-        cod_cli: clienteEditando.cod_cli,
-        estado: clienteEditando.estado // ← MANTENER EL ESTADO ORIGINAL
-      });
-    } else {
-      await crearCliente(datosCliente);
+    try {
+      if (clienteEditando) {
+        await actualizarCliente({
+          ...datosCliente,
+          cod_cli: clienteEditando.cod_cli,
+          estado: clienteEditando.estado // ← MANTENER EL ESTADO ORIGINAL
+        });
+      } else {
+        await crearCliente(datosCliente);
+      }
+      cerrarFormulario();
+    } catch (error) {
+      console.error('Error guardando cliente:', error);
     }
-    cerrarFormulario();
-  } catch (error) {
-    console.error('Error guardando cliente:', error);
-  }
-};
+  };
 
+  /**
+   * Abre el formulario en modo creación
+   */
   const abrirNuevoCliente = () => {
     setClienteEditando(null);
     setMostrarForm(true);
   };
 
+  /**
+   * Abre el formulario en modo edición
+   */
   const abrirEditarCliente = (cliente) => {
     setClienteEditando(cliente);
     setMostrarForm(true);
   };
 
+  /**
+   * Cierra el formulario y limpia el estado
+   */
   const cerrarFormulario = () => {
     setMostrarForm(false);
     setClienteEditando(null);
   };
 
-  // Calcular spans responsive
+  /**
+   * Calcula los spans del grid según el dispositivo y estado del formulario
+   */
   const getGridSpans = () => {
     if (isMobile) {
       return mostrarForm ? { lista: 12, form: 12 } : { lista: 12, form: 12 };
@@ -91,6 +110,9 @@ export function ClientePage() {
 
   const gridSpans = getGridSpans();
 
+  /**
+   * Renderiza cada resultado de búsqueda con formato específico
+   */
   const renderizarResultado = (resultado) => {
     return (
       <Group justify="space-between" w="100%">
@@ -108,9 +130,11 @@ export function ClientePage() {
       </Group>
     );
   };
+
   return (
     <div className="cliente-page">
       <Container size="xl" py="xl" px={isMobile ? "xs" : "md"}>
+        
         {/* Header Responsive */}
         <Group justify="space-between" mb="xl" wrap={isMobile ? "wrap" : "nowrap"} gap={isMobile ? "md" : "lg"}>
           <Group gap="md" wrap="nowrap">
@@ -131,6 +155,7 @@ export function ClientePage() {
             </div>
           </Group>
           
+          {/* Botón nuevo cliente (solo visible cuando el formulario está cerrado) */}
           {!mostrarForm && (
             <Button 
               leftSection={<IconPlus size={isMobile ? 14 : 18} />}
@@ -144,6 +169,7 @@ export function ClientePage() {
         </Group>
 
         <Grid gutter={isMobile ? "md" : "xl"} align="start">
+          
           {/* Lista de clientes */}
           <Grid.Col span={gridSpans.lista}>
             <Paper withBorder p={isMobile ? "sm" : "md"} radius="md" className="list-container">
@@ -167,6 +193,7 @@ export function ClientePage() {
                   </div>
                 </Group>
                 
+                {/* Componente de búsqueda */}
                 <Box className="buscador-container">
                   <Buscador
                     placeholder="Buscar clientes..."
@@ -187,6 +214,8 @@ export function ClientePage() {
                 </Box>
               </div>
               <Divider my="md" />
+              
+              {/* Lista de clientes */}
               <ClienteList
                 clientes={clientes}
                 onEditar={abrirEditarCliente}
@@ -196,7 +225,7 @@ export function ClientePage() {
             </Paper>
           </Grid.Col>
 
-          {/* Formulario */}
+          {/* Formulario de cliente (condicional) */}
           {mostrarForm && (
             <Grid.Col span={gridSpans.form}>
               <Card 
@@ -205,17 +234,17 @@ export function ClientePage() {
                 p={isMobile ? "md" : "lg"} 
                 radius="md" 
                 className="form-card"
-                 style={{
-                    position: 'relative', // ← Esto evita sobreposición
-                    top: 'auto',
-                    left: 'auto', 
-                    right: 'auto',
-                    bottom: 'auto',
-                    zIndex: 1, // ← Bajo z-index para que no se sobreponga
-                    margin: '0 auto', // ← Centrado normal
-                    height: 'auto', // ← Altura automática
-                    overflowY: 'visible' // ← Scroll normal
-                  }}
+                style={{
+                  position: 'relative',
+                  top: 'auto',
+                  left: 'auto', 
+                  right: 'auto',
+                  bottom: 'auto',
+                  zIndex: 1,
+                  margin: '0 auto',
+                  height: 'auto',
+                  overflowY: 'visible'
+                }}
               >
                 <div className="form-header">
                   <Group justify="space-between" align="center" wrap="nowrap">
@@ -227,6 +256,7 @@ export function ClientePage() {
                         {clienteEditando ? 'Modifica la información' : 'Completa los datos'}
                       </Text>
                     </div>
+                    {/* Botón cerrar formulario */}
                     <ActionIcon
                       size={isMobile ? "md" : "lg"}
                       onClick={cerrarFormulario}
@@ -237,64 +267,66 @@ export function ClientePage() {
                   </Group>
                 </div>
                 <Divider my="md" />
+                
+                {/* Formulario de cliente */}
                 <ClienteForm
                   cliente={clienteEditando}
                   onGuardar={handleGuardarCliente}
                   isMobile={isMobile}
-                  clientes={clientes} // ← ESTA PROP ES ESENCIAL
+                  clientes={clientes} // ← Prop esencial para validación de duplicados
                 />
               </Card>
             </Grid.Col>
           )}
         </Grid>
 
-       {/* Modal de Confirmación de Eliminación */}
-{mostrarConfirmacion && clienteAEliminar && (
-  <Modal
-    titulo={<span className="titulo-gradiente">Confirmar Eliminación</span>}
-    onClose={cancelarEliminacion}
-    tamaño="normal"
-  >
-    <div className="modal-eliminar-content">
-      <div className="eliminar-icon">
-        <IconTrash size={48} color="#e53e3e" />
-      </div>
-      
-      <Text ta="center" size="lg" fw={600} mb="md">
-        ¿Estás seguro de que quieres eliminar este cliente?
-      </Text>
-      
-      <Paper withBorder p="md" mb="xl" style={{ textAlign: 'center' }}>
-        <Text fw={500}>{clienteAEliminar.nombre}</Text>
-        <Text size="sm" c="dimmed">CI/NIT: {clienteAEliminar.ci_nit}</Text>
-      </Paper>
-      
-      <Text ta="center" c="dimmed" size="sm" mb="xl">
-        ⚠️ El cliente cambiará a estado "inactivo" y no aparecerá en la lista principal.
-      </Text>
+        {/* Modal de Confirmación de Eliminación */}
+        {mostrarConfirmacion && clienteAEliminar && (
+          <Modal
+            titulo={<span className="titulo-gradiente">Confirmar Eliminación</span>}
+            onClose={cancelarEliminacion}
+            tamaño="normal"
+          >
+            <div className="modal-eliminar-content">
+              <div className="eliminar-icon">
+                <IconTrash size={48} color="#e53e3e" />
+              </div>
+              
+              <Text ta="center" size="lg" fw={600} mb="md">
+                ¿Estás seguro de que quieres eliminar este cliente?
+              </Text>
+              
+              <Paper withBorder p="md" mb="xl" style={{ textAlign: 'center' }}>
+                <Text fw={500}>{clienteAEliminar.nombre}</Text>
+                <Text size="sm" c="dimmed">CI/NIT: {clienteAEliminar.ci_nit}</Text>
+              </Paper>
+              
+              <Text ta="center" c="dimmed" size="sm" mb="xl">
+                ⚠️ El cliente cambiará a estado "inactivo" y no aparecerá en la lista principal.
+              </Text>
 
-      <Group justify="center" gap="md">
-        <Button 
-          variant="light" 
-          onClick={cancelarEliminacion}
-          size="md"
-          className="btn-cancelar"
-        >
-          Cancelar
-        </Button>
-        <Button 
-          color="red" 
-          onClick={() => eliminarCliente(clienteAEliminar.cod_cli)}  
-          size="md"
-          leftSection={<IconTrash size={16} />}
-          className="btn-confirmar"
-        >
-          Confirmar Eliminación
-        </Button>
-      </Group>
-    </div>
-  </Modal>
-)}
+              <Group justify="center" gap="md">
+                <Button 
+                  variant="light" 
+                  onClick={cancelarEliminacion}
+                  size="md"
+                  className="btn-cancelar"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  color="red" 
+                  onClick={() => eliminarCliente(clienteAEliminar.cod_cli)}  
+                  size="md"
+                  leftSection={<IconTrash size={16} />}
+                  className="btn-confirmar"
+                >
+                  Confirmar Eliminación
+                </Button>
+              </Group>
+            </div>
+          </Modal>
+        )}
       </Container>
     </div>
   );
