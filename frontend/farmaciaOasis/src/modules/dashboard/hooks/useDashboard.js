@@ -1,7 +1,9 @@
-// hooks/useDashboard.js
 import { useState, useEffect } from 'react';
 import { dashboardService } from '../services/dashboardService';
 
+/**
+ * Hook personalizado para gestionar todos los datos del dashboard
+ */
 export const useDashboard = () => {
   const [metricas, setMetricas] = useState({
     totalHoy: 0,
@@ -18,7 +20,9 @@ export const useDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // FUNCIÓN PARA CALCULAR PORCENTAJES
+  /**
+   * Calcula el porcentaje de cambio entre hoy y ayer
+   */
   const calcularPorcentaje = (valorHoy, valorAyer) => {
     if (valorAyer === 0) return valorHoy > 0 ? '+100%' : '0%';
     const diferencia = valorHoy - valorAyer;
@@ -26,18 +30,22 @@ export const useDashboard = () => {
     return porcentaje > 0 ? `+${porcentaje.toFixed(1)}%` : `${porcentaje.toFixed(1)}%`;
   };
 
-  // FUNCIÓN PARA DETERMINAR TENDENCIA
+  /**
+   * Determina si la tendencia es positiva (up) o negativa (down)
+   */
   const determinarTendencia = (valorHoy, valorAyer) => {
     return valorHoy >= valorAyer ? 'up' : 'down';
   };
 
   useEffect(() => {
+    /**
+     * Carga todos los datos del dashboard en paralelo
+     */
     const cargarDatos = async () => {
       setLoading(true);
       setError(null);
       
       try {
-        // Cargar todos los datos en paralelo desde BD REAL
         const [
           metricasData,
           productosBajosData,
@@ -52,7 +60,6 @@ export const useDashboard = () => {
           dashboardService.obtenerTopProductos()
         ]);
 
-        // Actualizar estado con datos REALES de BD
         setMetricas({
           totalHoy: metricasData.totalHoy || 0,
           productosVendidos: metricasData.productosHoy || 0,
@@ -77,7 +84,7 @@ export const useDashboard = () => {
 
     cargarDatos();
 
-    // Recargar datos cada 5 minutos
+    // Recargar datos automáticamente cada 5 minutos
     const intervalo = setInterval(cargarDatos, 300000);
     return () => clearInterval(intervalo);
   }, []);

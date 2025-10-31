@@ -1,19 +1,21 @@
-// components/TopProductos.jsx
 import { Paper, Title, Table, Badge, Text, Group, ThemeIcon, Progress, Stack, ScrollArea, Box } from '@mantine/core';
 import { IconCrown, IconStar, IconTrendingUp, IconAward } from '@tabler/icons-react';
 import '../dashboard.css';
 
+/**
+ * Componente que muestra ranking de productos más vendidos
+ * Incluye barras de progreso, posiciones con colores y estadísticas
+ */
 function TopProductos({ productos }) {
-  // ✅ CORREGIDO: Usar todos los productos de BD
   const todosProductos = productos;
   const totalProductos = productos.length;
   
-  // Calcular venta máxima para la barra de progreso
+  // Calcular venta máxima para normalizar las barras de progreso
   const maxVentas = todosProductos.length > 0 
     ? Math.max(...todosProductos.map(p => p.ventas || 0))
     : 1;
 
-  // Colores para cada posición
+  // Configuración de colores e iconos por posición en el ranking
   const getPositionColor = (index) => {
     const colors = {
       0: { badge: 'yellow', icon: 'gold', bg: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' },
@@ -24,7 +26,6 @@ function TopProductos({ productos }) {
     return colors[index] || colors.default;
   };
 
-  // Iconos para cada posición
   const getPositionIcon = (index) => {
     const icons = {
       0: <IconCrown size={16} />,
@@ -42,6 +43,7 @@ function TopProductos({ productos }) {
     return 'blue';
   };
 
+  // Generar filas de la tabla con productos
   const rows = todosProductos.map((producto, index) => {
     const positionColors = getPositionColor(index);
     const porcentaje = maxVentas > 0 ? ((producto.ventas || 0) / maxVentas) * 100 : 0;
@@ -50,6 +52,7 @@ function TopProductos({ productos }) {
     return (
       <Table.Tr key={producto.nombre} className="mantine-Table-tr">
         <Table.Td className="mantine-Table-td">
+          {/* Badge de posición con icono y gradiente */}
           <Badge 
             size="md"
             variant="gradient"
@@ -66,7 +69,6 @@ function TopProductos({ productos }) {
         
         <Table.Td className="mantine-Table-td">
           <Stack gap={2}>
-            {/* ✅ CORREGIDO: producto.nombre en lugar de producto.nombre_prod */}
             <Text fw={700} size="sm" c="dark.8" lineClamp={1}>
               {producto.nombre}
             </Text>
@@ -75,7 +77,6 @@ function TopProductos({ productos }) {
               variant="light" 
               color="gray"
             >
-              {/* ✅ CORREGIDO: producto.categoria en lugar de producto.presentacion */}
               {producto.categoria || 'General'}
             </Badge>
           </Stack>
@@ -97,6 +98,7 @@ function TopProductos({ productos }) {
               </Text>
             </Group>
             
+            {/* Barra de progreso que muestra volumen de ventas */}
             <Progress 
               value={porcentaje} 
               color={progressColor}
@@ -111,6 +113,7 @@ function TopProductos({ productos }) {
 
   return (
     <Paper p="lg" withBorder radius="lg" shadow="md" className="top-productos-container">
+      {/* Encabezado con título y estadísticas */}
       <Box className="top-productos-header">
         <Group justify="space-between" align="flex-start" mb="md">
           <Group gap="sm">
@@ -141,6 +144,7 @@ function TopProductos({ productos }) {
         </Group>
       </Box>
 
+      {/* Contenido principal con tabla scrollable */}
       <Box className="top-productos-content" style={{ height: '400px' }}>
         <ScrollArea h={400} className="mantine-ScrollArea-root" scrollbarSize={6} type="auto">
           <Table className="mantine-Table-table" verticalSpacing="sm">
@@ -164,6 +168,7 @@ function TopProductos({ productos }) {
         </ScrollArea>
       </Box>
 
+      {/* Pie con total de ventas y contador */}
       <Box className="top-productos-footer">
         <Group justify="space-between" mt="md" p="sm">
           <Group gap="xs">

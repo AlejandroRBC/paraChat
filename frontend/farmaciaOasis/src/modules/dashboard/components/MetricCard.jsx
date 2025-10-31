@@ -1,4 +1,3 @@
-// components/MetricCard.jsx
 import { Paper, Text, Group, ThemeIcon, Badge } from '@mantine/core';
 import { 
   IconCurrencyDollar, 
@@ -10,6 +9,10 @@ import {
 } from '@tabler/icons-react';
 import '../dashboard.css';
 
+/**
+ * Tarjeta de métrica para mostrar indicadores clave del dashboard
+ * Muestra valores formateados con iconos y tendencias
+ */
 function MetricCard({ 
   valor, 
   etiqueta, 
@@ -18,14 +21,16 @@ function MetricCard({
   porcentaje, 
   tendencia 
 }) {
-  // ✅ CORREGIDO: Formato correcto para números
+  // Formatear valor según tipo y sufijo (Bs, unidades, etc.)
   const formattedValue = typeof valor === 'number' 
     ? sufijo === 'Bs' 
       ? `Bs ${valor.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
       : valor.toLocaleString('es-ES')
     : valor;
 
-  // Iconos según el tipo de métrica
+  /**
+   * Retorna el icono correspondiente según el tipo de métrica
+   */
   const getIcon = () => {
     if (sufijo === 'Bs') return <IconCurrencyDollar size={28} />;
     if (etiqueta.includes('Productos')) return <IconPackage size={28} />;
@@ -33,7 +38,7 @@ function MetricCard({
     return <IconTrendingUp size={28} />;
   };
 
-  // Color de tendencia REAL
+  // Configuración de tendencia (colores e iconos)
   const tendenciaColor = tendencia === 'up' ? 'green' : 'red';
   const tendenciaIcon = tendencia === 'up' ? <IconArrowUpRight size={16} /> : <IconArrowDownRight size={16} />;
 
@@ -47,6 +52,8 @@ function MetricCard({
       style={{ borderLeft: `8px solid ${color}` }}
     >
       <Group justify="space-between" align="flex-start">
+        
+        {/* Contenido principal: etiqueta, valor y tendencia */}
         <div style={{ flex: 1 }}>
           <Text size="sm" c="dimmed" fw={600} className="metric-label">
             {etiqueta}
@@ -56,7 +63,7 @@ function MetricCard({
             {formattedValue}
           </Text>
 
-          {/* Badge de tendencia REAL */}
+          {/* Badge de tendencia (opcional) */}
           {porcentaje && (
             <Badge 
               color={tendenciaColor} 
@@ -70,7 +77,7 @@ function MetricCard({
           )}
         </div>
 
-        {/* Icono principal */}
+        {/* Icono representativo de la métrica */}
         <ThemeIcon 
           size="xl" 
           variant="light" 
@@ -79,6 +86,7 @@ function MetricCard({
         >
           {getIcon()}
         </ThemeIcon>
+        
       </Group>
     </Paper>
   );

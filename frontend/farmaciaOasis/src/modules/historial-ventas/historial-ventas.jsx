@@ -11,6 +11,10 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import './historial-ventas.css';
 
+/**
+ * Componente principal del historial de ventas
+ * Incluye filtros, búsqueda, exportación a Excel y vista responsive
+ */
 function HistorialVentas() {
   const { 
     ventas, 
@@ -27,7 +31,7 @@ function HistorialVentas() {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Media queries para responsive
+  // Media queries para diseño responsive
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
   
@@ -41,6 +45,10 @@ function HistorialVentas() {
     setFiltroTipo(value);
   };
 
+  /**
+   * Genera reporte en formato Excel con todos los datos de ventas
+   * Incluye formato profesional con estilos y bordes
+   */
   const handleGenerarReporte = async () => {
     if (!ventas || ventas.length === 0) {
       alert("No hay datos de ventas para generar el reporte.");
@@ -50,14 +58,14 @@ function HistorialVentas() {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Historial de Ventas");
 
-    // Título grande
+    // Título principal del reporte
     worksheet.mergeCells("A1:I1");
     const titulo = worksheet.getCell("A1");
     titulo.value = "Reporte de Ventas";
     titulo.font = { bold: true, size: 18 };
     titulo.alignment = { horizontal: "center", vertical: "middle" };
 
-    // Encabezados
+    // Encabezados de columnas
     const encabezados = [
       "Nro",
       "ID Venta",
@@ -89,7 +97,7 @@ function HistorialVentas() {
       };
     });
 
-    // Agregar los datos
+    // Agregar datos de ventas al Excel
     ventas.forEach((v, i) => {
       const row = worksheet.addRow([
         i + 1,
@@ -115,13 +123,13 @@ function HistorialVentas() {
       });
     });
 
-    // Ajustar anchos de columnas
+    // Ajustar anchos de columnas para mejor visualización
     const anchos = [5, 12, 12, 10, 25, 12, 15, 45, 12];
     anchos.forEach((width, i) => {
       worksheet.getColumn(i + 1).width = width;
     });
 
-    // Guardar el archivo
+    // Guardar el archivo con nombre con fecha
     const buffer = await workbook.xlsx.writeBuffer();
     const fechaActual = new Date().toISOString().split("T")[0];
     saveAs(new Blob([buffer]), `reporte-ventas-${fechaActual}.xlsx`);
@@ -138,7 +146,7 @@ function HistorialVentas() {
     setDateRange({ start: null, end: null });
   };
 
-  // CORREGIDO: Las opciones deben coincidir con las del hook
+  // Opciones para el selector de período
   const opcionesReporte = [
     { value: 'general', label: 'General' },
     { value: 'hoy', label: 'Hoy' },
@@ -147,7 +155,7 @@ function HistorialVentas() {
     { value: 'año', label: 'Año Actual' },
   ];
 
-  // Debug info
+  // Debug info para desarrollo
   console.log('Estado actual:', {
     filtroTipo,
     busqueda,
@@ -156,6 +164,7 @@ function HistorialVentas() {
     ventasOriginalesCount: ventasOriginales.length
   });
 
+  // Estados de carga y error
   if (loading) {
     return <div className="cargando">Cargando historial de ventas...</div>;
   }
@@ -166,7 +175,7 @@ function HistorialVentas() {
 
   return (
     <div className="historial-ventas-container">
-      {/* Header Responsive */}
+      {/* Header con ícono y título */}
       <div className={`historial-header ${isMobile ? 'mobile' : ''}`}>
         <div className="historial-icon-container">
           <IconCurrencyDollar size={isMobile ? 24 : 30} /> 
@@ -175,8 +184,9 @@ function HistorialVentas() {
       </div>
       <br />
       
-      {/* Controles Responsive */}
+      {/* Controles de filtros y búsqueda */}
       <div className="historial-controles-container">
+        {/* Buscador en desktop */}
         {!isMobile && (
           <div className="historial-busqueda-container">
             <Buscador
@@ -190,7 +200,7 @@ function HistorialVentas() {
         
         <div className="historial-filtros-container">
           {isMobile ? (
-            // Vista Mobile - Todo en columna
+            // Vista Mobile - Diseño en columna
             <Stack gap="md" w="100%">
               {/* Buscador en móvil */}
               <Buscador
@@ -232,6 +242,7 @@ function HistorialVentas() {
                 </Button>
               </Group>
 
+              {/* Botón limpiar filtros cuando hay intervalo activo */}
               {dateRange.start && (
                 <Button
                   className='btn-limpiarHV'
@@ -246,8 +257,9 @@ function HistorialVentas() {
               )}
             </Stack>
           ) : (
-            // Vista Desktop/Tablet - Todo en línea
+            // Vista Desktop/Tablet - Diseño en línea
             <Group gap="md" align="flex-end" wrap={isTablet ? 'wrap' : 'nowrap'}>
+              {/* Buscador en tablet */}
               {isTablet && (
                 <div className="historial-busqueda-container">
                   <Buscador
@@ -279,7 +291,7 @@ function HistorialVentas() {
                 Intervalo {dateRange.start && '✓'}
               </Button>
 
-              {/* Botones derechos */}
+              {/* Botones alineados a la derecha */}
               <div className="botones-derecha">
                 <Stack gap="xs" align="flex-end">
                   {dateRange.start && (
@@ -309,8 +321,6 @@ function HistorialVentas() {
         </div>
       </div>
 
-      
-
       {/* Lista de Ventas o Mensaje de no datos */}
       {ventas.length === 0 ? (
         <Paper p="xl" withBorder radius="lg" className="no-data-message">
@@ -326,6 +336,7 @@ function HistorialVentas() {
         <VentasList ventas={ventas} />
       )}
 
+      {/* Modal para selección de rango de fechas */}
       <Modal
         titulo="Seleccionar Intervalo de Fechas"        
         onClose={() => setIsModalOpen(false)}
@@ -342,6 +353,10 @@ function HistorialVentas() {
   );
 }
 
+/**
+ * Componente modal para selección de rango de fechas
+ * Incluye validación de fechas y controles de aplicación
+ */
 function DateRangeModal({ onApply, onCancel, isMobile }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -379,6 +394,7 @@ function DateRangeModal({ onApply, onCancel, isMobile }) {
         </div>
       </div>
       
+      {/* Validación de fechas */}
       {startDate && endDate && new Date(startDate) > new Date(endDate) && (
         <Text size="sm" c="red">
           La fecha de inicio no puede ser mayor a la fecha fin

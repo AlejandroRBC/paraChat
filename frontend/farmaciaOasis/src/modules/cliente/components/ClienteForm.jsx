@@ -11,6 +11,10 @@ import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
 import { IconInfoCircle, IconLock } from '@tabler/icons-react';
 
+/**
+ * Formulario para crear o editar clientes con validación completa
+ * Maneja reactivación de clientes inactivos y validaciones de negocio
+ */
 export function ClienteForm({ 
   cliente, 
   onGuardar,
@@ -29,31 +33,29 @@ export function ClienteForm({
     }
   });
 
-  // Función para verificar si el formulario es válido
+  /**
+   * Valida si el formulario completo es válido
+   * Considera campos obligatorios, formatos y reglas de negocio
+   */
   const esFormularioValido = () => {
     const { nombre, ci_nit, descuento } = form.values;
     
-    // Campos obligatorios no vacíos
     if (!nombre.trim() || !ci_nit.trim()) {
       return false;
     }
     
-    // Sin errores de validación
     if (Object.keys(errores).length > 0) {
       return false;
     }
     
-    // Longitudes mínimas
     if (nombre.length < 2 || ci_nit.length < 3) {
       return false;
     }
     
-    // Validar formato CI/NIT (solo números y letras)
     if (!/^[0-9a-zA-Z]+$/.test(ci_nit)) {
       return false;
     }
     
-    // Validar descuento
     if (descuento < 0 || descuento > 100 || !Number.isFinite(descuento)) {
       return false;
     }
@@ -61,7 +63,10 @@ export function ClienteForm({
     return true;
   };
 
-  // Función de validación manual
+  /**
+   * Valida un campo específico y actualiza los errores
+   * Incluye validación de duplicados y reglas de formato
+   */
   const validarCampo = (nombre, valor) => {
     const nuevosErrores = { ...errores };
     
@@ -93,7 +98,7 @@ export function ClienteForm({
             const clienteExistente = clientes.find(cli => 
               cli.ci_nit === valor && 
               cli.estado === 'activo' &&
-              cli.cod_cli !== (cliente?.cod_cli) // Excluir el cliente actual si está editando
+              cli.cod_cli !== (cliente?.cod_cli)
             );
             
             if (clienteExistente) {
@@ -126,6 +131,7 @@ export function ClienteForm({
     setErrores(nuevosErrores);
   };
 
+  // Maneja cambios en los campos con validación en tiempo real
   const handleChange = (name, value) => {
     form.setFieldValue(name, value);
 
@@ -134,11 +140,16 @@ export function ClienteForm({
     }
   };
 
+  // Valida campo cuando pierde el foco
   const handleBlur = (name, value) => {
     setTocado(prev => ({ ...prev, [name]: true }));
     validarCampo(name, value);
   };
 
+  /**
+   * Valida todo el formulario antes de enviar
+   * Marca todos los campos como tocados para mostrar errores
+   */
   const validarFormulario = () => {
     const nuevosTocados = {};
     Object.keys(form.values).forEach(key => {
@@ -153,6 +164,7 @@ export function ClienteForm({
     return Object.keys(errores).length === 0 && esFormularioValido();
   };
 
+  // Carga datos del cliente cuando se edita
   useEffect(() => {
     if (cliente) {
       form.setValues({
@@ -170,7 +182,10 @@ export function ClienteForm({
     }
   }, [cliente]);
 
-  // Verificar si hay cliente para reactivar al cambiar CI/NIT
+  /**
+   * Detecta clientes inactivos para reactivación
+   * Cuando se ingresa un CI/NIT que existe pero está inactivo
+   */
   useEffect(() => {
     const ci_nit = form.values.ci_nit;
     if (ci_nit && clientes.length > 0 && !cliente) {
@@ -188,6 +203,7 @@ export function ClienteForm({
     }
   }, [form.values.ci_nit, clientes, cliente]);
 
+  // Maneja el envío del formulario con validación
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -208,6 +224,7 @@ export function ClienteForm({
   return (
     <form onSubmit={handleSubmit}>
       <Stack gap={isMobile ? "sm" : "md"}>
+        {/* Alertas de estado del formulario */}
         {hayErrores && (
           <Alert 
             icon={<IconInfoCircle size={16} />} 
@@ -219,6 +236,7 @@ export function ClienteForm({
           </Alert>
         )}
 
+        {/* Alerta para reactivación de cliente inactivo */}
         {clienteReactivar && (
           <Alert 
             variant="light" 
@@ -230,6 +248,7 @@ export function ClienteForm({
           </Alert>
         )}
 
+        {/* Campos del formulario */}
         <TextInput
           label="Nombre completo"
           placeholder="Ingresa el nombre del cliente"
@@ -268,6 +287,7 @@ export function ClienteForm({
           rightSection={<Text size="xs" c="dimmed">%</Text>}
         />
 
+        {/* Botón de envío con estado dinámico */}
         <Group justify="flex-end" mt="md">
           <Button 
             type="submit" 

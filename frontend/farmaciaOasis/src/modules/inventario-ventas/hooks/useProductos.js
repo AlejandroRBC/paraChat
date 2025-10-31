@@ -2,11 +2,10 @@ import { useState, useEffect,useCallback } from 'react';
 import InventarioService from '../services/InventarioService';
 
 export const useProductos = () => {
+
   const [productos, setProductos] = useState([]);
   const [laboratorios, setLaboratorios] = useState([]);
   const [cargando, setCargando] = useState(false);
-
-
   
   const cargarProductos = useCallback(async () => {
     setCargando(true);
@@ -27,7 +26,7 @@ export const useProductos = () => {
         porcentaje_g: producto.porcentaje_g,
         estado: producto.estado === 'activo' ? 'activado' : 'desactivado',
         id_lab: producto.id_lab,
-        id_proveedor: producto.id_proveedor
+        medida: producto.medida
       }));
       setProductos(productosMapeados);
     } catch (error) {
@@ -64,9 +63,9 @@ export const useProductos = () => {
         presentacion: nuevoProducto.presentacion,
         precio_venta: parseFloat(nuevoProducto.precio_venta), // Usar el precio calculado
         precio_compra: parseFloat(nuevoProducto.precio_compra),
-        valor_medida: 0,
+        medida: nuevoProducto.medida,
         id_lab: obtenerIdLaboratorio(nuevoProducto.laboratorio),
-        id_proveedor: 1
+        
       };
   
       const productoGuardado = await InventarioService.crearProducto(productoData);
@@ -81,6 +80,7 @@ export const useProductos = () => {
         precio_venta: productoGuardado.precio_venta,
         stock: productoGuardado.stock,
         fecha_expiracion: productoGuardado.fecha_exp,
+        medida:productoGuardado.medida,
         laboratorio: nuevoProducto.laboratorio,
         porcentaje_g: productoGuardado.porcentaje_g,
         estado: 'activado'
@@ -103,12 +103,11 @@ export const useProductos = () => {
         porcentaje_g: datosActualizados.porcentaje_g,
         stock: parseInt(datosActualizados.stock),
         presentacion: datosActualizados.presentacion,
-        precio_venta: parseFloat(datosActualizados.precio_venta), // Usar el precio calculado
+        precio_venta: parseFloat(datosActualizados.precio_venta), 
         precio_compra: parseFloat(datosActualizados.precio_compra),
-        valor_medida: 0,
+        medida: datosActualizados.medida,
         estado: 'activo',
         id_lab: obtenerIdLaboratorio(datosActualizados.laboratorio),
-        id_proveedor: 1
       };
   
       const productoActualizado = await InventarioService.actualizarProducto(id, productoData);
@@ -161,8 +160,8 @@ export const useProductos = () => {
           presentacion: producto.presentacion,
           precio_venta: producto.precio_venta,
           precio_compra: producto.precio_base,
-          valor_medida: 0,
-          estado: 'activo',
+          medida: producto.medida,
+    
           id_lab: producto.id_lab,
           id_proveedor: producto.id_proveedor
         });

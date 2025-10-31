@@ -21,10 +21,10 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
 
   // Función para verificar si el formulario es válido
   const esFormularioValido = () => {
-    const { codigo, lote, nombre, precio_compra, porcentaje_g, stock, fecha_expiracion, laboratorio } = formData;
+    const { lote, nombre, presentacion, medida, precio_compra, porcentaje_g, stock, fecha_expiracion, laboratorio } = formData;
     
-    // Campos obligatorios no vacíos
-    if (!codigo.trim() || !lote.trim() || !nombre.trim() || !precio_compra || !porcentaje_g || !stock || !fecha_expiracion || !laboratorio) {
+    // Campos obligatorios no vacíos - INCLUIR presentacion y medida
+    if (!lote.trim() || !nombre.trim() || !presentacion.trim() || !medida.trim() || !precio_compra || !porcentaje_g || !stock || !fecha_expiracion || !laboratorio) {
       return false;
     }
     
@@ -45,10 +45,10 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
     
     return true;
   };
-
   // Calcular precio de venta cuando cambien precio_compra o porcentaje_g
   useEffect(() => {
     calcularPrecioVenta();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.precio_compra, formData.porcentaje_g]);
 
   useEffect(() => {
@@ -59,6 +59,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
         nombre: producto.nombre || '',
         presentacion: producto.presentacion || '',
         precio_compra: producto.precio_base || '',
+        medida: producto.medida,
         porcentaje_g: producto.porcentaje_g || '',
         stock: producto.stock || '',
         fecha_expiracion: producto.fecha_expiracion || '',
@@ -112,6 +113,25 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
           nuevosErrores.nombre = 'El nombre no puede tener más de 100 caracteres';
         } else {
           delete nuevosErrores.nombre;
+        }
+        break;
+      
+        case 'presentacion':
+        if (!valor || !valor.trim()) {
+          nuevosErrores.presentacion = 'La presentación es requerida';
+        } else if (valor.length > 100) {
+          nuevosErrores.presentacion = 'la presentación o puede tener más de 100 caracteres';
+        } else {
+          delete nuevosErrores.presentacion;
+        }
+        break;
+        case 'medida':
+        if (!valor || !valor.trim()) {
+          nuevosErrores.medida = 'La medida es requerida';
+        } else if (valor.length > 15) {
+          nuevosErrores.medida = 'la medida o puede tener más de 15 caracteres';
+        } else {
+          delete nuevosErrores.medida;
         }
         break;
 
@@ -195,7 +215,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
 
   const validarFormulario = () => {
     const nuevosTocados = {};
-    const camposRequeridos = ['codigo', 'lote', 'nombre', 'precio_compra', 'porcentaje_g', 'stock', 'fecha_expiracion', 'laboratorio'];
+    const camposRequeridos = ['codigo', 'lote', 'nombre', 'precio_compra', 'porcentaje_g', 'stock', 'fecha_expiracion', 'laboratorio','presentacion','medida'];
     
     camposRequeridos.forEach(key => {
       nuevosTocados[key] = true;
@@ -247,7 +267,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
 
       <div className="mantine-form-grid">
         {/* Código */}
-        <div className="mantine-form-group">
+        {/* <div className="mantine-form-group">
           <label htmlFor="codigo">Código</label>
           <input
             id="codigo"
@@ -259,7 +279,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
             required
           />
           {errores.codigo && <span style={{color: 'red', fontSize: '0.75rem'}}>{errores.codigo}</span>}
-        </div>
+        </div> */}
         
         {/* Lote */}
         <div className="mantine-form-group">
@@ -298,8 +318,24 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
             name="presentacion"
             value={formData.presentacion}
             onChange={(e) => handleChange('presentacion', e.target.value)}
+            onBlur={(e) => handleBlur('presentacion', e.target.value)}
+
             placeholder="Presentación"
           />
+          {errores.presentacion && <span style={{color: 'red', fontSize: '0.75rem'}}>{errores.presentacion}</span>}
+        </div>
+        <div className="mantine-form-group">
+          <label htmlFor="medida">Medida</label>
+          <input
+            id="medida"
+            name="medida"
+            value={formData.medida}
+            onChange={(e) => handleChange('medida', e.target.value)}
+            onBlur={(e) => handleBlur('medida', e.target.value)}
+
+            placeholder="Medida"
+          />
+          {errores.medida && <span style={{color: 'red', fontSize: '0.75rem'}}>{errores.medida}</span>}
         </div>
 
         {/* Fila 3: Precio Compra | % Ganancia */}
@@ -310,7 +346,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
             name="precio_compra"
             value={formData.precio_compra}
             onChange={(value) => handleChange('precio_compra', value)}
-            onBlur={(e) => handleBlur('precio_compra', formData.precio_compra)}
+            onBlur={() => handleBlur('precio_compra', formData.precio_compra)}
             placeholder="0.00"
             min={0}
             step={0.01}
@@ -327,7 +363,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
             name="porcentaje_g"
             value={formData.porcentaje_g}
             onChange={(value) => handleChange('porcentaje_g', value)}
-            onBlur={(e) => handleBlur('porcentaje_g', formData.porcentaje_g)}
+            onBlur={() => handleBlur('porcentaje_g', formData.porcentaje_g)}
             placeholder="0"
             min={0}
             max={1000}
@@ -373,7 +409,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
             name="stock"
             value={formData.stock}
             onChange={(value) => handleChange('stock', value)}
-            onBlur={(e) => handleBlur('stock', formData.stock)}
+            onBlur={() => handleBlur('stock', formData.stock)}
             placeholder="0"
             min={0}
             required

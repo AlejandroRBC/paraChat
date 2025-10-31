@@ -5,11 +5,9 @@ const productosController = {
     const sql = `
       SELECT 
         p.*,
-        l.nombre_labo as laboratorio_nombre,
-        pr.nombre as proveedor_nombre
+        l.nombre_labo as laboratorio_nombre
       FROM producto p
       LEFT JOIN laboratorio l ON p.id_lab = l.id_lab
-      LEFT JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor
     `;
     db.all(sql, [], (err, rows) => {
       if (err) {
@@ -24,11 +22,9 @@ const productosController = {
     const sql = `
       SELECT 
         p.*,
-        l.nombre_labo as laboratorio_nombre,
-        pr.nombre as proveedor_nombre
+        l.nombre_labo as laboratorio_nombre
       FROM producto p
       LEFT JOIN laboratorio l ON p.id_lab = l.id_lab
-      LEFT JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor
       WHERE p.id_producto = ?
     `;
     db.get(sql, [req.params.id], (err, row) => {
@@ -50,9 +46,9 @@ const productosController = {
       presentacion,
       precio_venta,
       precio_compra,
-      valor_medida,
+      medida,
       id_lab,
-      id_proveedor
+      
     } = req.body;
     
     const estado = 'activo';
@@ -60,15 +56,15 @@ const productosController = {
     const sql = `
       INSERT INTO producto (
         nombre_prod, lote, fecha_exp, porcentaje_g, stock, 
-        presentacion, precio_venta, precio_compra, valor_medida, 
-        estado, id_lab, id_proveedor
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        presentacion, precio_venta, precio_compra, medida, 
+        estado, id_lab
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     db.run(sql, [
       nombre_prod, lote, fecha_exp, porcentaje_g, stock,
-      presentacion, precio_venta, precio_compra, valor_medida,
-      estado, id_lab, id_proveedor
+      presentacion, precio_venta, precio_compra, medida,
+      estado, id_lab
     ], function(err) {
       if (err) {
         res.status(400).json({ error: err.message });
@@ -78,8 +74,8 @@ const productosController = {
         data: { 
           id_producto: this.lastID,
           nombre_prod, lote, fecha_exp, porcentaje_g, stock,
-          presentacion, precio_venta, precio_compra, valor_medida,
-          estado, id_lab, id_proveedor
+          presentacion, precio_venta, precio_compra, medida,
+          estado, id_lab
         }
       });
     });
@@ -95,10 +91,9 @@ const productosController = {
       presentacion,
       precio_venta,
       precio_compra,
-      valor_medida,
+      medida,
       estado,
       id_lab,
-      id_proveedor
     } = req.body;
     
     const sql = `
@@ -106,14 +101,14 @@ const productosController = {
       SET 
         nombre_prod = ?, lote = ?, fecha_exp = ?, porcentaje_g = ?, 
         stock = ?, presentacion = ?, precio_venta = ?, precio_compra = ?, 
-        valor_medida = ?, estado = ?, id_lab = ?, id_proveedor = ?
+        medida = ?, estado = ?, id_lab = ?
       WHERE id_producto = ?
     `;
     
     db.run(sql, [
       nombre_prod, lote, fecha_exp, porcentaje_g, stock,
-      presentacion, precio_venta, precio_compra, valor_medida,
-      estado, id_lab, id_proveedor, req.params.id
+      presentacion, precio_venta, precio_compra, medida,
+      estado, id_lab, req.params.id
     ], function(err) {
       if (err) {
         res.status(400).json({ error: err.message });
@@ -123,11 +118,9 @@ const productosController = {
       db.get(`
         SELECT 
           p.*,
-          l.nombre_labo as laboratorio_nombre,
-          pr.nombre as proveedor_nombre
+          l.nombre_labo as laboratorio_nombre
         FROM producto p
         LEFT JOIN laboratorio l ON p.id_lab = l.id_lab
-        LEFT JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor
         WHERE p.id_producto = ?
       `, [req.params.id], (err, row) => {
         if (err) {

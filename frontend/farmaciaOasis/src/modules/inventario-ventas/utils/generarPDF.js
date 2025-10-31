@@ -196,7 +196,9 @@
                 <thead>
                 <tr>
                     <th style="width: 10%;">Cant.</th>
-                    <th style="width: 40%;">Producto</th>
+                    <th style="width: 20%;">Producto</th>
+                    <th style="width: 20%;">medida</th>
+                    
                     <th style="width: 20%; text-align: right;">P. Unit.</th>
                     
                     <th style="width: 15%; text-align: right;">Subtotal</th>
@@ -209,6 +211,10 @@
                     <td>
                         ${item.nombre}
                         ${item.presentacion ? `<br><span style="color: #999; font-size: 9px;">(${item.presentacion})</span>` : ''}
+                        
+                    </td>
+                    <td>
+                        ${item.medida}
                     </td>
                     <td class="text-right">Bs ${item.precio_venta.toFixed(2)}</td>
                     
@@ -461,7 +467,9 @@
                 <thead>
                 <tr>
                     <th style="width: 10%;">Cant.</th>
-                    <th style="width: 40%;">Producto</th>
+                    <th style="width: 20%;">Producto</th>
+                    <th style="width: 20%;">medida</th>
+                    
                     <th style="width: 20%; text-align: right;">P. Unit.</th>
 
                     <th style="width: 15%; text-align: right;">Subtotal</th>
@@ -474,6 +482,10 @@
                     <td>
                         ${item.nombre}
                         ${item.presentacion ? `<br><span style="color: #999; font-size: 9px;">(${item.presentacion})</span>` : ''}
+                        
+                    </td>
+                    <td>
+                        ${item.medida}
                     </td>
                     <td class="text-right">Bs ${item.precio_venta.toFixed(2)}</td>
                     

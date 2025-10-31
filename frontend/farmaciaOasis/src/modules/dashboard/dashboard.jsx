@@ -1,4 +1,3 @@
-// dashboard.jsx (ya lo tienes, solo asegurar que use los datos reales)
 import { useState } from 'react';
 import { useDashboard } from './hooks/useDashboard';
 import { 
@@ -18,6 +17,10 @@ import VentasChart from './components/VentasChart';
 import TopProductos from './components/TopProductos';
 import './dashboard.css';
 
+/**
+ * Componente principal del Dashboard
+ * Integra todos los componentes y maneja el estado global
+ */
 function Dashboard() {
   const {
     metricas,
@@ -37,6 +40,7 @@ function Dashboard() {
   const [mostrarBajos, setMostrarBajos] = useState(false);
   const [mostrarVencer, setMostrarVencer] = useState(false);
 
+  // Estados de carga y error
   if (loading) {
     return (
       <Container size="xl" py="md">
@@ -61,15 +65,15 @@ function Dashboard() {
       py="md" 
       className="dashboard-main-container"
     >
-      {/* HEADER */}
+      {/* Header con notificaciones */}
       <Header 
         productosBajos={productosBajos}
         productosPorVencer={productosPorVencer}
       />
 
-      {/* MÉTRICAS CON DATOS REALES */}
+      {/* Grid de métricas principales */}
       <Grid mt="xl">
-        <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}> {/* ✅ RESPONSIVE */}
+        <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}>
           <MetricCard
             valor={metricas.totalHoy}
             etiqueta="Total de Hoy"
@@ -99,7 +103,7 @@ function Dashboard() {
         </Grid.Col>
       </Grid>
 
-      {/* GRÁFICA Y TOP PRODUCTOS CON DATOS REALES */}
+      {/* Sección de gráfica y ranking de productos */}
       <Grid mt="xl">
         <Grid.Col span={{ base: 12, lg: isMobile ? 12 : isTablet ? 8 : 8 }}>
           <VentasChart data={ventasMensuales} />
@@ -109,7 +113,7 @@ function Dashboard() {
         </Grid.Col>
       </Grid>
 
-      {/* BOTONES PARA MODALES CON DATOS REALES */}
+      {/* Botones para abrir modales de alertas */}
       <Group 
         className="dashboard-buttons-container" 
         mt="xl" 
@@ -144,7 +148,7 @@ function Dashboard() {
         </Button>
       </Group>
 
-      {/* MODALES CON DATOS REALES */}
+      {/* Modales para detalles de productos */}
       <ProductosBajosModal
         productos={productosBajos}
         opened={mostrarBajos}

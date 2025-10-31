@@ -1,3 +1,7 @@
+/* ============================================= */
+/* PROVEEDORES STYLES - CÓDIGO COMPLETO */
+/* ============================================= */
+
 /* Página completa - FONDO BLANCO */
 .proveedor-page {
   min-height: 100vh;
@@ -93,7 +97,6 @@
   align-items: flex-start;
 }
 
-
 /* Categoría de resultado */
 .result-category {
   background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
@@ -102,6 +105,7 @@
   background-clip: text;
   font-weight: 600;
 }
+
 /* Estilos para el modal de eliminación */
 .modal-eliminar-content {
   text-align: center;
@@ -138,9 +142,10 @@
   background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
   transform: translateY(-1px);
 }
+
 .titulo-gradiente {
-  font-weight: 700; /* hace la letra más ancha/gruesa */
-  font-size: 1.5rem; /* ajusta tamaño si quieres */
+  font-weight: 700;
+  font-size: 1.5rem; 
   background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

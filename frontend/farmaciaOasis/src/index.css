@@ -1,8 +1,6 @@
-/* ============================================= */
-/* COMPONENTES GLOBALES - TABLAS Y BOTONES */
-/* ============================================= */
-
-/* ===== SISTEMA DE TABLAs===== */
+/* ========================================================= */
+/* ===================== SECCIÓN: TABLAS =================== */
+/* ========================================================= */
 /* 
  * Tablas compactas con diseño elegante y gradiente
  * Optimizadas para máxima legibilidad y espacio
@@ -85,12 +83,13 @@
 
 /* Efecto hover sutil para filas completas */
 .mantine-Table-tr:hover .mantine-Table-td {
-  background: rgba(0, 0, 0, 0.08) ; /* ✅ Gris fuerte */
+  background: rgba(0, 0, 0, 0.08) ;
   color: #2D3748 ;
   transform: none ;
   font-weight: 500 ;
   box-shadow: none ;
 }
+
 .mantine-Table-tr:hover {
   background: rgba(0, 0, 0, 0.02) ;
 }
@@ -115,7 +114,10 @@
   border-bottom: none ;
 }
 
-/* ===== SISTEMA DE BOTONES ===== */
+
+/* ========================================================= */
+/* ===================== SECCIÓN: BOTONES ================== */
+/* ========================================================= */
 /* 
  * Botones con efecto shine y animaciones fluidas
  * Diseño consistente en toda la aplicación
@@ -200,20 +202,27 @@
   margin: 0 ;
 }
 
-/* FUENTES LETRAS */
+
+/* ========================================================= */
+/* ===================== SECCIÓN: FUENTES ================== */
+/* ========================================================= */
+
 * {
     font-family: 'Montserrat', sans-serif ;
     margin: 0;
     padding: 0;
     font-weight: 400;
-    
 }
 
 body {
     font-family: 'Montserrat', sans-serif ;
     font-weight: 400;
 }
-/* FORMULARIOS */
+
+
+/* ========================================================= */
+/* ===================== SECCIÓN: FORMULARIOS DEL MODAL =============== */
+/* ========================================================= */
 .mantine-form {
   width: 100%;
   background: white;
@@ -288,11 +297,13 @@ body {
 .mantine-form-group select:hover {
   border-color: #b3e5fc;
 }
+
 .form-group input::placeholder,
 .form-group textarea::placeholder {
   color: #000000 ; 
   opacity: 1; 
 }
+
 .mantine-form-actions {
   display: flex;
   gap: 1rem;
@@ -312,7 +323,6 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(120, 144, 156, 0.3);
   background: linear-gradient(135deg, #00BCD4 0%, #1871c1 100%);
-  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
 }
-
 

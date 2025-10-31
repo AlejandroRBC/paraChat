@@ -2,8 +2,15 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:4000/api';
 
+/**
+ * Servicio para gestionar operaciones CRUD de proveedores
+ * Conecta con la API backend para todas las operaciones de proveedores
+ */
 const proveedorService = {
-  // GET todos los proveedores
+  /**
+   * Obtiene todos los proveedores del sistema
+   * @returns {Promise<Array>} Lista de proveedores
+   */
   obtenerProveedores: async () => {
     try {
       const response = await axios.get(`${API_URL}/proveedores`);
@@ -14,7 +21,9 @@ const proveedorService = {
     }
   },
 
-  // GET proveedor por ID
+  /**
+   * Obtiene un proveedor específico por su ID
+   */
   obtenerProveedor: async (id) => {
     try {
       const response = await axios.get(`${API_URL}/proveedores/${id}`);
@@ -25,7 +34,9 @@ const proveedorService = {
     }
   },
 
-  // POST crear proveedor
+  /**
+   * Crea un nuevo proveedor en el sistema
+   */
   crearProveedor: async (proveedorData) => {
     try {
       const response = await axios.post(`${API_URL}/proveedores`, proveedorData);
@@ -36,7 +47,9 @@ const proveedorService = {
     }
   },
 
-  // PUT actualizar proveedor
+  /**
+   * Actualiza los datos de un proveedor existente
+   */
   actualizarProveedor: async (id, proveedorData) => {
     try {
       const response = await axios.put(`${API_URL}/proveedores/${id}`, proveedorData);
@@ -47,7 +60,10 @@ const proveedorService = {
     }
   },
 
-  // DELETE proveedor (eliminación suave)
+  /**
+   * Elimina un proveedor (eliminación suave)
+  
+   */
   eliminarProveedor: async (id) => {
     try {
       const response = await axios.delete(`${API_URL}/proveedores/${id}`);

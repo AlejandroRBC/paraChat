@@ -8,12 +8,20 @@ import {
 } from '@mantine/core';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 
+/**
+ * Componente de lista para mostrar clientes en formato tabla
+ * Incluye acciones de editar y eliminar con diseño responsive
+ */
 export function ClienteList({ 
   clientes, 
   onEditar, 
   onEliminar,
   isMobile = false 
 }) {
+  /**
+   * Genera las filas de la tabla con datos de clientes
+   * Adapta tamaños y estilos según el dispositivo
+   */
   const filas = clientes.map((cliente) => (
     <Table.Tr key={cliente.cod_cli}>
       <Table.Td>

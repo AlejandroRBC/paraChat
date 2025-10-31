@@ -13,6 +13,10 @@ import {
 import { Group, CloseButton, Avatar, Text } from '@mantine/core';
 import classes from './MantineSidebar.module.css';
 
+/**
+ * Datos de navegación para la sidebar
+ * Define las rutas, etiquetas e íconos del menú
+ */
 const data = [
   { link: '/', label: 'Dashboard', icon: IconHome },
   { link: '/inventario', label: 'Inventario', icon: IconPackage },
@@ -22,15 +26,23 @@ const data = [
   { link: '/proveedores', label: 'Proveedores y Mercancia', icon: IconTruck },
 ];
 
+/**
+ * Componente Sidebar para navegación principal
+ * Responsive con funcionalidad de cierre en móviles
+ */
 export function MantineSidebar({ onClose }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [active, setActive] = useState(location.pathname);
 
+  // Sincronizar el estado activo con la ruta actual
   useEffect(() => {
     setActive(location.pathname);
   }, [location.pathname]);
 
+  /**
+   * Genera los enlaces de navegación con estado activo
+   */
   const links = data.map((item) => (
     <button
       className={classes.link}
@@ -39,7 +51,7 @@ export function MantineSidebar({ onClose }) {
       onClick={() => {
         setActive(item.link);
         navigate(item.link);
-        if (onClose) onClose();
+        if (onClose) onClose(); // Cerrar sidebar en móvil después de navegar
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
@@ -49,13 +61,14 @@ export function MantineSidebar({ onClose }) {
 
   return (
     <nav className={classes.navbar}>
-      {/* Header */}
+      {/* Header con logo y botón cerrar (solo en móvil) */}
       <div className={classes.header}>
         <Group justify="space-between">
           <div className={classes.logoContainer}>
             <img src="/img/logo.png" alt="Farmacia Oasis" className={classes.logo} />
             <Text size="sm" c="white" fw={600}>Farmacia Oasis</Text>
           </div>
+          {/* Botón cerrar solo visible cuando hay función onClose (móvil) */}
           {onClose && (
             <CloseButton 
               size="md" 
@@ -66,13 +79,13 @@ export function MantineSidebar({ onClose }) {
         </Group>
       </div>
 
-      {/* Navigation Links */}
+      {/* Navegación principal */}
       <div className={classes.navbarMain}>
         {links}
       </div>
 
       {/* 
-      Si en algun momento queremos meter un usuario o un login asi chalitaFooter
+      Sección de usuario deshabilitada temporalmente
       <div className={classes.footer}>
         <div className={classes.userInfo}>
           <Avatar 

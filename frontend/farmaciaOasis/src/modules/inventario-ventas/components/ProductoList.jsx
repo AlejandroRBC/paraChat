@@ -91,7 +91,10 @@ const filas = productos.map((producto) => {
             {producto.nombre}
             </Table.Td>
             <Table.Td >
-            {producto.presentacion}
+                {producto.presentacion}
+            </Table.Td>
+            <Table.Td >
+                {producto.medida}
             </Table.Td>
             <Table.Td>
                 Bs {producto.precio_base}
@@ -199,6 +202,9 @@ return (
                 </Table.Th>
                 <Table.Th>
                 Presentacion
+                </Table.Th>
+                <Table.Th>
+                medida
                 </Table.Th>
                 <Table.Th>
                 Precio Base

@@ -13,7 +13,6 @@ const inventarioService = {
             throw error;
             }
         },
-
         // GET producto por ID
         obtenerProducto: async (id) => {
             try {
@@ -24,7 +23,6 @@ const inventarioService = {
             throw error;
             }
         },
-
         // POST crear producto
         crearProducto: async (productoData) => {
             try {
@@ -35,7 +33,6 @@ const inventarioService = {
             throw error;
             }
         },
-
         // PUT actualizar producto
         actualizarProducto: async (id, productoData) => {
             try {
@@ -46,7 +43,6 @@ const inventarioService = {
             throw error;
             }
         },
-
         // DELETE producto (eliminación suave)
         eliminarProducto: async (id) => {
             try {
@@ -57,7 +53,6 @@ const inventarioService = {
             throw error;
             }
         },
-
         // GET todos los laboratorios
         // POST crear laboratorio
         crearLaboratorio: async (laboratorioData) => {
@@ -75,7 +70,6 @@ const inventarioService = {
             throw error;
             }
         },
-        
         // GET todos los laboratorios
         obtenerLaboratorios: async () => {
             try {

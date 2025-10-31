@@ -1,6 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'; 
 import HistorialVentasService from '../services/historial-ventasService'; 
 
+/**
+ * Hook personalizado para la gestión del historial de ventas
+ * Maneja filtrado por fecha, búsqueda y carga de datos
+ */
 export function useVentas() {
   const [ventas, setearVentas] = useState([]);
   const [error, setError] = useState(null);
@@ -9,6 +13,10 @@ export function useVentas() {
   const [dateRange, setDateRange] = useState({ start: null, end: null });
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Busca medicamentos en el string de productos de una venta
+   * Maneja formatos como "Medicamento x Cantidad = Precio"
+   */
   const buscarSoloMedicamentos = (nombre_prod, textoBusqueda) => {
     if (!nombre_prod) return false;
     
@@ -17,13 +25,16 @@ export function useVentas() {
     
     return medicamentos.some(medicamento => {
       const nombreMedicamento = medicamento
-        .split('x')[0] 
-        .split('=')[0]  
+        .split('x')[0]        // Separa cantidad
+        .split('=')[0]        // Separa precio
         .trim();
       return nombreMedicamento.includes(textoBusqueda);
     });
   };
 
+  /**
+   * Calcula el lunes de la semana de una fecha dada
+   */
   const obtenerLunesSemanaActual = (fecha) => {
     const fechaCopy = new Date(fecha);
     const dia = fechaCopy.getDay();
@@ -31,6 +42,9 @@ export function useVentas() {
     return new Date(fechaCopy.setDate(diff));
   };
 
+  /**
+   * Calcula el domingo de la semana de una fecha dada
+   */
   const obtenerDomingoSemanaActual = (fecha) => {
     const lunes = obtenerLunesSemanaActual(fecha);
     const domingo = new Date(lunes);
@@ -38,6 +52,9 @@ export function useVentas() {
     return domingo;
   };
 
+  /**
+   * Parsea diferentes formatos de fecha a objeto Date
+   */
   const parsearFecha = (fechaString) => {
     if (!fechaString) return null;
     
@@ -59,6 +76,7 @@ export function useVentas() {
     }
   };
 
+  // Cargar ventas al inicializar el hook
   useEffect(() => {
     const cargarVentas = async () => {
       try {
@@ -73,6 +91,7 @@ export function useVentas() {
           return;
         }
 
+        // Ordenar ventas por fecha más reciente primero
         const ventasOrdenadas = datos.sort((a, b) => {
           const fechaA = new Date(`${a.fecha} ${a.hora}`);
           const fechaB = new Date(`${b.fecha} ${b.hora}`);
@@ -91,9 +110,13 @@ export function useVentas() {
     cargarVentas();
   }, []);
 
+  /**
+   * Ventas filtradas según búsqueda, tipo de filtro y rango de fechas
+   */
   const ventasFiltradas = useMemo(() => {
     let resultado = [...ventas];
 
+    // Filtro por búsqueda (ID o medicamentos)
     if (busqueda) {
       const textoBusqueda = busqueda.toLowerCase().trim();
       resultado = resultado.filter(venta =>
@@ -104,6 +127,7 @@ export function useVentas() {
       );
     }
 
+    // Filtro por tipo de período
     if (filtroTipo !== 'general') {
       const ahora = new Date();
       
@@ -167,6 +191,7 @@ export function useVentas() {
       }
     }
 
+    // Filtro por rango de fechas personalizado
     if (dateRange.start && dateRange.end) {
       const inicio = new Date(dateRange.start);
       inicio.setHours(0, 0, 0, 0);

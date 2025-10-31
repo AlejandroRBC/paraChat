@@ -1,12 +1,15 @@
+/* ============================================= */
+/* NAVBAR SUPERIOR STYLES */
+/* ============================================= */
 
-/* Navbar Superior - MÁS GRUESO Y CON ESTILO */
+/* Navbar principal con gradiente y efectos */
 .navbar-header {
   background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
   border-bottom: 3px solid var(--mantine-color-blue-6);
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.15),
     0 1px 0 rgba(255, 255, 255, 0.1) inset;
-  height: 80px !important; /* Más grueso */
+  height: 80px !important; 
   position: fixed;
   top: 0;
   left: 0;
@@ -15,7 +18,7 @@
   backdrop-filter: blur(10px);
 }
 
-/* Botón del menú mejorado */
+/* Botón del menú hamburguesa */
 .navbar-toggle {
   background: linear-gradient(135deg, 
     var(--mantine-color-blue-7), 
@@ -36,7 +39,7 @@
     0 0 20px rgba(255, 255, 255, 0.2);
 }
 
-/* Contenedor del logo */
+/* Contenedor del logo con efectos visuales */
 .logo-container {
   position: relative;
   padding: 8px 0;
@@ -59,6 +62,7 @@
   overflow: hidden;
 }
 
+/* Efecto de brillo al pasar el mouse */
 .logo-wrapper::before {
   content: '';
   position: absolute;
@@ -85,11 +89,11 @@
     0 0 30px rgba(255, 255, 255, 0.1);
 }
 
-/* Logo con bordes recurvados y animación */
+/* Logo con animaciones y efectos */
 .navbar-logo {
   height: 50px;
   width: auto;
-  border-radius: 12px; /* Bordes más recurvados */
+  border-radius: 12px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 2;
@@ -98,7 +102,7 @@
 }
 
 .logo-wrapper:hover .navbar-logo {
-  border-radius: 20px; /* Más recurvado al hover */
+  border-radius: 20px; 
   transform: scale(1.1) rotate(2deg);
   border-color: rgba(255, 255, 255, 0.3);
   filter: 
@@ -141,7 +145,7 @@
   }
 }
 
-/* Texto de la marca */
+/* Texto de la marca con gradiente */
 .brand-text {
   display: flex;
   flex-direction: column;
@@ -170,6 +174,7 @@
   margin-left: auto;
 }
 
+/* Sección de bienvenida con efectos de vidrio */
 .welcome-section {
   background: rgba(255, 255, 255, 0.1);
   padding: 8px 16px;
@@ -193,6 +198,7 @@
   color: white;
 }
 
+/* Indicador de estado del sistema */
 .status-indicator {
   display: flex;
   align-items: center;
@@ -223,7 +229,9 @@
   }
 }
 
-/* Sidebar Overlay */
+/* ===== SIDEBAR OVERLAY ===== */
+
+/* Overlay para el sidebar móvil */
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -241,6 +249,7 @@
   opacity: 1;
 }
 
+/* Fondo semitransparente */
 .sidebar-backdrop {
   position: absolute;
   top: 0;
@@ -251,6 +260,7 @@
   backdrop-filter: blur(2px);
 }
 
+/* Contenedor del sidebar */
 .sidebar-wrapper {
   position: absolute;
   top: 0;
@@ -265,15 +275,17 @@
   transform: translateX(0);
 }
 
-/* Contenido principal - Ajustado para navbar más grueso */
+/* ===== CONTENIDO PRINCIPAL ===== */
+
+/* Ajuste del contenido para el navbar más grueso */
 .main-content {
-  margin-top: 80px; /* Ajustado para el navbar más grueso */
+  margin-top: 80px;
   min-height: calc(100vh - 80px);
   background: var(--mantine-color-gray-0);
   transition: all 0.3s ease;
 }
 
-/* Cuando el sidebar está abierto */
+/* Estados cuando el sidebar está abierto */
 body.sidebar-open {
   overflow: hidden;
 }
@@ -282,4 +294,3 @@ body.sidebar-open {
   pointer-events: none;
   user-select: none;
 }
-

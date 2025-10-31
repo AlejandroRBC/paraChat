@@ -1,6 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import proveedorService from '../services/proveedorService';
 
+/**
+ * Hook personalizado para la gestión completa de proveedores
+ * Maneja estado, búsqueda, CRUD y lógica de negocio
+ */
 export function useProveedores() {
   const [proveedores, setProveedores] = useState([]);
   const [proveedorEditando, setProveedorEditando] = useState(null);
@@ -8,11 +12,14 @@ export function useProveedores() {
   const [busqueda, setBusqueda] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  // Cargar proveedores al inicializar
+  // Cargar proveedores al inicializar el hook
   useEffect(() => {
     cargarProveedores();
   }, []);
 
+  /**
+   * Carga todos los proveedores desde el servicio
+   */
   const cargarProveedores = async () => {
     setCargando(true);
     try {
@@ -25,7 +32,10 @@ export function useProveedores() {
     }
   };
 
-  // Filtrar proveedores por búsqueda
+  /**
+   * Filtra proveedores por término de búsqueda
+   * Busca en nombre, teléfono y concepto
+   */
   const proveedoresFiltrados = useMemo(() => {
     if (!busqueda.trim()) return proveedores;
 
@@ -37,7 +47,10 @@ export function useProveedores() {
     );
   }, [proveedores, busqueda]);
 
-  // Resultados para el buscador
+  /**
+   * Prepara resultados para el componente de búsqueda
+   * Formatea los datos para mostrar en sugerencias
+   */
   const resultadosBusqueda = useMemo(() => {
     if (!busqueda.trim()) return [];
 
@@ -51,7 +64,9 @@ export function useProveedores() {
     }));
   }, [proveedoresFiltrados, busqueda]);
 
-  // CREAR PROVEEDOR
+  /**
+   * Crea un nuevo proveedor en el sistema
+   */
   const crearProveedor = async (nuevoProveedor) => {
     try {
       const proveedorCreado = await proveedorService.crearProveedor(nuevoProveedor);
@@ -64,7 +79,9 @@ export function useProveedores() {
     }
   };
 
-  // ACTUALIZAR PROVEEDOR
+  /**
+   * Actualiza los datos de un proveedor existente
+   */
   const actualizarProveedor = async (proveedorActualizado) => {
     try {
       const resultado = await proveedorService.actualizarProveedor(
@@ -79,6 +96,7 @@ export function useProveedores() {
         }
       );
 
+      // Actualizar estado local con el proveedor modificado
       setProveedores(prev =>
         prev.map(p =>
           p.id_proveedor === proveedorActualizado.id_proveedor ? resultado : p
@@ -94,6 +112,10 @@ export function useProveedores() {
     }
   };
 
+  /**
+   * Maneja la selección de un resultado de búsqueda
+   * Abre el formulario de edición para el proveedor seleccionado
+   */
   const manejarSeleccionResultado = (resultado) => {
     const proveedorEncontrado = proveedores.find(p => p.id_proveedor === resultado.id);
     if (proveedorEncontrado) {
@@ -101,11 +123,15 @@ export function useProveedores() {
     }
   };
 
+  /**
+   * Abre el formulario en modo edición
+   */
   const abrirEditarProveedor = (proveedor) => {
     setProveedorEditando(proveedor);
     setMostrarForm(true);
   };
 
+  // Retornar estado y funciones para el componente
   return {
     proveedores: proveedoresFiltrados,
     proveedoresOriginales: proveedores,

@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { MantineProvider } from '@mantine/core';
 import App from './App';
 
-// IMPORTAR ESTILOS DE MANTINE (ESTO FALTA)
+// IMPORTAR ESTILOS DE MANTINE
 import '@mantine/core/styles.css';
 
 //IMPORTAR FUENTE

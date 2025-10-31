@@ -1,10 +1,13 @@
-// components/ProductosBajosModal.jsx
 import { Modal, Table, Badge, Text, Group, Paper, Title, Alert, ScrollArea, Box, ActionIcon } from '@mantine/core';
 import { IconAlertTriangle, IconPackage, IconCheck, IconX } from '@tabler/icons-react';
 import '../dashboard.css';
 
+/**
+ * Modal para mostrar productos con stock bajo o crítico
+ * Incluye sistema de colores por nivel de stock y estadísticas
+ */
 function ProductosBajosModal({ productos, opened, onClose }) {
-  // ✅ CORREGIDO: Usar estructura real de BD
+  // Sistema de clasificación por niveles de stock
   const getEstado = (stock) => {
     if (stock <= 5) return 'Crítico';
     if (stock < 11 && stock > 4) return 'Bajo';
@@ -21,16 +24,19 @@ function ProductosBajosModal({ productos, opened, onClose }) {
     return stock <= 5 ? 'filled' : 'light';
   };
 
+  // Estadísticas de productos por nivel de stock
   const productosCriticos = productos.filter(p => p.stock <= 5).length;
   const productosBajos = productos.filter(p => p.stock < 11 && p.stock > 4).length;
   const productosNecesitanAtencion = productosCriticos + productosBajos;
 
+  // Colores de borde según nivel de stock
   const getBorderColor = (stock) => {
     if (stock <= 5) return '#ff6b6b';
     if (stock < 11) return '#ffa94d';
     return '#51cf66';
   };
 
+  // Filas de la tabla con productos
   const rows = productos.map((producto) => {
     const estado = getEstado(producto.stock);
     const badgeColor = getBadgeColor(producto.stock);
@@ -46,7 +52,6 @@ function ProductosBajosModal({ productos, opened, onClose }) {
           <Group gap="sm">
             <IconPackage size={16} color={badgeColor} />
             <div>
-              {/* ✅ CORREGIDO: producto.nombre_prod en lugar de producto.nombre */}
               <Text fw={600} size="sm" c="dark.8">{producto.nombre}</Text>
               <Text size="xs" c="dimmed">ID: {producto.id}</Text>
             </div>
@@ -82,7 +87,6 @@ function ProductosBajosModal({ productos, opened, onClose }) {
           </Group>
         </Table.Td>
         <Table.Td className="product-cell">
-          {/* ✅ CORREGIDO: producto.laboratorio ya viene bien del servicio */}
           <Text fw={500} size="sm" c="dark.7">{producto.laboratorio}</Text>
         </Table.Td>
       </Table.Tr>
@@ -117,6 +121,7 @@ function ProductosBajosModal({ productos, opened, onClose }) {
       withCloseButton={false}
       scrollAreaComponent={ScrollArea.Autosize}
     >
+      {/* Botón de cierre personalizado */}
       <ActionIcon 
         variant="subtle" 
         color="gray" 
@@ -128,12 +133,14 @@ function ProductosBajosModal({ productos, opened, onClose }) {
         <IconX size={20} />
       </ActionIcon>
 
+      {/* Estado vacío o con productos */}
       {productos.length === 0 ? (
         <Alert color="green" title="Todo en orden" icon={<IconPackage size={16} />} radius="md">
           No hay productos con stock bajo en este momento.
         </Alert>
       ) : (
         <>
+          {/* Alerta de productos que necesitan atención */}
           <Box className="alert-container">
             <Alert 
               color="blue" 
@@ -146,6 +153,7 @@ function ProductosBajosModal({ productos, opened, onClose }) {
             </Alert>
           </Box>
 
+          {/* Tabla de productos */}
           <Paper withBorder radius="md" className="table-paper">
             <Table verticalSpacing={2} highlightOnHover>
               <Table.Thead>
@@ -160,6 +168,7 @@ function ProductosBajosModal({ productos, opened, onClose }) {
             </Table>
           </Paper>
 
+          {/* Resumen de estadísticas */}
           <Group justify="space-between" mt="md">
             <Group gap="xs">
               <Text size="sm" c="dimmed">

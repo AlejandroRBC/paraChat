@@ -1,6 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import clienteService from '../services/clienteService';
 
+/**
+ * Hook personalizado para la gestión completa de clientes
+ * Maneja estado, búsqueda, CRUD y lógica de negocio
+ */
 export function useClientes() {
   const [clientes, setClientes] = useState([]);
   const [clienteEditando, setClienteEditando] = useState(null);
@@ -10,11 +14,14 @@ export function useClientes() {
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [cargando, setCargando] = useState(false);
 
-  // Cargar clientes al inicializar
+  // Cargar clientes al inicializar el hook
   useEffect(() => {
     cargarClientes();
   }, []);
 
+  /**
+   * Carga todos los clientes desde el servicio
+   */
   const cargarClientes = async () => {
     setCargando(true);
     try {
@@ -27,12 +34,15 @@ export function useClientes() {
     }
   };
 
-  // Filtrar solo clientes ACTIVOS
+  // Filtrar solo clientes ACTIVOS para mostrar
   const clientesActivos = useMemo(() => {
     return clientes.filter(cliente => cliente.estado === 'activo');
   }, [clientes]);
 
-  // Filtrar clientes por búsqueda (solo activos)
+  /**
+   * Filtra clientes por término de búsqueda
+   * Busca en nombre y CI/NIT de clientes activos
+   */
   const clientesFiltrados = useMemo(() => {
     if (!busqueda.trim()) return clientesActivos;
     
@@ -43,7 +53,10 @@ export function useClientes() {
     );
   }, [clientesActivos, busqueda]);
 
-  // ✅ AGREGADO: Resultados para el buscador (igual que useProveedores)
+  /**
+   * Prepara resultados para el componente de búsqueda
+   * Formatea los datos para mostrar en sugerencias
+   */
   const resultadosBusqueda = useMemo(() => {
     if (!busqueda.trim()) return [];
 
@@ -57,7 +70,10 @@ export function useClientes() {
     }));
   }, [clientesFiltrados, busqueda]);
 
-  // ✅ AGREGADO: Manejar selección de resultado (igual que useProveedores)
+  /**
+   * Maneja la selección de un resultado de búsqueda
+   * Abre el formulario de edición para el cliente seleccionado
+   */
   const manejarSeleccionResultado = (resultado) => {
     const clienteEncontrado = clientes.find(c => c.cod_cli === resultado.id);
     if (clienteEncontrado) {
@@ -65,14 +81,20 @@ export function useClientes() {
     }
   };
 
-  // Buscar cliente inactivo por CI/NIT
+  /**
+   * Busca clientes inactivos por CI/NIT
+   * Usado para detectar reactivaciones
+   */
   const buscarClienteInactivoPorCI = (ci_nit) => {
     return clientes.find(cliente => 
       cliente.ci_nit === ci_nit && cliente.estado === 'inactivo'
     );
   };
 
-  // CREAR CLIENTE
+  /**
+   * Crea un nuevo cliente o reactiva uno existente
+   * Detecta clientes inactivos con el mismo CI/NIT
+   */
   const crearCliente = async (nuevoCliente) => {
     try {
       // Buscar si existe cliente inactivo con mismo CI/NIT
@@ -108,7 +130,9 @@ export function useClientes() {
     }
   };
 
-  // ACTUALIZAR CLIENTE
+  /**
+   * Actualiza los datos de un cliente existente
+   */
   const actualizarCliente = async (clienteActualizado) => {
     try {
       const resultado = await clienteService.actualizarCliente(
@@ -134,7 +158,10 @@ export function useClientes() {
     }
   };
 
-  // ELIMINAR CLIENTE
+  /**
+   * Elimina un cliente cambiando su estado a inactivo
+   * Implementa eliminación lógica (soft delete)
+   */
   const eliminarCliente = async (id) => {
     try {
       await clienteService.eliminarCliente(id);
@@ -153,21 +180,31 @@ export function useClientes() {
     }
   };
 
+  /**
+   * Inicia el proceso de eliminación mostrando confirmación
+   */
   const solicitarEliminacion = (cliente) => {
     setClienteAEliminar(cliente);
     setMostrarConfirmacion(true);
   };
 
+  /**
+   * Cancela el proceso de eliminación
+   */
   const cancelarEliminacion = () => {
     setMostrarConfirmacion(false);
     setClienteAEliminar(null);
   };
 
+  /**
+   * Abre el formulario en modo edición
+   */
   const abrirEditarCliente = (cliente) => {
     setClienteEditando(cliente);
     setMostrarForm(true);
   };
 
+  // Retornar estado y funciones para el componente
   return {
     clientes: clientesFiltrados,
     clienteEditando,
@@ -175,7 +212,6 @@ export function useClientes() {
     busqueda,
     cargando,
     setBusqueda,
-    // ✅ AGREGADOS: Estas son las props que faltaban
     resultadosBusqueda,
     clienteAEliminar,
     mostrarConfirmacion,
@@ -186,7 +222,6 @@ export function useClientes() {
     eliminarCliente,
     solicitarEliminacion,
     cancelarEliminacion,
-    // ✅ AGREGADO: Esta función es esencial
     manejarSeleccionResultado,
     abrirEditarCliente,
     recargarClientes: cargarClientes

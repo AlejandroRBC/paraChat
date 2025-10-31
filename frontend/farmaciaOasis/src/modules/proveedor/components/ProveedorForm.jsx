@@ -11,6 +11,10 @@ import { useForm } from '@mantine/form';
 import { useEffect, useState } from 'react';
 import { IconAlertCircle, IconLock } from '@tabler/icons-react';
 
+/**
+ * Formulario para crear y editar proveedores
+ * Incluye validación automática y cálculo de precios
+ */
 export function ProveedorForm({ 
   proveedor, 
   onGuardar,
@@ -30,7 +34,10 @@ export function ProveedorForm({
     }
   });
 
-  // Función para verificar si el formulario es válido
+  /**
+   * Valida si el formulario completo es válido
+   * Verifica campos obligatorios y reglas de negocio
+   */
   const esFormularioValido = () => {
     const { nombre, telefono, concepto } = form.values;
     
@@ -52,7 +59,9 @@ export function ProveedorForm({
     return true;
   };
 
-  // Función de validación
+  /**
+   * Valida un campo específico y actualiza los errores
+   */
   const validarCampo = (nombre, valor) => {
     const nuevosErrores = { ...errores };
     
@@ -120,6 +129,7 @@ export function ProveedorForm({
     setErrores(nuevosErrores);
   };
 
+  // Maneja cambios en los campos con validación en tiempo real
   const handleChange = (name, value) => {
     form.setFieldValue(name, value);
 
@@ -128,11 +138,16 @@ export function ProveedorForm({
     }
   };
 
+  // Valida campo cuando pierde el foco
   const handleBlur = (name, value) => {
     setTocado(prev => ({ ...prev, [name]: true }));
     validarCampo(name, value);
   };
 
+  /**
+   * Valida todo el formulario antes de enviar
+   * Marca todos los campos como tocados para mostrar errores
+   */
   const validarFormulario = () => {
     const nuevosTocados = {};
     Object.keys(form.values).forEach(key => {
@@ -147,6 +162,7 @@ export function ProveedorForm({
     return Object.keys(errores).length === 0 && esFormularioValido();
   };
 
+  // Carga datos del proveedor cuando se edita
   useEffect(() => {
     if (proveedor) {
       form.setValues({
@@ -164,7 +180,10 @@ export function ProveedorForm({
     }
   }, [proveedor]);
 
-  // Calcular precio_total automáticamente
+  /**
+   * Calcula automáticamente el precio total
+   * Se ejecuta cuando cambia cantidad o precio unitario
+   */
   useEffect(() => {
     const cantidad = form.values.cantidad;
     const precio_unitario = form.values.precio_unitario;
@@ -175,6 +194,7 @@ export function ProveedorForm({
     }
   }, [form.values.cantidad, form.values.precio_unitario]);
 
+  // Maneja el envío del formulario con validación
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -195,6 +215,7 @@ export function ProveedorForm({
     <form onSubmit={handleSubmit}>
       <Stack gap={isMobile ? "sm" : "md"}>
 
+        {/* Alertas de errores de validación */}
         {hayErrores && (
           <Alert 
             icon={<IconAlertCircle size={16} />} 
@@ -206,6 +227,7 @@ export function ProveedorForm({
           </Alert>
         )}
 
+        {/* Campos del formulario */}
         <TextInput
           label="Nombre del proveedor"
           placeholder="Ingresa el nombre del proveedor"
@@ -266,6 +288,7 @@ export function ProveedorForm({
           rightSection={<Text size="xs" c="dimmed">Bs</Text>}
         />
 
+        {/* Campo de precio total calculado automáticamente */}
         <NumberInput
           label="Precio Total"
           placeholder="0.00"
@@ -277,6 +300,7 @@ export function ProveedorForm({
           rightSection={<Text size="xs" c="dimmed">Bs</Text>}
         />
 
+        {/* Botón de envío con estado dinámico */}
         <Group justify="flex-end" mt="md">
           <Button 
             type="submit" 
