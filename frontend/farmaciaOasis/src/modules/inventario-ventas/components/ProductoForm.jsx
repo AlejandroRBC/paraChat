@@ -23,8 +23,13 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
   const esFormularioValido = () => {
     const { lote, nombre, presentacion, medida, precio_compra, porcentaje_g, stock, fecha_expiracion, laboratorio } = formData;
     
+<<<<<<< HEAD
     // Campos obligatorios no vacíos - INCLUIR presentacion y medida
     if (!lote.trim() || !nombre.trim() || !presentacion.trim() || !medida.trim() || !precio_compra || !porcentaje_g || !stock || !fecha_expiracion || !laboratorio) {
+=======
+    // Campos obligatorios no vacíos
+    if ( !lote.trim() || !nombre.trim() || !precio_compra || !porcentaje_g || !stock || !fecha_expiracion || !laboratorio) {
+>>>>>>> 4becc4ac40e2796f05357041e4d704c2dad6b1a2
       return false;
     }
     

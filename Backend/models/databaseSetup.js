@@ -40,7 +40,11 @@ const createTables = () => {
     presentacion TEXT,
     precio_venta REAL,
     precio_compra REAL,
+<<<<<<< HEAD
     medida TEXT,
+=======
+    medida REAL,
+>>>>>>> 4becc4ac40e2796f05357041e4d704c2dad6b1a2
     estado TEXT,
     id_lab INTEGER,
     FOREIGN KEY (id_lab) REFERENCES laboratorio(id_lab)
