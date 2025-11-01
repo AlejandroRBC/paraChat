@@ -218,54 +218,6 @@ const ventasController = {
     });
   },
 
-  // Obtener historial de ingresos/egresos
-  getHistorialIngresosEgresos: (req, res) => {
-    const sql = `
-      SELECT * FROM Historial_Ingresos_Egresos 
-      ORDER BY fecha DESC, hora DESC
-      LIMIT 100
-    `;
-    
-    db.all(sql, [], (err, rows) => {
-      if (err) {
-        res.status(400).json({ error: err.message });
-        return;
-      }
-      res.json({ data: rows });
-    });
-  },
-
-  // Obtener ventas por rango de fechas
-  getVentasPorFecha: (req, res) => {
-    const { fechaInicio, fechaFin } = req.query;
-    
-    const sql = `
-      SELECT 
-        v.id_venta,
-        v.fecha,
-        v.hora,
-        c.nombre AS cliente,
-        v.metodo_pago,
-        v.total,
-        v.descuento,
-        (v.total + COALESCE(v.descuento, 0)) as total_sin_descuento,
-        COUNT(dv.id_detalle) as cantidad_productos
-      FROM venta v
-      LEFT JOIN cliente c ON v.id_cliente = c.cod_cli
-      LEFT JOIN detalle_venta dv ON v.id_venta = dv.id_venta
-      WHERE v.fecha BETWEEN ? AND ?
-      GROUP BY v.id_venta, v.fecha, v.hora, c.nombre, v.metodo_pago, v.total, v.descuento
-      ORDER BY v.fecha DESC, v.hora DESC
-    `;
-    
-    db.all(sql, [fechaInicio, fechaFin], (err, rows) => {
-      if (err) {
-        res.status(400).json({ error: err.message });
-        return;
-      }
-      res.json({ data: rows });
-    });
-  },
 };
 
 module.exports = ventasController;

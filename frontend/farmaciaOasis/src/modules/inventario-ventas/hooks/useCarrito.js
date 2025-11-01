@@ -4,6 +4,7 @@ import clienteService from '../services/clienteService';
 
 export const useCarrito = (productos, actualizarStockProducto, recargarProductos) => {
   const [carrito, setCarrito] = useState([]);
+  const [descuentoCliente, setDescuentoCliente] = useState(0);
 
   const hayStockDisponible = (producto, cantidadDeseada = 1) => {
     const productoEnInventario = productos.find(p => p.id === producto.id);
@@ -73,35 +74,42 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
 
   const vaciarCarrito = () => {
     setCarrito([]);
+    setDescuentoCliente(0);
+  };
+
+  // ✅ NUEVO: Función para actualizar el descuento
+  const actualizarDescuento = (porcentajeDescuento) => {
+    setDescuentoCliente(parseFloat(porcentajeDescuento) || 0);
   };
 
   const realizarVenta = async (datosCliente) => {
     try {
-      
-
       // ✅ BUSCAR O CREAR CLIENTE (automáticamente reactiva si está inactivo)
       let idCliente = null;
       let clienteReactivado = false;
+      let porcentajeDescuento = 0;
       
       if (datosCliente.ci_nit && datosCliente.ci_nit !== '00000') {
-
-        
         // ✅ Verificar si el cliente existe y está inactivo
         const clienteExistente = await clienteService.obtenerClientePorCI(datosCliente.ci_nit);
-        if (clienteExistente && clienteExistente.estado === 'inactivo') {
-          clienteReactivado = true;
+        if (clienteExistente) {
+          porcentajeDescuento = clienteExistente.descuento || 0;
+          
+          if (clienteExistente.estado === 'inactivo') {
+            clienteReactivado = true;
+          }
         }
         
         idCliente = await clienteService.buscarOCrearCliente(
           datosCliente.nombre,
-          datosCliente.ci_nit
+          datosCliente.ci_nit,
+          porcentajeDescuento
         );
-        
       }
 
       // Preparar datos para el backend
       const ventaData = {
-        cliente: idCliente, // ✅ Enviar ID del cliente, no el CI
+        cliente: idCliente,
         metodo_pago: datosCliente.metodo_pago,
         productos: carrito.map(item => ({
           id: item.id,
@@ -110,22 +118,21 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
         }))
       };
 
-      
-
       // Llamar al servicio
       const resultado = await ventasService.crearVenta(ventaData);
-      
-      const totalReal = resultado.total || totalVenta;
       
       const ventaCompleta = {
         ...resultado,
         datosCliente: datosCliente,
-        clienteReactivado: clienteReactivado, // ✅ Información sobre reactivación
+        clienteReactivado: clienteReactivado,
         productosVendidos: carrito.map(item => ({
           ...item,
           subtotal: item.precio_venta * item.cantidad
         })),
-        total: totalReal
+        total: resultado.total,
+        total_sin_descuento: resultado.total_sin_descuento,
+        descuento_aplicado: resultado.descuento_aplicado,
+        porcentaje_descuento: resultado.porcentaje_descuento
       };
       
       // Recargar productos desde la base de datos
@@ -135,11 +142,6 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
       
       // Vaciar carrito después de venta exitosa
       vaciarCarrito();
-      
-  
-      
-      // ✅ Mostrar mensaje si el cliente fue reactivado
-      
       
       return ventaCompleta;
       
@@ -154,16 +156,23 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
     }
   };
 
-  const totalVenta = carrito.reduce((total, item) => total + (item.precio_venta * item.cantidad), 0);
+  // ✅ ACTUALIZADO: Calcular totales con descuento
+  const totalSinDescuento = carrito.reduce((total, item) => total + (item.precio_venta * item.cantidad), 0);
+  const montoDescuento = totalSinDescuento * (descuentoCliente / 100);
+  const totalConDescuento = totalSinDescuento - montoDescuento;
 
   return {
     carrito,
+    descuentoCliente,
     agregarAlCarrito,
     modificarCantidad,
     eliminarDelCarrito,
     vaciarCarrito,
     realizarVenta,
-    totalVenta,
+    actualizarDescuento,
+    totalVenta: totalConDescuento,
+    totalSinDescuento,
+    montoDescuento,
     hayStockDisponible, 
     obtenerStockDisponible 
   };

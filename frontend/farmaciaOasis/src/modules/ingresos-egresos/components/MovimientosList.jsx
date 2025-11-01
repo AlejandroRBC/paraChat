@@ -52,7 +52,7 @@ function MovimientosList({ movimientos }) {
     
     return (
       <Table.Tr key={movimiento.id}>
-        <Table.Td>#{movimiento.id_producto}</Table.Td>
+        <Table.Td>PROOD {movimiento.id_producto}</Table.Td>
         <Table.Td>{movimiento.nombre}</Table.Td>
         <Table.Td>{movimiento.presentacion}</Table.Td>
         <Table.Td>{movimiento.lote}</Table.Td>
@@ -70,7 +70,14 @@ function MovimientosList({ movimientos }) {
           </Badge>
         </Table.Td>
         <Table.Td>
-          {new Date(movimiento.fecha).toLocaleDateString('es-ES')}
+
+          {(() => {
+            const fecha = new Date(movimiento.fecha);
+            fecha.setDate(fecha.getDate() + 1); // sumamos 1 día
+            return fecha.toLocaleDateString('es-ES');
+          })()}
+        
+
         </Table.Td>
         <Table.Td>{movimiento.hora}</Table.Td>
         <Table.Td>{movimiento.laboratorio}</Table.Td>

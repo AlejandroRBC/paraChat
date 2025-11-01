@@ -1,7 +1,14 @@
-    import html2pdf from 'html2pdf.js';
-    import dayjs from 'dayjs';
+import html2pdf from 'html2pdf.js';
+import dayjs from 'dayjs';
 
-    export function generarPDFVenta(datosVenta, carrito, totalVenta, numeroVenta) {
+export function generarPDFVenta(datosVenta, carrito, totalVenta, numeroVenta, datosConDescuento = {}) {
+    // ✅ EXTRAER DATOS DE DESCUENTO
+    const {
+        totalSinDescuento = totalVenta,
+        montoDescuento = 0,
+        porcentajeDescuento = 0
+    } = datosConDescuento;
+
     // Crear el contenido HTML del comprobante
     const contenidoHTML = `
         <!DOCTYPE html>
@@ -161,6 +168,17 @@
             font-size: 9px;
             font-weight: bold;
             }
+            .descuento-info {
+            background: #f0f9ff;
+            border: 1px solid #b3e5fc;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin: 10px 0;
+            }
+            .descuento-text {
+            color: #0288d1;
+            font-weight: 600;
+            }
         </style>
         </head>
         <body>
@@ -186,6 +204,7 @@
                 <p><strong>Nombre:</strong> ${datosVenta.nombre}</p>
                 <p><strong>CI/NIT:</strong> ${datosVenta.ci_nit || 'S/D'}</p>
                 <p><strong>Método de Pago:</strong> <span class="badge">${datosVenta.metodo_pago.toUpperCase()}</span></p>
+                ${porcentajeDescuento > 0 ? `<p><strong>Descuento Cliente:</strong> <span class="badge" style="background: #4caf50;">${porcentajeDescuento}%</span></p>` : ''}
             </div>
             </div>
 
@@ -214,7 +233,7 @@
                         
                     </td>
                     <td>
-                        ${item.medida}
+                        ${item.medida || 'N/A'}
                     </td>
                     <td class="text-right">Bs ${item.precio_venta.toFixed(2)}</td>
                     
@@ -231,10 +250,17 @@
                 <span class="label">Cantidad de artículos:</span>
                 <span>${carrito.reduce((sum, item) => sum + item.cantidad, 0)}</span>
             </div>
-            <div class="summary-row">
-                <span class="label">Subtotal:</span>
-                <span>Bs ${totalVenta.toFixed(2)}</span>
-            </div>
+            
+            ${porcentajeDescuento > 0 ? `
+                <div class="summary-row">
+                    <span class="label">Subtotal:</span>
+                    <span>Bs ${totalSinDescuento.toFixed(2)}</span>
+                </div>
+                <div class="summary-row descuento-text">
+                    <span class="label">Descuento (${porcentajeDescuento}%):</span>
+                    <span>- Bs ${montoDescuento.toFixed(2)}</span>
+                </div>
+            ` : ''}
             
             <div class="total-row">
                 <span>TOTAL:</span>
@@ -267,9 +293,16 @@
 
     // Generar PDF
     html2pdf().set(opciones).from(contenidoHTML).save();
-    }
+}
 
-    export function imprimirComprobante(datosVenta, carrito, totalVenta, numeroVenta) {
+export function imprimirComprobante(datosVenta, carrito, totalVenta, numeroVenta, datosConDescuento = {}) {
+    // ✅ EXTRAER DATOS DE DESCUENTO
+    const {
+        totalSinDescuento = totalVenta,
+        montoDescuento = 0,
+        porcentajeDescuento = 0
+    } = datosConDescuento;
+
     const contenidoHTML = `
         <!DOCTYPE html>
         <html>
@@ -426,6 +459,10 @@
             font-size: 9px;
             font-weight: bold;
             }
+            .descuento-text {
+            color: #0288d1;
+            font-weight: 600;
+            }
             @media print {
             body {
                 margin: 0;
@@ -458,6 +495,7 @@
                 <p><strong>Nombre:</strong> ${datosVenta.nombre}</p>
                 <p><strong>CI/NIT:</strong> ${datosVenta.ci_nit || 'S/D'}</p>
                 <p><strong>Método de Pago:</strong> <span class="badge">${datosVenta.metodo_pago.toUpperCase()}</span></p>
+                ${porcentajeDescuento > 0 ? `<p><strong>Descuento Cliente:</strong> <span class="badge" style="background: #4caf50;">${porcentajeDescuento}%</span></p>` : ''}
             </div>
             </div>
 
@@ -485,7 +523,7 @@
                         
                     </td>
                     <td>
-                        ${item.medida}
+                        ${item.medida || 'N/A'}
                     </td>
                     <td class="text-right">Bs ${item.precio_venta.toFixed(2)}</td>
                     
@@ -501,10 +539,17 @@
                 <span class="label">Cantidad de artículos:</span>
                 <span>${carrito.reduce((sum, item) => sum + item.cantidad, 0)}</span>
             </div>
-            <div class="summary-row">
-                <span class="label">Subtotal:</span>
-                <span>Bs ${totalVenta.toFixed(2)}</span>
-            </div>
+            
+            ${porcentajeDescuento > 0 ? `
+                <div class="summary-row">
+                    <span class="label">Subtotal:</span>
+                    <span>Bs ${totalSinDescuento.toFixed(2)}</span>
+                </div>
+                <div class="summary-row descuento-text">
+                    <span class="label">Descuento (${porcentajeDescuento}%):</span>
+                    <span>- Bs ${montoDescuento.toFixed(2)}</span>
+                </div>
+            ` : ''}
             
             <div class="total-row">
                 <span>TOTAL:</span>
@@ -527,4 +572,4 @@
     const ventana = window.open('', '_blank');
     ventana.document.write(contenidoHTML);
     ventana.document.close();
-    }
+}

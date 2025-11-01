@@ -35,6 +35,7 @@ function IngresosEgresos() {
   // Opciones para filtros rápidos de fecha
   const opcionesFiltroRapido = [
     { value: 'general', label: 'General' },
+    { value: 'hoy', label: 'Hoy'},
     { value: 'semana', label: 'Semana Actual' },
     { value: 'mes', label: 'Mes Actual' },
     { value: 'año', label: 'Año Actual' },
@@ -46,6 +47,13 @@ function IngresosEgresos() {
     setFiltroRapido(filtro);
     
     switch (filtro) {
+      case 'hoy': 
+      const today = new Date();
+      const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      setDateRange({ start, end });
+      break;
+    
       case 'semana':
         const inicioSemana = new Date(hoy);
         inicioSemana.setDate(hoy.getDate() - hoy.getDay());
@@ -91,20 +99,16 @@ function IngresosEgresos() {
 
   // Función para filtrar por fecha - CORREGIDA
   const filtrarPorFecha = (movimiento) => {
-    if (!dateRange.start && !dateRange.end) return true;
-    
-    const fechaMov = new Date(movimiento.fecha);
-    const fechaInicio = dateRange.start ? new Date(dateRange.start) : null;
-    const fechaFin = dateRange.end ? new Date(dateRange.end) : null;
+    if (!dateRange.start || !dateRange.end) return true;
 
-    // Ajustar fechas para comparación sin hora
-    if (fechaInicio) fechaInicio.setHours(0, 0, 0, 0);
-    if (fechaFin) fechaFin.setHours(23, 59, 59, 999);
-    fechaMov.setHours(12, 0, 0, 0);
+    // Convertir todo a YYYY-MM-DD
+    const fechaMov = movimiento.fecha.slice(0, 10); 
+    const start = dateRange.start.toISOString().slice(0, 10);
+    const end = dateRange.end.toISOString().slice(0, 10);
 
-    return (!fechaInicio || fechaMov >= fechaInicio) &&
-           (!fechaFin || fechaMov <= fechaFin);
+    return fechaMov >= start && fechaMov <= end;
   };
+
 
   // Filtrar movimientos
   const movimientosFiltrados = buscarMovimientos(busqueda)
@@ -124,6 +128,7 @@ function IngresosEgresos() {
     precio_venta: m.precio_venta,
     lote:m.lote,
     tipo: m.tipo,
+    
   }));
 
   // Estadísticas

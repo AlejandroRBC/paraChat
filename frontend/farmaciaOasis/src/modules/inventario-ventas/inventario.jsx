@@ -34,12 +34,16 @@ function Inventario() {
 
   const {
     carrito,
+    descuentoCliente,        // ✅ NUEVO
     agregarAlCarrito,
     modificarCantidad,
     eliminarDelCarrito,
     vaciarCarrito,
     realizarVenta,
+    actualizarDescuento,     // ✅ NUEVO
     totalVenta,
+    totalSinDescuento,       // ✅ NUEVO
+    montoDescuento,          // ✅ NUEVO
     hayStockDisponible,
     obtenerStockDisponible
   } = useCarrito(
@@ -533,10 +537,14 @@ const renderizarResultado = (resultado) => {
         <VentaForm
           carrito={carrito}
           totalVenta={totalVenta}
+          totalSinDescuento={totalSinDescuento}    // ✅ NUEVO
+          montoDescuento={montoDescuento}          // ✅ NUEVO
+          descuentoCliente={descuentoCliente}      // ✅ NUEVO
           onModificarCantidad={modificarCantidad}
           onEliminarItem={eliminarDelCarrito}
           onVaciarCarrito={vaciarCarrito}
           onRealizarVenta={handleRealizarVenta}
+          onActualizarDescuento={actualizarDescuento} // ✅ NUEVO
           onCancel={() => setSidebarAbierto(false)}
           isMobile={isMobile}
         />

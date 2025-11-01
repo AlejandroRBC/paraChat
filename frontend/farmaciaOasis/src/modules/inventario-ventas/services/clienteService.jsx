@@ -1,4 +1,3 @@
-// Ruta: frontend/farmaciaOasis/src/modules/inventario-ventas/services/clienteService.jsx
 
 import axios from 'axios';
 
@@ -29,6 +28,18 @@ const clienteService = {
     }
   },
 
+  // ✅ NUEVO: Buscar cliente por CI exacto (para autocompletado)
+  buscarClientePorCIExacto: async (ci_nit) => {
+    try {
+      const response = await axios.get(`${API_URL}/clientes`);
+      const clientes = response.data.data;
+      return clientes.find(cliente => cliente.ci_nit === ci_nit && cliente.estado === 'activo');
+    } catch (error) {
+      console.error('Error al buscar cliente por CI exacto:', error);
+      throw error;
+    }
+  },
+
   // Crear nuevo cliente
   crearCliente: async (clienteData) => {
     try {
@@ -55,7 +66,6 @@ const clienteService = {
         estado: 'activo'
       });
       
-      
       return responseUpdate.data.data;
     } catch (error) {
       console.error('❌ Error al reactivar cliente:', error);
@@ -75,7 +85,6 @@ const clienteService = {
       const clienteExistente = await clienteService.obtenerClientePorCI(ci_nit);
       
       if (clienteExistente) {
-       
         // ✅ Si el cliente está inactivo, reactivarlo
         if (clienteExistente.estado === 'inactivo') {
           await clienteService.reactivarCliente(clienteExistente.cod_cli);

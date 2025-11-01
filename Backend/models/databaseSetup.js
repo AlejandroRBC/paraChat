@@ -40,11 +40,7 @@ const createTables = () => {
     presentacion TEXT,
     precio_venta REAL,
     precio_compra REAL,
-<<<<<<< HEAD
     medida TEXT,
-=======
-    medida REAL,
->>>>>>> 4becc4ac40e2796f05357041e4d704c2dad6b1a2
     estado TEXT,
     id_lab INTEGER,
     FOREIGN KEY (id_lab) REFERENCES laboratorio(id_lab)
@@ -58,6 +54,7 @@ const createTables = () => {
     total REAL,
     metodo_pago TEXT,
     id_cliente INTEGER,
+    descuento REAL,
     FOREIGN KEY (id_cliente) REFERENCES cliente(cod_cli)
   )`);
 
@@ -75,6 +72,7 @@ const createTables = () => {
   // Historial Ingresos_Egresos
   db.run(`CREATE TABLE IF NOT EXISTS Historial_Ingresos_Egresos (
     id_hie INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_producto INTEGER,
     nombre TEXT,
     presentacion TEXT,
     lote TEXT,
@@ -88,14 +86,19 @@ const createTables = () => {
 
   // TRIGGERS
   db.serialize(() => {
-    // Trigger para registrar movimientos de venta
+    //Eliminar triggers antiguos para evitar duplicados
     db.run(`DROP TRIGGER IF EXISTS registrar_movimiento_venta`);
+    db.run(`DROP TRIGGER IF EXISTS registrar_egreso_stock`);
+    db.run(`DROP TRIGGER IF EXISTS registrar_ingreso_producto_nuevo`);
+    db.run(`DROP TRIGGER IF EXISTS registrar_ingreso_actualizacion_stock`);
+
+    //trigger para registrar movimiento de venta (egreso)
     db.run(`CREATE TRIGGER registrar_movimiento_venta
       AFTER INSERT ON detalle_venta
       FOR EACH ROW
       BEGIN
-        -- Insertar movimiento en historial
         INSERT INTO Historial_Ingresos_Egresos (
+          id_producto,
           nombre,
           presentacion,
           lote,
@@ -106,62 +109,31 @@ const createTables = () => {
           fecha,
           hora
         )
-        VALUES (
-          (SELECT nombre_prod FROM producto WHERE id_producto = NEW.id_producto),
-          (SELECT presentacion FROM producto WHERE id_producto = NEW.id_producto),
-          (SELECT lote FROM producto WHERE id_producto = NEW.id_producto),
-          (SELECT precio_venta FROM producto WHERE id_producto = NEW.id_producto),
-          (SELECT stock FROM producto WHERE id_producto = NEW.id_producto),
-          (SELECT stock - NEW.cantidad FROM producto WHERE id_producto = NEW.id_producto),
-          (SELECT nombre_labo FROM laboratorio WHERE id_lab = (SELECT id_lab FROM producto WHERE id_producto = NEW.id_producto)),
+        SELECT
+          p.id_producto,
+          p.nombre_prod,
+          p.presentacion,
+          p.lote,
+          p.precio_venta,
+          p.stock,
+          p.stock - NEW.cantidad,
+          l.nombre_labo,
           DATE('now','localtime'),
           TIME('now','localtime')
-        );
+        FROM producto p
+        JOIN laboratorio l ON p.id_lab = l.id_lab
+        WHERE p.id_producto = NEW.id_producto;
 
-        -- Actualizar stock
-        UPDATE producto
-        SET stock = stock - NEW.cantidad
-        WHERE id_producto = NEW.id_producto;
-      END;`
-    );
+      END;
+    `);
 
-    // Trigger para los egresos (salida de productos)
-    db.run(`DROP TRIGGER IF EXISTS registrar_egreso_stock`);
-    db.run(`CREATE TRIGGER registrar_egreso_stock
-      AFTER UPDATE ON producto
-      FOR EACH ROW
-      WHEN NEW.stock < OLD.stock
-      BEGIN
-        INSERT INTO Historial_Ingresos_Egresos (
-          nombre,
-          presentacion,
-          lote,
-          precio_venta,
-          stock_antiguo,
-          stock_nuevo,
-          laboratorio,
-          fecha,
-          hora
-        )
-        VALUES (
-          NEW.nombre_prod,
-          NEW.presentacion,
-          NEW.lote,
-          NEW.precio_venta,
-          OLD.stock,
-          NEW.stock,
-          (SELECT nombre_labo FROM laboratorio WHERE id_lab = NEW.id_lab),
-          DATE('now','localtime'),
-          TIME('now','localtime')
-        );
-      END;`);
-
-    // Trigger para nuevo producto (ingreso)
-    db.run(`CREATE TRIGGER IF NOT EXISTS registrar_ingreso_producto_nuevo
+    //Trigger pararegistrar ingreso al agregar nuevo producto
+    db.run(`CREATE TRIGGER registrar_ingreso_producto_nuevo
       AFTER INSERT ON producto
       FOR EACH ROW
       BEGIN
         INSERT INTO Historial_Ingresos_Egresos (
+          id_producto,
           nombre,
           presentacion,
           lote,
@@ -170,24 +142,28 @@ const createTables = () => {
           stock_nuevo,
           laboratorio
         )
-        VALUES (
+        SELECT
+          NEW.id_producto,
           NEW.nombre_prod,
           NEW.presentacion,
           NEW.lote,
           NEW.precio_venta,
           0,
           NEW.stock,
-          (SELECT nombre_labo FROM laboratorio WHERE id_lab = NEW.id_lab)
-        );
-      END;`);
+          l.nombre_labo
+        FROM laboratorio l
+        WHERE l.id_lab = NEW.id_lab;
+      END;
+    `);
 
-    // Trigger para actualización de stock (solo aumentos) (ingreso)
-    db.run(`CREATE TRIGGER IF NOT EXISTS registrar_ingreso_actualizacion_stock
+    // Trigger para registrar ingreso al aumentar stock
+    db.run(`CREATE TRIGGER registrar_ingreso_actualizacion_stock
       AFTER UPDATE ON producto
       FOR EACH ROW
       WHEN NEW.stock > OLD.stock
       BEGIN
         INSERT INTO Historial_Ingresos_Egresos (
+          id_producto,
           nombre,
           presentacion,
           lote,
@@ -196,18 +172,20 @@ const createTables = () => {
           stock_nuevo,
           laboratorio
         )
-        VALUES (
+        SELECT
+          NEW.id_producto,
           NEW.nombre_prod,
           NEW.presentacion,
           NEW.lote,
           NEW.precio_venta,
           OLD.stock,
           NEW.stock,
-          (SELECT nombre_labo FROM laboratorio WHERE id_lab = NEW.id_lab)
-        );
-      END;`);
-  
-     // Trigger para desactivar producto cuando stock llega a 0
+          l.nombre_labo
+        FROM laboratorio l
+        WHERE l.id_lab = NEW.id_lab;
+      END;
+    `);
+        // Trigger para desactivar producto cuando stock llega a 0
   db.run(`CREATE TRIGGER IF NOT EXISTS desactivar_producto_stock_cero
     AFTER UPDATE ON producto
     FOR EACH ROW
@@ -218,30 +196,6 @@ const createTables = () => {
       WHERE id_producto = NEW.id_producto;
     END;`);
 
-  // Trigger para desactivar producto cuando vence
-  db.run(`CREATE TRIGGER IF NOT EXISTS desactivar_producto_vencido
-    AFTER UPDATE ON producto
-    FOR EACH ROW
-    WHEN NEW.fecha_exp IS NOT NULL 
-      AND DATE(NEW.fecha_exp) < DATE('now','localtime') 
-      AND NEW.estado = 'activo'
-      AND (OLD.fecha_exp IS NULL OR DATE(OLD.fecha_exp) >= DATE('now','localtime'))
-    BEGIN
-      UPDATE producto 
-      SET estado = 'desactivado' 
-      WHERE id_producto = NEW.id_producto;
-    END;`);
-
-  // Trigger adicional: verificar productos vencidos al insertar
-  db.run(`CREATE TRIGGER IF NOT EXISTS verificar_vencimiento_al_insertar
-    AFTER INSERT ON producto
-    FOR EACH ROW
-    WHEN NEW.fecha_exp IS NOT NULL AND DATE(NEW.fecha_exp) < DATE('now','localtime')
-    BEGIN
-      UPDATE producto 
-      SET estado = 'desactivado' 
-      WHERE id_producto = NEW.id_producto;
-    END;`);
 
   });
 };
