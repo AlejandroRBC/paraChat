@@ -12,12 +12,14 @@ const ventasController = {
         c.ci_nit,
         v.metodo_pago,
         v.total,
+        v.descuento,
+        (v.total + COALESCE(v.descuento, 0)) as total_sin_descuento,
         GROUP_CONCAT(p.nombre_prod || ' x' || dv.cantidad, ', ') AS productos
       FROM venta v
       LEFT JOIN cliente c ON v.id_cliente = c.cod_cli
       INNER JOIN detalle_venta dv ON dv.id_venta = v.id_venta
       INNER JOIN producto p ON dv.id_producto = p.id_producto
-      GROUP BY v.id_venta, v.fecha, v.hora, c.nombre, c.ci_nit, v.metodo_pago, v.total
+      GROUP BY v.id_venta, v.fecha, v.hora, c.nombre, c.ci_nit, v.metodo_pago, v.total, v.descuento
       ORDER BY v.fecha DESC, v.hora DESC
     `;
     
@@ -38,7 +40,8 @@ const ventasController = {
       SELECT 
         v.*,
         c.nombre as cliente_nombre,
-        c.ci_nit as cliente_ci_nit
+        c.ci_nit as cliente_ci_nit,
+        c.descuento as porcentaje_descuento_cliente
       FROM venta v
       LEFT JOIN cliente c ON v.id_cliente = c.cod_cli
       WHERE v.id_venta = ?
@@ -77,113 +80,144 @@ const ventasController = {
     });
   },
 
- 
   create: (req, res) => {
     const { cliente, metodo_pago, productos } = req.body;
     
-    // Calcular total
-    const total = productos.reduce((sum, producto) => {
+    // Calcular total sin descuento
+    const totalSinDescuento = productos.reduce((sum, producto) => {
       return sum + (producto.precio * producto.cantidad);
     }, 0);
     
     // Iniciar transacción
     db.serialize(() => {
-      // Insertar venta
-      const sqlVenta = `
-        INSERT INTO venta (total, metodo_pago, id_cliente)
-        VALUES (?, ?, ?)
-      `;
+      // Primero obtener el descuento del cliente si existe
+      const obtenerDescuentoCliente = (callback) => {
+        if (!cliente) {
+          callback(null, 0);
+          return;
+        }
+        
+        const sqlDescuento = "SELECT descuento FROM cliente WHERE cod_cli = ?";
+        db.get(sqlDescuento, [cliente], (err, row) => {
+          if (err) {
+            callback(err);
+            return;
+          }
+          callback(null, row ? row.descuento : 0);
+        });
+      };
       
-      db.run(sqlVenta, [total, metodo_pago, cliente || null], function(err) {
+      obtenerDescuentoCliente((err, descuentoCliente) => {
         if (err) {
           res.status(400).json({ error: err.message });
           return;
         }
         
-        const ventaId = this.lastID;
-        const detalles = [];
+        // Calcular descuento y total final
+        const descuentoAplicado = totalSinDescuento * (descuentoCliente / 100);
+        const totalFinal = totalSinDescuento - descuentoAplicado;
         
-        // ✅ FUNCIÓN PARA ACTUALIZAR STOCK
-        const actualizarStockProducto = (productoId, cantidad, callback) => {
-          const sqlActualizarStock = `
-            UPDATE producto 
-            SET stock = stock - ? 
-            WHERE id_producto = ? AND estado = 'activo'
-          `;
+        // Insertar venta con descuento
+        const sqlVenta = `
+          INSERT INTO venta (total, metodo_pago, id_cliente, descuento)
+          VALUES (?, ?, ?, ?)
+        `;
+        
+        db.run(sqlVenta, [totalFinal, metodo_pago, cliente || null, descuentoAplicado], function(err) {
+          if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+          }
           
-          db.run(sqlActualizarStock, [cantidad, productoId], function(err) {
-            if (err) {
-              callback(err);
-              return;
-            }
-            
-            if (this.changes === 0) {
-              callback(new Error(`Producto no encontrado o inactivo: ${productoId}`));
-              return;
-            }
-            
-            callback(null);
-          });
-        };
-        
-        // Insertar cada detalle de venta y actualizar stock
-        let productosProcesados = 0;
-        let errorOcurrido = null;
-        
-        productos.forEach((producto) => {
-          const subtotal = producto.precio * producto.cantidad;
+          const ventaId = this.lastID;
+          const detalles = [];
           
-          // ✅ PRIMERO: Actualizar el stock del producto
-          actualizarStockProducto(producto.id, producto.cantidad, (err) => {
-            if (err) {
-              errorOcurrido = err;
-              return;
-            }
-            
-            // ✅ SEGUNDO: Insertar el detalle de venta
-            const sqlDetalle = `
-              INSERT INTO detalle_venta (id_venta, id_producto, cantidad, subtotal)
-              VALUES (?, ?, ?, ?)
+          // ✅ FUNCIÓN PARA ACTUALIZAR STOCK
+          const actualizarStockProducto = (productoId, cantidad, callback) => {
+            const sqlActualizarStock = `
+              UPDATE producto 
+              SET stock = stock - ? 
+              WHERE id_producto = ? AND estado = 'activo'
             `;
             
-            db.run(sqlDetalle, [ventaId, producto.id, producto.cantidad, subtotal], function(err) {
+            db.run(sqlActualizarStock, [cantidad, productoId], function(err) {
+              if (err) {
+                callback(err);
+                return;
+              }
+              
+              if (this.changes === 0) {
+                callback(new Error(`Producto no encontrado o inactivo: ${productoId}`));
+                return;
+              }
+              
+              callback(null);
+            });
+          };
+          
+          // Insertar cada detalle de venta y actualizar stock
+          let productosProcesados = 0;
+          let errorOcurrido = null;
+          
+          productos.forEach((producto) => {
+            const subtotal = producto.precio * producto.cantidad;
+            
+            // ✅ PRIMERO: Actualizar el stock del producto
+            actualizarStockProducto(producto.id, producto.cantidad, (err) => {
               if (err) {
                 errorOcurrido = err;
                 return;
               }
               
-              detalles.push({
-                id_detalle: this.lastID,
-                id_producto: producto.id,
-                cantidad: producto.cantidad,
-                subtotal: subtotal
-              });
+              // ✅ SEGUNDO: Insertar el detalle de venta
+              const sqlDetalle = `
+                INSERT INTO detalle_venta (id_venta, id_producto, cantidad, subtotal)
+                VALUES (?, ?, ?, ?)
+              `;
               
-              productosProcesados++;
-              
-              // Cuando todos los productos han sido procesados
-              if (productosProcesados === productos.length) {
-                if (errorOcurrido) {
-                  res.status(400).json({ error: errorOcurrido.message });
+              db.run(sqlDetalle, [ventaId, producto.id, producto.cantidad, subtotal], function(err) {
+                if (err) {
+                  errorOcurrido = err;
                   return;
                 }
                 
-                res.json({
-                  data: {
-                    id_venta: ventaId,
-                    total,
-                    metodo_pago,
-                    id_cliente: cliente,
-                    detalles
-                  }
+                detalles.push({
+                  id_detalle: this.lastID,
+                  id_producto: producto.id,
+                  cantidad: producto.cantidad,
+                  subtotal: subtotal
                 });
-              }
+                
+                productosProcesados++;
+                
+                // Cuando todos los productos han sido procesados
+                if (productosProcesados === productos.length) {
+                  if (errorOcurrido) {
+                    res.status(400).json({ error: errorOcurrido.message });
+                    return;
+                  }
+                  
+                  res.json({
+                    data: {
+                      id_venta: ventaId,
+                      total: totalFinal,
+                      total_sin_descuento: totalSinDescuento,
+                      descuento_aplicado: descuentoAplicado,
+                      porcentaje_descuento: descuentoCliente,
+                      metodo_pago,
+                      id_cliente: cliente,
+                      detalles
+                    }
+                  });
+                }
+              });
             });
           });
         });
       });
     });
   },
+
   // Obtener historial de ingresos/egresos
   getHistorialIngresosEgresos: (req, res) => {
     const sql = `
@@ -213,12 +247,14 @@ const ventasController = {
         c.nombre AS cliente,
         v.metodo_pago,
         v.total,
+        v.descuento,
+        (v.total + COALESCE(v.descuento, 0)) as total_sin_descuento,
         COUNT(dv.id_detalle) as cantidad_productos
       FROM venta v
       LEFT JOIN cliente c ON v.id_cliente = c.cod_cli
       LEFT JOIN detalle_venta dv ON v.id_venta = dv.id_venta
       WHERE v.fecha BETWEEN ? AND ?
-      GROUP BY v.id_venta, v.fecha, v.hora, c.nombre, v.metodo_pago, v.total
+      GROUP BY v.id_venta, v.fecha, v.hora, c.nombre, v.metodo_pago, v.total, v.descuento
       ORDER BY v.fecha DESC, v.hora DESC
     `;
     
@@ -230,8 +266,6 @@ const ventasController = {
       res.json({ data: rows });
     });
   },
-
 };
-
 
 module.exports = ventasController;

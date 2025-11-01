@@ -10,6 +10,7 @@ const historialController = {
     const sql = `
       SELECT 
         id_hie as id,
+        id_producto,
         nombre,
         presentacion,
         lote,
@@ -59,6 +60,7 @@ const historialController = {
     const sql = `
       SELECT 
         id_hie as id,
+        id_producto,
         nombre,
         presentacion,
         lote,
@@ -103,6 +105,7 @@ const historialController = {
     const sql = `
       SELECT 
         id_hie as id,
+        id_producto,
         nombre,
         presentacion,
         lote,
